@@ -1,11 +1,13 @@
-import { Button } from '@/components/ui/button';
+import Header from './components/ui/Header';
 
 const App = () => {
   return (
-    <div>
-      welcome
-      <Button>Click me</Button>
-    </div>
+    <>
+      <Header />
+      <div className='w-full mx-auto px-4'>
+        <main></main>
+      </div>
+    </>
   );
 };
 
