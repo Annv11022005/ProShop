@@ -1,13 +1,18 @@
-import Header from './components/ui/Header';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import AppLayout from './components/ui/AppLayout';
+import HomeScreen from './screens/HomeScreen';
+import ProductScreen from './screens/ProductScreen';
 
 const App = () => {
   return (
-    <>
-      <Header />
-      <div className='w-full mx-auto px-4'>
-        <main></main>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path='/' element={<HomeScreen />} />
+          <Route path='/product/:id' element={<ProductScreen />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

@@ -1,3 +1,4 @@
+import { Link, NavLink } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { LogIn, ShoppingCart } from 'lucide-react';
 
@@ -6,18 +7,23 @@ const Header = () => {
     <header>
       <nav className='navbar'>
         <div className='brand'>
-          <a href='/' className='text-white'>
-            ProShop
-          </a>
+          <div className='mark'>
+            <div className='glyph'></div>
+          </div>
+          <Link href='/'>ProShop</Link>
         </div>
 
         <div className='flex gap-3 action'>
-          <Button size='lg'>
-            <ShoppingCart /> Cart
-          </Button>
-          <Button size='lg'>
-            <LogIn /> Sign in
-          </Button>
+          <NavLink to='/cart'>
+            <Button size='lg'>
+              <ShoppingCart /> Cart
+            </Button>
+          </NavLink>
+          <NavLink to='/login'>
+            <Button size='lg'>
+              <LogIn /> Sign in
+            </Button>
+          </NavLink>
         </div>
       </nav>
     </header>
