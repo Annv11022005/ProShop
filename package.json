@@ -1,0 +1,37 @@
+{
+  "name": "package",
+  "version": "1.0.0",
+  "description": "eCommerce",
+  "homepage": "https://github.com/Annv11022005/ProShop#readme",
+  "bugs": {
+    "url": "https://github.com/Annv11022005/ProShop/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Annv11022005/ProShop.git"
+  },
+  "license": "MIT",
+  "author": "Anify",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "node backend/seeder.js",
+    "data:destroy": "node backend/seeder.js -d"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "colors": "^1.4.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.7.4"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "nodemon": "^3.1.14"
+  }
+}
