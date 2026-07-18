@@ -193,10 +193,14 @@
   @apply text-primary text-2xl font-medium;
 }
 
-.flex-beetwen-center {
+.flex-between-center {
   @apply flex items-center justify-between;
 }
 
 .line {
   @apply w-full h-px bg-sidebar-border;
+}
+
+.buble {
+  @apply absolute rounded-full bg-muted w-5 h-5 text-sm text-primary z-1 -top-2 -right-1 flex items-center justify-center;
 }

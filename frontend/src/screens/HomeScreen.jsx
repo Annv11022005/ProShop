@@ -1,23 +1,29 @@
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import Product from '@/components/ui/Product';
-import { useProducts } from '@/features/Cart/useProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { Spinner } from '@/components/ui/spinner';
+import { Message } from '@/components/ui/Message';
 
 const HomeScreen = () => {
   const { isPending, error, data: products } = useProducts();
 
-  if (isPending) return <Spinner />;
-  if (error) return <p>Lỗi: {error.message}</p>;
-
   return (
-    <Row>
-      {products.map((product) => (
-        <Col key={product._id}>
-          <Product product={product} />
-        </Col>
-      ))}
-    </Row>
+    <>
+      {isPending ? (
+        <Spinner />
+      ) : error ? (
+        <Message>{error?.data?.message || error.error}</Message>
+      ) : (
+        <Row>
+          {products.map((product) => (
+            <Col key={product._id}>
+              <Product product={product} />
+            </Col>
+          ))}
+        </Row>
+      )}
+    </>
   );
 };
 

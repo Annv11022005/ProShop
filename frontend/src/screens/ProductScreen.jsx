@@ -1,4 +1,4 @@
-import ProductDetail from '@/features/Cart/ProductDetail';
+import ProductDetail from '@/features/product/ProductDetail';
 
 const ProductScreen = () => {
   return <ProductDetail />;

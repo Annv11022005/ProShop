@@ -1,8 +1,12 @@
 import { Link, NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
 import { Button } from '../ui/button';
 import { LogIn, ShoppingCart } from 'lucide-react';
 
 const Header = () => {
+  const { cartItems } = useSelector((state) => state.cart);
+
   return (
     <header>
       <nav className='navbar'>
@@ -15,8 +19,11 @@ const Header = () => {
 
         <div className='flex gap-3 action'>
           <NavLink to='/cart'>
-            <Button size='lg'>
+            <Button size='lg' className=' relative'>
               <ShoppingCart /> Cart
+              {cartItems.length > 0 && (
+                <span className='buble'>{cartItems.length}</span>
+              )}
             </Button>
           </NavLink>
           <NavLink to='/login'>
