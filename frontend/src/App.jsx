@@ -4,10 +4,15 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Provider } from 'react-redux';
 import store from './store';
 
-import AppLayout from './components/ui/AppLayout';
-import HomeScreen from './screens/HomeScreen';
-import ProductScreen from './screens/ProductScreen';
-import CartScreen from './screens/CartScreen';
+import AppLayout from '@/components/AppLayout';
+import HomeScreen from '@/screens/HomeScreen';
+import ProductScreen from '@/screens/ProductScreen';
+import CartScreen from '@/screens/CartScreen';
+import LoginScreen from '@/screens/LoginScreen';
+import RegisterScreen from '@/screens/RegisterScreen';
+import ShippingScreen from '@/screens/ShippingScreen';
+import PrivateRoutes from '@/components/PrivateRoutes';
+import PaymentScreen from './screens/PaymentScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,6 +33,13 @@ const App = () => {
               <Route path='/' element={<HomeScreen />} />
               <Route path='/product/:id' element={<ProductScreen />} />
               <Route path='/cart' element={<CartScreen />} />
+              <Route path='/login' element={<LoginScreen />} />
+              <Route path='/register' element={<RegisterScreen />} />
+
+              <Route element={<PrivateRoutes />}>
+                <Route path='/shipping' element={<ShippingScreen />} />
+                <Route path='/payment' element={<PaymentScreen />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>

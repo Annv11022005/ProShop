@@ -9,8 +9,8 @@ import {
   registerUser,
   updateUser,
   updateUserProfile,
-} from '../controller/userController';
-import { admin, protect } from '../middleware/authMiddleware';
+} from '../controller/userController.js';
+import { admin, protect } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.route('/').get(protect, admin, getUsers).post(registerUser);

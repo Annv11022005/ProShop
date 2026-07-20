@@ -7,9 +7,7 @@ const CartSummary = ({ cartItems }) => {
       <CardHeader>
         <CardTitle>
           <h3 className='text-primary text-3xl font-semibold mb-3 text-center'>
-            Subtotal
-            {cartItems.reduce((acc, item) => acc + item.qty, 0)}
-            items
+            Subtotal {cartItems.reduce((acc, item) => acc + item.qty, 0)} items
           </h3>
           <p className='text-muted-foreground font-medium text-xl italic'>
             ${' '}
