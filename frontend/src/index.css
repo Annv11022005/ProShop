@@ -51,6 +51,7 @@
 }
 
 :root {
+  --success: #a4ce8b;
   --accent-primary: oklch(0.7 0.15 25);
   --accent-secondary: oklch(0.75 0.15 340);
   --background: oklch(1 0 0);

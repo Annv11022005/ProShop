@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-const CartSummary = ({ cartItems }) => {
+const CartSummary = ({ cartItems, checkoutHandler }) => {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +19,11 @@ const CartSummary = ({ cartItems }) => {
       </CardHeader>
 
       <CardFooter>
-        <Button size='lg' disable={cartItems.length === 0}>
+        <Button
+          size='lg'
+          disable={cartItems.length === 0}
+          onClick={checkoutHandler}
+        >
           Process To Checkout
         </Button>
       </CardFooter>

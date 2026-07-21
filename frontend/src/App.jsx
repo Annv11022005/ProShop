@@ -12,7 +12,9 @@ import LoginScreen from '@/screens/LoginScreen';
 import RegisterScreen from '@/screens/RegisterScreen';
 import ShippingScreen from '@/screens/ShippingScreen';
 import PrivateRoutes from '@/components/PrivateRoutes';
-import PaymentScreen from './screens/PaymentScreen';
+import PaymentScreen from '@/screens/PaymentScreen';
+import PlaceOrderScreen from '@/screens/PlaceOrderScreen';
+import OrderScreen from './screens/OrderScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,13 +34,15 @@ const App = () => {
             <Route element={<AppLayout />}>
               <Route path='/' element={<HomeScreen />} />
               <Route path='/product/:id' element={<ProductScreen />} />
-              <Route path='/cart' element={<CartScreen />} />
               <Route path='/login' element={<LoginScreen />} />
               <Route path='/register' element={<RegisterScreen />} />
 
               <Route element={<PrivateRoutes />}>
+                <Route path='/cart' element={<CartScreen />} />
                 <Route path='/shipping' element={<ShippingScreen />} />
                 <Route path='/payment' element={<PaymentScreen />} />
+                <Route path='/place-order' element={<PlaceOrderScreen />} />
+                <Route path='/order/:id' element={<OrderScreen />} />
               </Route>
             </Route>
           </Routes>

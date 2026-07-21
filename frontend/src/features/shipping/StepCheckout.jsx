@@ -52,7 +52,7 @@ const StepCheckout = ({ step1, step2, step3, step4 }) => {
 
           <BreadcrumbItem>
             {step4 ? (
-              <BreadcrumbLink render={<Link to='/' />}>
+              <BreadcrumbLink render={<Link to='/place-order' />}>
                 Place Order
               </BreadcrumbLink>
             ) : (

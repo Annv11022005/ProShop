@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/Authentication/authSlice';
 import { useLogout } from '@/hooks/useAuth';
 
-import { Button } from '../ui/button';
+import { Button } from './ui/button';
 import { LogIn, LogOutIcon, ShoppingCart, UserIcon } from 'lucide-react';
 import {
   DropdownMenu,
@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './dropdown-menu';
+} from './ui/dropdown-menu';
 import { toast } from 'sonner';
 
 const Header = () => {
@@ -48,7 +48,7 @@ const Header = () => {
           <NavLink to='/cart'>
             <Button size='lg' className=' relative'>
               <ShoppingCart /> Cart
-              {cartItems.length > 0 && (
+              {userInfo && cartItems.length > 0 && (
                 <span className='buble'>{cartItems.length}</span>
               )}
             </Button>
