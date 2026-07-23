@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { setCredentials } from './authSlice';
-import { useRegister } from '@/hooks/useAuth';
+import { useRegister } from './hooks/useAuth';
 
 import useToggle from '@/lib/handleToggle';
 

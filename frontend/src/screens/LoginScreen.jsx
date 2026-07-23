@@ -1,4 +1,4 @@
-import LoginForm from '@/features/Authentication/LoginForm';
+import LoginForm from '@/features/authentication/LoginForm';
 
 const LoginScreen = () => {
   return (

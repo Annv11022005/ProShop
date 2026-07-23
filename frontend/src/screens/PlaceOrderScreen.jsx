@@ -1,4 +1,4 @@
-import PlaceOrderPage from '@/features/place-order/PlaceOrderPage';
+import { PlaceOrderPage } from '@/features/checkout';
 
 const PlaceOrderScreen = () => {
   return (

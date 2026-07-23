@@ -24,7 +24,7 @@ const Product = ({ product }) => {
         <Link to={`/product/${product._id}`}>
           <h1 className='product-title'>{product.name}</h1>
         </Link>
-        <Rating value={product.rating} text={`${product.numReviews} reviews`} />
+        <Rating value={product.rating} text={`${product.numberViews} reviews`} />
       </CardContent>
       <CardFooter>
         <div className='flex items-center w-full justify-between'>

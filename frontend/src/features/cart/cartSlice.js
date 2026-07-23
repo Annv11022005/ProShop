@@ -1,4 +1,4 @@
-import { updateCart } from '@/lib/cartUtils';
+import { updateCart } from './utils/cartUtils';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = localStorage.getItem('cart')

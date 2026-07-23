@@ -1,4 +1,4 @@
-import { getProduct } from '@/services/apiProducts';
+import { getProduct } from '../api/apiProducts';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 

@@ -11,3 +11,15 @@ export async function getOrderbyID(id) {
 
   return res.data;
 }
+
+export async function payOrder({ id, detail }) {
+  const res = await axios.put(`/api/orders/${id}/pay`, detail);
+
+  return res.data;
+}
+
+export async function getPaypalClientId() {
+  const res = await axios.get(`/api/config/paypal`);
+
+  return res.data;
+}

@@ -11,12 +11,14 @@ export function Message({ children, variant = 'danger' }) {
       </Alert>
     );
   } else if (variant === 'success') {
-    <Alert
-      variant='destructive'
-      className='max-w-md text-success border-success'
-    >
-      <BadgeCheckIcon />
-      {children}
-    </Alert>;
+    return (
+      <Alert
+        variant='destructive'
+        className='max-w-md text-[#7aca4c] border-[#a4ce8b]'
+      >
+        <BadgeCheckIcon />
+        {children}
+      </Alert>
+    );
   }
 }

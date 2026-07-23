@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { savePaymentMethod } from '../cart/cartSlice';
+import { savePaymentMethod } from '../../cart/cartSlice';
 
 import {
   FieldGroup,
@@ -10,7 +10,7 @@ import {
   FieldContent,
   FieldLabel,
 } from '@/components/ui/field';
-import StepCheckout from '../shipping/StepCheckout';
+import StepCheckout from '../components/StepCheckout';
 import { Button } from '@/components/ui/button';
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
 

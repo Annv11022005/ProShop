@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '@/features/Authentication/authSlice';
-import { useLogout } from '@/hooks/useAuth';
+import { logout } from '@/features/authentication/authSlice';
+import { useLogout } from '@/features/authentication/hooks/useAuth';
 
 import { Button } from './ui/button';
 import { LogIn, LogOutIcon, ShoppingCart, UserIcon } from 'lucide-react';

@@ -1,4 +1,4 @@
-import { login, logout, register } from '@/services/apiUsers';
+import { login, logout, register } from '../api/apiUsers';
 import { useMutation } from '@tanstack/react-query';
 
 export function useLogin() {

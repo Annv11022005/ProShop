@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import StepCheckout from '../shipping/StepCheckout';
+import StepCheckout from '../components/StepCheckout';
 import { Field, FieldGroup, FieldSet, FieldTitle } from '@/components/ui/field';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import { Message } from '@/components/ui/Message';
-import ListItems from './ListItems';
-import PlaceOrderSummary from './PlaceOrderSummary';
-import { useCreateOrder } from '@/hooks/useOrders';
-import { clearCartItems } from '../cart/cartSlice';
+import ListItems from '../components/ListItems';
+import PlaceOrderSummary from '../components/PlaceOrderSummary';
+import { useCreateOrder } from '@/features/order/hooks/useOrders';
+import { clearCartItems } from '../../cart/cartSlice';
 import { toast } from 'sonner';
 
 const PlaceOrderPage = () => {

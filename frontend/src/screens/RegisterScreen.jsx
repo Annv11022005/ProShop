@@ -1,4 +1,4 @@
-import RegisterForm from '@/features/Authentication/RegisterForm';
+import RegisterForm from '@/features/authentication/RegisterForm';
 
 const RegisterScreen = () => {
   return (

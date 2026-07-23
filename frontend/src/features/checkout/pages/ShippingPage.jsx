@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import FormAddress from './FormAddress';
+import FormAddress from '../components/FormAddress';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { saveShippingAddress } from '../cart/cartSlice';
-import StepCheckout from './StepCheckout';
+import { saveShippingAddress } from '../../cart/cartSlice';
+import StepCheckout from '../components/StepCheckout';
 
 const ShippingPage = () => {
   const cart = useSelector((state) => state.cart);

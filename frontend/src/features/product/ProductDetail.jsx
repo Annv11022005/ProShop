@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../cart/cartSlice.js';
 
-import { useProduct } from '../../hooks/useProduct.js';
+import { useProduct } from './hooks/useProduct';
 
 import { ChevronLeft } from 'lucide-react';
 
@@ -58,7 +58,7 @@ const ProductDetail = () => {
 
               <Rating
                 value={product.rating}
-                text={`${product.numReviews} reviews`}
+                text={`${product.numberViews} reviews`}
               />
 
               <span className='line' />

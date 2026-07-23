@@ -1,7 +1,7 @@
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import Product from '@/components/ui/Product';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/features/product/hooks/useProducts';
 import { Spinner } from '@/components/ui/spinner';
 import { Message } from '@/components/ui/Message';
 

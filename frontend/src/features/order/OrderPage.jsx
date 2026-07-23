@@ -1,18 +1,112 @@
-import { useGetOrderDetail } from '@/hooks/useOrders';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import {
+  useGetOrderDetail,
+  usePayOrder,
+  useGetPayPalClientById,
+} from './hooks/useOrders';
 
+import Item from '../checkout/components/Item';
 import Col from '@/components/ui/Col';
 import Row from '@/components/ui/Row';
 import { Message } from '@/components/ui/Message';
 import { Spinner } from '@/components/ui/spinner';
 import { FieldGroup, FieldSet, FieldTitle, Field } from '@/components/ui/field';
-import Item from '../place-order/Item';
-import PlaceOrderSummary from '../place-order/PlaceOrderSummary';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 const OrderPage = () => {
-  const { isPending, error, order } = useGetOrderDetail();
+  const { id: orderId } = useParams();
 
-  if (isPending) return <Spinner />;
+  const {
+    isPending: pendingGetOrderDetail,
+    error,
+    order,
+  } = useGetOrderDetail(orderId);
+
+  const { isPending: pendingPay, payOrderItem } = usePayOrder();
+
+  const [{ isPending: isPaypalScriptPending }, paypalDispatch] =
+    usePayPalScriptReducer();
+
+  const {
+    isPending: pendingPaypal,
+    paypal,
+    error: errorPaypal,
+  } = useGetPayPalClientById();
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!errorPaypal && !pendingPaypal && paypal?.clientId) {
+      const loadPaypalScript = async () => {
+        paypalDispatch({
+          type: 'resetOption',
+          value: {
+            'client-id': paypal.clientId,
+            currency: 'USD',
+          },
+        });
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
+
+      if (order && !order.isPaid) {
+        if (!window.paypal) {
+          loadPaypalScript();
+        }
+      }
+    }
+  }, [order, paypal, paypalDispatch, pendingPaypal, errorPaypal]);
+
+  if (pendingGetOrderDetail) return <Spinner />;
   if (error) return <Message>{error.message}</Message>;
+
+  function onApprove(data, actions) {
+    return actions.order.capture().then(async function (details) {
+      try {
+        await payOrderItem({ orderId, details });
+        toast.success('Payment successfully');
+      } catch (error) {
+        toast.error(error?.data?.message || error?.message || 'payment error');
+      }
+    });
+  }
+
+  // async function onApproveTest() {
+  //   await payOrderItem({ orderId, details: { payer: {} } });
+  //   toast.success('Payment successfully');
+  // }
+
+  function createOrder(data, actions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: {
+              value: order.totalPrice,
+            },
+          },
+        ],
+      })
+      .then((paypalOrderId) => {
+        return paypalOrderId;
+      });
+  }
+
+  function onError(err) {
+    toast.error(err.message);
+  }
+
+  if (!order) return null;
 
   return (
     <>
@@ -59,7 +153,7 @@ const OrderPage = () => {
                 <Field>
                   {order.isDelivered ? (
                     <Message variant='success'>
-                      Delivered on {order.Delivered}
+                      Delivered on {order.deliveredAt}
                     </Message>
                   ) : (
                     <Message variant='danger'>Not Delivered</Message>
@@ -104,11 +198,55 @@ const OrderPage = () => {
           </Col>
 
           <Col fluid>
-            <PlaceOrderSummary
-              cart={order}
-              isLoading={false}
-              placeOrderHandler={() => {}}
-            />
+            <Card className='rounded-none'>
+              <CardHeader>
+                <CardTitle>
+                  <h3 className='text-primary text-3xl font-semibold mb-3 text-center'>
+                    Order Summary
+                  </h3>
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent className='flex flex-col gap-y-3 divide-y divide-primary'>
+                <div className='flex flex-row justify-between'>
+                  <p>Items:</p>
+                  <p>$ {order.itemsPrice}</p>
+                </div>
+                <div className='flex flex-row justify-between'>
+                  <p>Shipping:</p>
+                  <p>$ {order.shippingPrice}</p>
+                </div>
+                <div className='flex flex-row justify-between'>
+                  <p>Tax:</p>
+                  <p>$ {order.taxPrice}</p>
+                </div>
+                <div className='flex flex-row justify-between'>
+                  <p>Total:</p>
+                  <p>$ {order.totalPrice}</p>
+                </div>
+              </CardContent>
+
+              {!order.isPaid && (
+                <CardFooter className=''>
+                  {pendingPaypal && <Spinner />}
+                  {isPaypalScriptPending ? (
+                    <Spinner />
+                  ) : (
+                    <div className='flex flex-col gap-3 items-center justify-center w-full'>
+                      {/* <Button size='lg' onClick={onApproveTest}>
+                        {pendingPay ? <Spinner /> : 'Test Pay order'}
+                      </Button> */}
+
+                      <PayPalButtons
+                        createOrder={createOrder}
+                        onApprove={onApprove}
+                        onError={onError}
+                      />
+                    </div>
+                  )}
+                </CardFooter>
+              )}
+            </Card>
           </Col>
         </Row>
       </div>
