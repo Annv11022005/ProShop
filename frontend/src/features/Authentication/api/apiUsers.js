@@ -25,3 +25,11 @@ export async function register(data) {
 
   return res.data;
 }
+
+export async function profile(data) {
+  const res = await axios.put('/api/users/profile', data, {
+    withCredentials: true,
+  });
+
+  return res.data;
+}

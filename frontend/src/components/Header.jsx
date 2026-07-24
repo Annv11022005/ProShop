@@ -63,10 +63,12 @@ const Header = () => {
                 }
               />
               <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <UserIcon />
-                  Profile
-                </DropdownMenuItem>
+                <Link to='/profile'>
+                  <DropdownMenuItem>
+                    <UserIcon />
+                    Profile
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant='destructive'

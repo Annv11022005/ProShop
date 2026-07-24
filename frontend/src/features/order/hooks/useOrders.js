@@ -5,6 +5,7 @@ import {
   getOrderbyID,
   payOrder,
   getPaypalClientId,
+  getMyOrders,
 } from '../api/apiOrders';
 
 export function useCreateOrder() {
@@ -42,7 +43,8 @@ export function usePayOrder() {
     error,
     mutateAsync: payOrderItem,
   } = useMutation({
-    mutationFn: ({ orderId, details }) => payOrder({ id: orderId, detail: details }),
+    mutationFn: ({ orderId, details }) =>
+      payOrder({ id: orderId, detail: details }),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
     },
@@ -65,4 +67,20 @@ export function useGetPayPalClientById() {
   });
 
   return { isPending, error, paypal };
+}
+
+export function useOrderHistory() {
+  const {
+    isPending,
+    error,
+    data: myOrders,
+  } = useQuery({
+    queryKey: ['orderHistory'],
+    queryFn: () => getMyOrders(),
+    retry: false,
+    gcTime: 5 * 60 * 1000,
+    staleTime: 0,
+  });
+
+  return { isPending, error, myOrders };
 }

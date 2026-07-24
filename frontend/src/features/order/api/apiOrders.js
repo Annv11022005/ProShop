@@ -23,3 +23,9 @@ export async function getPaypalClientId() {
 
   return res.data;
 }
+
+export async function getMyOrders() {
+  const res = await axios.get('/api/orders/mine');
+
+  return res.data;
+}

@@ -16,6 +16,7 @@ import PrivateRoutes from '@/components/PrivateRoutes';
 import PaymentScreen from '@/screens/PaymentScreen';
 import PlaceOrderScreen from '@/screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ const App = () => {
                 <Route path='/product/:id' element={<ProductScreen />} />
                 <Route path='/login' element={<LoginScreen />} />
                 <Route path='/register' element={<RegisterScreen />} />
+                <Route path='/profile' element={<ProfileScreen />} />
 
                 <Route element={<PrivateRoutes />}>
                   <Route path='/cart' element={<CartScreen />} />

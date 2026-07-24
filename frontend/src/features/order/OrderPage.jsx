@@ -22,7 +22,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
