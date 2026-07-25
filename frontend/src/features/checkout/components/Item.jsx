@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 
 const Item = ({ item }) => {
-  const { image, name, price, qty, _id } = item;
+  const { image, name, price, qty, _id, product } = item;
+  const productId = product || _id;
   return (
     <div className='flex justify-around items-center py-3'>
       <img src={image} alt={name} width='100px' className=' rounded-lg' />
 
-      <Link to={`/product/${_id}`}>
+      <Link to={`/product/${productId}`}>
         <h3 className='text-primary hover:italic hover:underline text-sm font-semibold'>
           {name}
         </h3>

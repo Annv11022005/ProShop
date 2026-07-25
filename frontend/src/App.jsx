@@ -5,6 +5,9 @@ import { Provider } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import store from './store';
 
+import AdminRoutes from '@/components/AdminRoutes';
+import PrivateRoutes from '@/components/PrivateRoutes';
+
 import AppLayout from '@/components/AppLayout';
 import HomeScreen from '@/screens/HomeScreen';
 import ProductScreen from '@/screens/ProductScreen';
@@ -12,11 +15,16 @@ import CartScreen from '@/screens/CartScreen';
 import LoginScreen from '@/screens/LoginScreen';
 import RegisterScreen from '@/screens/RegisterScreen';
 import ShippingScreen from '@/screens/ShippingScreen';
-import PrivateRoutes from '@/components/PrivateRoutes';
 import PaymentScreen from '@/screens/PaymentScreen';
 import PlaceOrderScreen from '@/screens/PlaceOrderScreen';
-import OrderScreen from './screens/OrderScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import OrderScreen from '@/screens/OrderScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
+import OrderListScreen from '@/screens/admin/OrderListScreen';
+import ProductListScreen from '@/screens/admin/ProductListScreen';
+import ProductEditScreen from '@/screens/admin/ProductEditScreen';
+import CreateProductScreen from '@/screens/admin/CreateProductScreen';
+import UserListScreen from '@/screens/admin/UserListScreen';
+import UserEditScreen from '@/screens/admin/UserEditScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +55,27 @@ const App = () => {
                   <Route path='/payment' element={<PaymentScreen />} />
                   <Route path='/place-order' element={<PlaceOrderScreen />} />
                   <Route path='/order/:id' element={<OrderScreen />} />
+                </Route>
+
+                <Route element={<AdminRoutes />}>
+                  <Route
+                    path='/admin/order-list'
+                    element={<OrderListScreen />}
+                  />
+                  <Route
+                    path='/admin/product-list'
+                    element={<ProductListScreen />}
+                  />
+                  <Route
+                    path='/admin/product/:id/edit'
+                    element={<ProductEditScreen />}
+                  />
+                  <Route
+                    path='/admin/product/create'
+                    element={<CreateProductScreen />}
+                  />
+                  <Route path='/admin/user-list' element={<UserListScreen />} />
+                  <Route path='/admin/user/:id' element={<UserEditScreen />} />
                 </Route>
               </Route>
             </Routes>

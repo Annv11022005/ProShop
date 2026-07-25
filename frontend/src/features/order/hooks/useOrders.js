@@ -24,6 +24,7 @@ export function useGetOrderDetail(orderId) {
   const {
     isPending,
     error,
+    refetch,
     data: order,
   } = useQuery({
     queryKey: ['order', orderId],
@@ -33,7 +34,7 @@ export function useGetOrderDetail(orderId) {
     staleTime: 0,
   });
 
-  return { isPending, error, order };
+  return { isPending, error, order, refetch };
 }
 
 export function usePayOrder() {

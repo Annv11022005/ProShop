@@ -22,6 +22,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useUpdateOrder } from '../admin/hook/useAdmin';
+import { Button } from '@/components/ui/button';
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
@@ -30,9 +32,10 @@ const OrderPage = () => {
     isPending: pendingGetOrderDetail,
     error,
     order,
+    refetch,
   } = useGetOrderDetail(orderId);
 
-  const { isPending: pendingPay, payOrderItem } = usePayOrder();
+  const { payOrderItem } = usePayOrder();
 
   const [{ isPending: isPaypalScriptPending }, paypalDispatch] =
     usePayPalScriptReducer();
@@ -44,6 +47,7 @@ const OrderPage = () => {
   } = useGetPayPalClientById();
 
   const { userInfo } = useSelector((state) => state.auth);
+  const { isPending: pendingDeliver, deliverOrder } = useUpdateOrder();
 
   useEffect(() => {
     if (!errorPaypal && !pendingPaypal && paypal?.clientId) {
@@ -73,9 +77,12 @@ const OrderPage = () => {
     return actions.order.capture().then(async function (details) {
       try {
         await payOrderItem({ orderId, details });
-        toast.success('Payment successfully');
+        refetch();
+        toast.success('Payment successfully', { position: 'top-center' });
       } catch (error) {
-        toast.error(error?.data?.message || error?.message || 'payment error');
+        toast.error(error?.data?.message || error?.message || 'payment error', {
+          position: 'top-center',
+        });
       }
     });
   }
@@ -103,6 +110,18 @@ const OrderPage = () => {
 
   function onError(err) {
     toast.error(err.message);
+  }
+
+  async function deliverHandler() {
+    try {
+      await deliverOrder(orderId);
+      refetch();
+      toast.success('Order delivered', { position: 'top-center' });
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || 'payment error', {
+        position: 'top-center',
+      });
+    }
   }
 
   if (!order) return null;
@@ -225,8 +244,8 @@ const OrderPage = () => {
                 </div>
               </CardContent>
 
-              {!order.isPaid && (
-                <CardFooter className=''>
+              {!order.isPaid && !userInfo.isAdmin && (
+                <CardFooter>
                   {pendingPaypal && <Spinner />}
                   {isPaypalScriptPending ? (
                     <Spinner />
@@ -242,6 +261,18 @@ const OrderPage = () => {
                         onError={onError}
                       />
                     </div>
+                  )}
+                </CardFooter>
+              )}
+
+              {userInfo.isAdmin && userInfo && !order.isDelivered && (
+                <CardFooter>
+                  {pendingDeliver ? (
+                    <Spinner />
+                  ) : (
+                    <Button size='lg' onClick={deliverHandler}>
+                      Make at Delivered
+                    </Button>
                   )}
                 </CardFooter>
               )}

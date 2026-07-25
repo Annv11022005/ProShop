@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../cart/cartSlice.js';
@@ -16,7 +16,8 @@ import { Message } from '@/components/ui/Message.jsx';
 import ProductActionCard from './ProductActionCard.jsx';
 
 const ProductDetail = () => {
-  const { isPending, error, data: product } = useProduct();
+  const { id: productId } = useParams();
+  const { isPending, error, data: product } = useProduct(productId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);

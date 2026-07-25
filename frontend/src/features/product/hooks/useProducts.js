@@ -5,11 +5,12 @@ export function useProducts() {
   const {
     isPending,
     error,
+    refetch,
     data: products,
   } = useQuery({
     queryKey: ['product'],
     queryFn: () => getProducts(),
   });
 
-  return { isPending, error, data: products };
+  return { isPending, error, data: products, refetch };
 }

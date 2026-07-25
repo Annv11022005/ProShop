@@ -53,7 +53,7 @@ const Header = () => {
               )}
             </Button>
           </NavLink>
-          {userInfo ? (
+          {userInfo && !userInfo.isAdmin ? (
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -70,6 +70,41 @@ const Header = () => {
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant='destructive'
+                  disabled={isPending}
+                  onClick={logoutHandler}
+                >
+                  <LogOutIcon />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : userInfo && userInfo.isAdmin ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant='outline' size='lg'>
+                    {userInfo.name}
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <Link to='/admin/order-list'>
+                  <DropdownMenuItem>Orders</DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+
+                <Link to='/admin/product-list'>
+                  <DropdownMenuItem>Products</DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+
+                <Link to='/admin/user-list'>
+                  <DropdownMenuItem>Users</DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   variant='destructive'
                   disabled={isPending}

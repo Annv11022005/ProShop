@@ -11,3 +11,32 @@ export async function getProduct(id) {
 
   return res.data;
 }
+
+export async function createProduct(data) {
+  const res = await axios.post('/api/products', data);
+
+  return res.data;
+}
+
+export async function updateProduct({ id, data }) {
+  const res = await axios.put(`/api/products/${id}`, data);
+
+  return res.data;
+}
+
+export async function uploadProductImage(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const res = await axios.post('/api/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  return res.data;
+}
+
+export async function deleteProduct(id) {
+  const res = await axios.delete(`/api/products/${id}`);
+
+  return res.data;
+}
