@@ -44,7 +44,7 @@ const App = () => {
             <Routes>
               <Route element={<AppLayout />}>
                 <Route path='/' element={<HomeScreen />} />
-                <Route path='/product/:id' element={<ProductScreen />} />
+                <Route path='/product/:slug' element={<ProductScreen />} />
                 <Route path='/login' element={<LoginScreen />} />
                 <Route path='/register' element={<RegisterScreen />} />
                 <Route path='/profile' element={<ProfileScreen />} />

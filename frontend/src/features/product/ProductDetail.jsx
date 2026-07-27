@@ -16,8 +16,8 @@ import { Message } from '@/components/ui/Message.jsx';
 import ProductActionCard from './ProductActionCard.jsx';
 
 const ProductDetail = () => {
-  const { id: productId } = useParams();
-  const { isPending, error, data: product } = useProduct(productId);
+  const { slug } = useParams();
+  const { isPending, error, data: product } = useProduct(slug);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);

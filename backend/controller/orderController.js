@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../model/orderModel.js';
+import Address from '../model/addressModel.js';
 
 // @desc Create new order
 // POST /api/orders
@@ -7,7 +8,7 @@ import Order from '../model/orderModel.js';
 export const addOrderItems = asyncHandler(async (req, res) => {
   const {
     orderItems,
-    shippingAddress,
+    addressId,
     paymentMethod,
     itemsPrice,
     taxPrice,
@@ -19,6 +20,16 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('No order item');
   } else {
+    const selectedAddress = await Address.findOne({
+      _id: addressId,
+      user: req.user._id,
+    });
+
+    if (!selectedAddress) {
+      res.status(404);
+      throw new Error('Shipping address not found');
+    }
+
     const order = new Order({
       orderItems: orderItems.map((x) => ({
         ...x,
@@ -26,7 +37,15 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         _id: undefined,
       })),
       user: req.user._id,
-      shippingAddress,
+      shippingAddress: {
+        addressRef: selectedAddress._id,
+        name: selectedAddress.name,
+        phone: selectedAddress.phone,
+        address: selectedAddress.address,
+        city: selectedAddress.city,
+        postalCode: selectedAddress.postalCode,
+        country: selectedAddress.country,
+      },
       paymentMethod,
       itemsPrice,
       taxPrice,
@@ -53,10 +72,9 @@ export const getMyOrder = asyncHandler(async (req, res) => {
 // POST /api/orders/:id
 // @access private
 export const getOrderByID = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate(
-    'user',
-    'name email',
-  );
+  const order = await Order.findById(req.params.id)
+    .populate('user', 'name email')
+    .populate('shippingAddress.addressRef');
 
   if (order) {
     res.status(200).json(order);

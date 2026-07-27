@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Link } from 'react-router-dom';
 
-const StepCheckout = ({ step1, step2, step3, step4 }) => {
+const StepCheckout = ({ step1, step2, step3 }) => {
   return (
     <div className='w-full flex items-center justify-center py-2'>
       <Breadcrumb>
@@ -26,19 +26,6 @@ const StepCheckout = ({ step1, step2, step3, step4 }) => {
 
           <BreadcrumbItem>
             {step2 ? (
-              <BreadcrumbLink render={<Link to='/shipping' />}>
-                Shipping
-              </BreadcrumbLink>
-            ) : (
-              <BreadcrumbPage className='text-muted-foreground'>
-                Shipping
-              </BreadcrumbPage>
-            )}
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-
-          <BreadcrumbItem>
-            {step3 ? (
               <BreadcrumbLink render={<Link to='/payment' />}>
                 Payment
               </BreadcrumbLink>
@@ -51,7 +38,7 @@ const StepCheckout = ({ step1, step2, step3, step4 }) => {
           <BreadcrumbSeparator />
 
           <BreadcrumbItem>
-            {step4 ? (
+            {step3 ? (
               <BreadcrumbLink render={<Link to='/place-order' />}>
                 Place Order
               </BreadcrumbLink>

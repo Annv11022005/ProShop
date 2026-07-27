@@ -37,7 +37,7 @@ const PaymentPage = () => {
 
   return (
     <div>
-      <StepCheckout step1 step2 step3 />
+      <StepCheckout step1 step2 />
 
       <form onSubmit={submitHandler}>
         <FieldSet className='w-full m-3'>

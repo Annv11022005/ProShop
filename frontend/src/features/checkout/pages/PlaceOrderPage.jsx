@@ -52,7 +52,7 @@ const PlaceOrderPage = () => {
 
   return (
     <>
-      <StepCheckout step1 step2 step3 step4 />
+      <StepCheckout step1 step2 step3 />
 
       <Row template='lg:grid-cols-[2fr_1fr]'>
         <Col fluid className='divide-y divide-primary'>

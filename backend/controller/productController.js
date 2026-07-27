@@ -10,10 +10,15 @@ export const getProducts = asyncHandler(async (req, res) => {
 });
 
 // @desc fetch a product
-// GET /api/products/:id
+// GET /api/products/:slugOrId
 // @access public
-export const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+export const getProductBySlugOrId = asyncHandler(async (req, res) => {
+  const isObjectId = req.params.slugOrId.match(/^[0-9a-fA-F]{24}$/);
+  
+  const product = isObjectId
+    ? await Product.findById(req.params.slugOrId)
+    : await Product.findOne({ slug: req.params.slugOrId });
+
   if (product) {
     return res.json(product);
   } else {

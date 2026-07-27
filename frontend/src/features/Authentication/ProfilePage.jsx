@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useToggle from '@/lib/handleToggle';
 import { useOrderHistory } from '../order/hooks/useOrders';
+import { setCredentials } from './authSlice';
 
 import { Button } from '@/components/ui/button';
 import Col from '@/components/ui/Col';
@@ -16,10 +17,10 @@ import Row from '@/components/ui/Row';
 import { Spinner } from '@/components/ui/spinner';
 import { useProfileMutation } from './hooks/useProfile';
 import { toast } from 'sonner';
-import { setCredentials } from './authSlice';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Message } from '@/components/ui/Message';
 import MyOrders from './components/MyOrders';
+import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -68,6 +69,13 @@ const ProfilePage = () => {
         <h2 className='w-full text-center mb-2 uppercase font-semibold'>
           Reset Information
         </h2>
+
+        <Link to='/shipping'>
+          <Button variant='outline' size='lg' className='my-2'>
+            Update Shipping Address
+          </Button>
+        </Link>
+
         <form onSubmit={submitHandler}>
           <FieldSet>
             <FieldGroup>

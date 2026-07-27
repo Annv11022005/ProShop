@@ -1,6 +1,5 @@
 import {
   Card,
-  //   CardAction,
   CardContent,
   CardFooter,
   CardHeader,
@@ -15,21 +14,24 @@ const Product = ({ product }) => {
     <Card>
       <CardHeader>
         <CardTitle>
-          <Link to={`/product/${product._id}`}>
+          <Link to={`/product/${product.slug || product._id}`}>
             <img src={product.image} />
           </Link>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Link to={`/product/${product._id}`}>
+        <Link to={`/product/${product.slug || product._id}`}>
           <h1 className='product-title'>{product.name}</h1>
         </Link>
-        <Rating value={product.rating} text={`${product.numberViews} reviews`} />
+        <Rating
+          value={product.rating}
+          text={`${product.numberViews} reviews`}
+        />
       </CardContent>
       <CardFooter>
         <div className='flex items-center w-full justify-between'>
           <h2 className='product-price'>$ {product.price}</h2>
-          <Link to={`/product/${product._id}`}>
+          <Link to={`/product/${product.slug || product._id}`}>
             <Button>Mua ngay</Button>
           </Link>
         </div>

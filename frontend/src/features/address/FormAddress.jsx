@@ -3,6 +3,10 @@ import { FieldGroup, FieldSet, Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
 const FormAddress = ({
+  name,
+  setName,
+  phone,
+  setPhone,
   address,
   setAddress,
   city,
@@ -17,6 +21,32 @@ const FormAddress = ({
     <form onSubmit={submitHandler}>
       <FieldSet className='w-full m-3'>
         <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor='name' className='text-md'>
+              Name
+            </FieldLabel>
+            <Input
+              id='name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type='text'
+              placeholder='VD: nhà riêng, công ty, ...'
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor='phone' className='text-md'>
+              Phone
+            </FieldLabel>
+            <Input
+              id='phone'
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              type='text'
+              placeholder='0915 xxx xxx'
+            />
+          </Field>
+
           <Field>
             <FieldLabel htmlFor='address' className='text-md'>
               Address
@@ -71,7 +101,7 @@ const FormAddress = ({
 
           <Field orientation='horizontal'>
             <Button size='lg' type='submit'>
-              Continue
+              Save Shipping Address
             </Button>
           </Field>
         </FieldGroup>

@@ -7,14 +7,14 @@ import {
 } from '../api/apiProducts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export function useProduct(productId) {
+export function useProduct(idOrSlug) {
   const {
     isPending,
     error,
     data: product,
   } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: () => getProduct(productId),
+    queryKey: ['product', idOrSlug],
+    queryFn: () => getProduct(idOrSlug),
     retry: false,
   });
 

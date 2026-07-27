@@ -11,7 +11,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   if (token) {
     try {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decode.userID).select('-password');
+      req.user = await User.findById(decode.userId).select('-password');
       next();
     } catch (error) {
       console.log(error);
@@ -28,7 +28,7 @@ export const admin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();
   } else {
-    res.status(401);
+    res.status(403);
     throw new Error('Not authorized as admin');
   }
 };
