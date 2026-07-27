@@ -3,6 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import useToggle from '@/lib/handleToggle';
 import { useOrderHistory } from '../order/hooks/useOrders';
 import { setCredentials } from './authSlice';
+import { useProfileMutation } from './hooks/useProfile';
+import MyOrders from './components/MyOrders';
+import { useNavigate } from 'react-router-dom';
+import {
+  useDeleteAddress,
+  useGetAllAddress,
+  useGetDefaultAddress,
+  useUpdateDefaultAddress,
+} from '../address/hooks/useAddress';
 
 import { Button } from '@/components/ui/button';
 import Col from '@/components/ui/Col';
@@ -15,14 +24,27 @@ import {
 } from '@/components/ui/input-group';
 import Row from '@/components/ui/Row';
 import { Spinner } from '@/components/ui/spinner';
-import { useProfileMutation } from './hooks/useProfile';
 import { toast } from 'sonner';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Message } from '@/components/ui/Message';
-import MyOrders from './components/MyOrders';
-import { Link } from 'react-router-dom';
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Command,
+  CommandDialog,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 const ProfilePage = () => {
+  const [open, setOpen] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
 
   const [name, setName] = useState(userInfo?.name || '');
@@ -30,15 +52,45 @@ const ProfilePage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const {
+    isPending: pendingDelete,
+    // error: errDelete,
+    deletedAddress,
+  } = useDeleteAddress();
+
+  const { isPending: pendingGet, allAddress } = useGetAllAddress();
+
+  const {
+    isPending: pendingDefault,
+    error: errDefault,
+    currentAddress,
+    refetch,
+  } = useGetDefaultAddress();
+
+  const {
+    isPending: pendingUp,
+    error: errUp,
+    replaceDefaultAddress,
+  } = useUpdateDefaultAddress();
+
   const [isPassword, handleToggle] = useToggle(false);
   const [isConfirmPassword, handleToggleConfirm] = useToggle(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { isPending, profileUser } = useProfileMutation();
   const { isPending: pendingMyOrder, error, myOrders } = useOrderHistory();
 
-  if (!userInfo) return <Spinner />;
+  if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
+
+  if (errDefault && errDefault?.response?.status !== 404) {
+    return <Message>Không tải được địa chỉ, thử lại sau</Message>;
+  }
+
+  if (errUp) {
+    return <Message>{errUp?.message}</Message>;
+  }
 
   async function submitHandler(e) {
     e.preventDefault();
@@ -63,6 +115,31 @@ const ProfilePage = () => {
     }
   }
 
+  function updateDefaultAddressHandler(id) {
+    replaceDefaultAddress(id, {
+      onSuccess: () => {
+        toast.success('Đã đặt làm địa chỉ mặc định', {
+          position: 'top-center',
+        });
+        refetch();
+        setOpen(false);
+      },
+      onError: (err) =>
+        toast(err.response?.data?.message, { position: 'top-center' }),
+    });
+  }
+
+  function deleteAddressHandler(id) {
+    deletedAddress(id, {
+      onSuccess: () =>
+        toast.success('Đã xoá địa chỉ', {
+          position: 'top-center',
+        }),
+      onError: (err) =>
+        toast(err.response?.data?.message, { position: 'top-center' }),
+    });
+  }
+
   return (
     <Row template='lg:grid-cols-[1fr_2fr]' className='gap-3'>
       <Col fluid>
@@ -70,11 +147,93 @@ const ProfilePage = () => {
           Reset Information
         </h2>
 
-        <Link to='/shipping'>
-          <Button variant='outline' size='lg' className='my-2'>
-            Update Shipping Address
-          </Button>
-        </Link>
+        <Card className='rounded-none'>
+          <CardHeader>
+            <CardTitle className='font-semibold'>
+              Shipping Address Default
+            </CardTitle>
+            <CardDescription>
+              {!currentAddress ? (
+                'Anh/chị chưa có địa chỉ nào.'
+              ) : (
+                <>
+                  {currentAddress.name}, {currentAddress.phone},
+                  {currentAddress.address}, {currentAddress.city},{' '}
+                  {currentAddress.postalCode}, {currentAddress.country}
+                </>
+              )}
+            </CardDescription>
+            <CardAction className='my-auto'>
+              <Button
+                variant='link'
+                onClick={() => {
+                  if (!currentAddress) {
+                    navigate('/shipping', { state: { action: 'create' } });
+                  } else {
+                    setOpen(true);
+                  }
+                }}
+              >
+                {!currentAddress ? 'Create Address' : 'Change Address'}
+              </Button>
+            </CardAction>
+          </CardHeader>
+
+          <CardFooter>
+            <Button
+              onClick={() =>
+                navigate('/shipping', { state: { action: 'create' } })
+              }
+            >
+              Create New Address
+            </Button>
+          </CardFooter>
+        </Card>
+
+        <CommandDialog
+          open={open}
+          onOpenChange={setOpen}
+          className='sm:max-w-160 p-3'
+        >
+          <Command>
+            <CommandList>
+              <CommandGroup heading='Shipping Address'>
+                {allAddress.map((addr) => (
+                  <div
+                    key={addr._id}
+                    className='flex flex-row gap-3 items-center'
+                  >
+                    <CommandItem
+                      disabled={pendingUp}
+                      onSelect={() => updateDefaultAddressHandler(addr._id)}
+                      className='p-2 mb-2 text-sm font-medium w-125'
+                    >
+                      {addr.name}, {addr.phone}, {addr.address}, {addr.city},{' '}
+                      {addr.postalCode}, {addr.country}
+                    </CommandItem>
+                    <Button
+                      variant='outline'
+                      onClick={() => {
+                        navigate('/shipping', {
+                          state: { action: 'update', address: addr },
+                        });
+                        setOpen(false);
+                      }}
+                    >
+                      Sửa
+                    </Button>
+                    <Button
+                      disabled={pendingDelete}
+                      onClick={() => deleteAddressHandler(addr._id)}
+                    >
+                      Xoá
+                    </Button>
+                  </div>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </CommandDialog>
 
         <form onSubmit={submitHandler}>
           <FieldSet>

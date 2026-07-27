@@ -66,7 +66,7 @@ export const updateAddressDefault = asyncHandler(async (req, res) => {
   }
 
   await Address.updateMany(
-    { user: req.user._id, isDefault: true },
+    { user: req.user._id },
     { $set: { isDefault: false } },
   );
 

@@ -43,7 +43,9 @@ export const createOrderSchema = Joi.object({
     'array.min': 'Đơn hàng phải có ít nhất 1 sản phẩm',
     'any.required': 'Danh sách sản phẩm là bắt buộc',
   }),
-  shippingAddress: shippingAddressSchema.required(),
+  addressId: Joi.string().required().messages({
+    'any.required': 'ID địa chỉ giao hàng là bắt buộc',
+  }),
   paymentMethod: Joi.string().trim().required().messages({
     'any.required': 'Phương thức thanh toán là bắt buộc',
   }),

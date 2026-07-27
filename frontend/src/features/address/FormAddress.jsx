@@ -3,6 +3,7 @@ import { FieldGroup, FieldSet, Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
 const FormAddress = ({
+  action = 'create',
   name,
   setName,
   phone,
@@ -16,6 +17,7 @@ const FormAddress = ({
   country,
   setCountry,
   submitHandler,
+  isSubmitting,
 }) => {
   return (
     <form onSubmit={submitHandler}>
@@ -100,8 +102,10 @@ const FormAddress = ({
           </Field>
 
           <Field orientation='horizontal'>
-            <Button size='lg' type='submit'>
-              Save Shipping Address
+            <Button size='lg' disabled={isSubmitting} type='submit'>
+              {action === 'create'
+                ? 'Create Shipping Address'
+                : 'Save Shipping Address'}
             </Button>
           </Field>
         </FieldGroup>

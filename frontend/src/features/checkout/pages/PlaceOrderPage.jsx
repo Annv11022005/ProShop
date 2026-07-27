@@ -9,11 +9,13 @@ import { Message } from '@/components/ui/Message';
 import ListItems from '../components/ListItems';
 import PlaceOrderSummary from '../components/PlaceOrderSummary';
 import { useCreateOrder } from '@/features/order/hooks/useOrders';
+import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
 import { clearCartItems } from '../../cart/cartSlice';
 import { toast } from 'sonner';
 
 const PlaceOrderPage = () => {
   const { createOrderItems, isPending } = useCreateOrder();
+  const { currentAddress } = useGetDefaultAddress();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,7 +33,10 @@ const PlaceOrderPage = () => {
     createOrderItems(
       {
         orderItems: cart.cartItems,
-        shippingAddress: cart.shippingAddress,
+        addressId:
+          cart.shippingAddress?.addressId ||
+          cart.shippingAddress?._id ||
+          currentAddress?._id,
         paymentMethod: cart.paymentMethod,
         itemsPrice: cart.itemsPrice,
         shippingPrice: cart.shippingPrice,
@@ -61,6 +66,7 @@ const PlaceOrderPage = () => {
               <Field className='flex flex-row'>
                 <FieldTitle className='text-md'>Address:</FieldTitle>
                 <p>
+                  {cart.shippingAddress.name}, {cart.shippingAddress.phone},{' '}
                   {cart.shippingAddress.address}, {cart.shippingAddress.city},{' '}
                   {cart.shippingAddress.postalCode},{' '}
                   {cart.shippingAddress.country}

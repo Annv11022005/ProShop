@@ -1,4 +1,4 @@
-import { ShippingPage } from '@/features/checkout';
+import ShippingPage from '@/features/address/ShippingPage';
 
 const ShippingScreen = () => {
   return (

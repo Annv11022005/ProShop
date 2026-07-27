@@ -1,109 +1,132 @@
-import { useState } from 'react';
-import FormAddress from './FormAddress';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useCreateAddress, useUpdateAddress } from './hooks/useAddress';
 import { saveShippingAddress } from '../cart/cartSlice';
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandDialog,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+
+import FormAddress from './FormAddress';
+import { Message } from '@/components/ui/Message';
+import { toast } from 'sonner';
 
 const ShippingPage = () => {
-  const cart = useSelector((state) => state.cart);
-  const { shippingAddress } = cart;
-  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState('');
+  const location = useLocation();
 
+  const {
+    isPending: pendingAdd,
+    error: errAdd,
+    addAddress,
+  } = useCreateAddress();
+
+  const {
+    isPending: pendingUp,
+    error: errUp,
+    replaceAddress,
+  } = useUpdateAddress();
+
+  const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState(shippingAddress?.address || '');
-  const [city, setCity] = useState(shippingAddress?.city || '');
-  const [postalCode, setPostalCode] = useState(
-    shippingAddress?.postalCode || '',
-  );
-  const [country, setCountry] = useState(shippingAddress?.country || '');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const st = location.state;
+    if (!st) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAction(st.action);
+    if (st.action === 'update' && st.address) {
+      const a = st.address;
+      setEditingId(a._id);
+      setName(a.name);
+      setPhone(a.phone);
+      setAddress(a.address);
+      setCity(a.city);
+      setPostalCode(a.postalCode);
+      setCountry(a.country);
+    }
+  }, [location.state]);
+
   function submitHandler(e) {
     e.preventDefault();
-    dispatch(saveShippingAddress({ address, city, postalCode, country }));
-    navigate('/profile');
+
+    if (action === 'create') {
+      addAddress(
+        { name, phone, address, city, postalCode, country },
+        {
+          onSuccess: (newAddress) => {
+            dispatch(
+              saveShippingAddress({
+                addressId: newAddress._id,
+                name: newAddress.name,
+                phone: newAddress.phone,
+                address: newAddress.address,
+                city: newAddress.city,
+                postalCode: newAddress.postalCode,
+                country: newAddress.country,
+              }),
+            );
+            setAction('');
+            navigate('/profile');
+          },
+          onError: (err) => {
+            toast(err.response?.data?.message, { position: 'top-center' });
+          },
+        },
+      );
+    } else if (action === 'update') {
+      replaceAddress(
+        {
+          id: editingId,
+          data: { name, phone, address, city, postalCode, country },
+        },
+        {
+          onSuccess: () => {
+            setAction('');
+            setEditingId(null);
+            navigate('/profile');
+            toast.success('Cập nhật địa chỉ thành công', {
+              position: 'top-center',
+            });
+          },
+          onError: (err) => {
+            toast(err.response?.data?.message, { position: 'top-center' });
+          },
+        },
+      );
+    }
+  }
+
+  if (errAdd || errUp) {
+    return <Message>{errAdd?.message || errUp?.message}</Message>;
   }
 
   return (
     <div className='flex flex-col justify-center'>
-      <Card className='rounded-none m-3'>
-        <CardHeader>
-          <CardTitle className='font-semibold'>
-            Shipping Address Default
-          </CardTitle>
-          <CardDescription>
-            Nhà riêng, 0915468302, 117 Chu Văn An, Xã Nam Phước, TP Đà Nẵng
-          </CardDescription>
-          <CardAction className='my-auto'>
-            <Button variant='link' onClick={() => setOpen(true)}>
-              Change Address
-            </Button>
-          </CardAction>
-        </CardHeader>
-      </Card>
-
-      <CommandDialog
-        open={open}
-        onOpenChange={setOpen}
-        className='sm:max-w-160 p-3'
-      >
-        <Command>
-          <CommandList>
-            <CommandGroup heading='Shipping Address'>
-              <div className='flex flex-row gap-3'>
-                <CommandItem className='p-2 mb-2 text-sm font-medium w-125'>
-                  Nhà riêng, 0915468302, 117 Chu Văn An, Xã Nam Phước, TP Đà
-                  Nẵng
-                </CommandItem>
-                <Button variant='outline'>Sửa</Button>
-                <Button>Xoá</Button>
-              </div>
-
-              <div className='flex flex-row gap-3'>
-                <CommandItem className='p-2 mb-2 text-sm font-medium w-125'>
-                  Công ty, 0915468302, 117 Chu Văn An, Xã Nam Phước, TP Đà Nẵng
-                </CommandItem>
-                <Button variant='outline'>Sửa</Button>
-                <Button>Xoá</Button>
-              </div>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
-
-      <FormAddress
-        name={name}
-        setName={setName}
-        phone={phone}
-        setPhone={setPhone}
-        address={address}
-        setAddress={setAddress}
-        city={city}
-        setCity={setCity}
-        postalCode={postalCode}
-        setPostalCode={setPostalCode}
-        country={country}
-        setCountry={setCountry}
-        submitHandler={submitHandler}
-      />
+      {(action === 'create' || action === 'update') && (
+        <FormAddress
+          name={name}
+          setName={setName}
+          phone={phone}
+          setPhone={setPhone}
+          address={address}
+          setAddress={setAddress}
+          city={city}
+          setCity={setCity}
+          postalCode={postalCode}
+          setPostalCode={setPostalCode}
+          country={country}
+          setCountry={setCountry}
+          submitHandler={submitHandler}
+          action={action}
+          isSubmitting={pendingAdd || pendingUp}
+        />
+      )}
     </div>
   );
 };

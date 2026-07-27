@@ -157,6 +157,7 @@ const OrderPage = () => {
                 <Field className='flex flex-row'>
                   <FieldTitle className='text-md'>Address:</FieldTitle>
                   <p>
+                    {order.shippingAddress.name}, {order.shippingAddress.phone},{' '}
                     {order.shippingAddress.address},{' '}
                     {order.shippingAddress.city},{' '}
                     {order.shippingAddress.postalCode},{' '}
