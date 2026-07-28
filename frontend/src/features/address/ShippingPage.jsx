@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { useCreateAddress, useUpdateAddress } from './hooks/useAddress';
-import { saveShippingAddress } from '../cart/cartSlice';
 
 import FormAddress from './FormAddress';
 import { Message } from '@/components/ui/Message';
@@ -31,9 +29,9 @@ const ShippingPage = () => {
   const [city, setCity] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
+  const [isDefault, setIsDefault] = useState(false);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const st = location.state;
@@ -49,6 +47,7 @@ const ShippingPage = () => {
       setCity(a.city);
       setPostalCode(a.postalCode);
       setCountry(a.country);
+      setIsDefault(a.isDefault);
     }
   }, [location.state]);
 
@@ -59,18 +58,7 @@ const ShippingPage = () => {
       addAddress(
         { name, phone, address, city, postalCode, country },
         {
-          onSuccess: (newAddress) => {
-            dispatch(
-              saveShippingAddress({
-                addressId: newAddress._id,
-                name: newAddress.name,
-                phone: newAddress.phone,
-                address: newAddress.address,
-                city: newAddress.city,
-                postalCode: newAddress.postalCode,
-                country: newAddress.country,
-              }),
-            );
+          onSuccess: () => {
             setAction('');
             navigate('/profile');
           },
@@ -83,7 +71,7 @@ const ShippingPage = () => {
       replaceAddress(
         {
           id: editingId,
-          data: { name, phone, address, city, postalCode, country },
+          data: { name, phone, address, city, postalCode, country, isDefault },
         },
         {
           onSuccess: () => {
@@ -122,6 +110,8 @@ const ShippingPage = () => {
           setPostalCode={setPostalCode}
           country={country}
           setCountry={setCountry}
+          isDefault={isDefault}
+          setIsDefault={setIsDefault}
           submitHandler={submitHandler}
           action={action}
           isSubmitting={pendingAdd || pendingUp}

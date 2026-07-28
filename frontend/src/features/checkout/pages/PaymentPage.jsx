@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { savePaymentMethod } from '../../cart/cartSlice';
 
@@ -13,21 +13,21 @@ import {
 import StepCheckout from '../components/StepCheckout';
 import { Button } from '@/components/ui/button';
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
+import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('');
+  const { currentAddress, isPending } = useGetDefaultAddress();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const cart = useSelector((state) => state.cart);
-  const { shippingAddress } = cart;
-
   useEffect(() => {
-    if (!shippingAddress) {
-      navigate('/shipping');
+    if (isPending) return;
+    if (!currentAddress) {
+      navigate('/shipping', { state: { action: 'create' } });
     }
-  }, [navigate, shippingAddress]);
+  }, [navigate, currentAddress, isPending]);
 
   function submitHandler(e) {
     e.preventDefault();

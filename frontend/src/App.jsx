@@ -56,27 +56,24 @@ const App = () => {
                   <Route path='/place-order' element={<PlaceOrderScreen />} />
                   <Route path='/order/:id' element={<OrderScreen />} />
                 </Route>
+              </Route>
 
-                <Route element={<AdminRoutes />}>
-                  <Route
-                    path='/admin/order-list'
-                    element={<OrderListScreen />}
-                  />
-                  <Route
-                    path='/admin/product-list'
-                    element={<ProductListScreen />}
-                  />
-                  <Route
-                    path='/admin/product/:id/edit'
-                    element={<ProductEditScreen />}
-                  />
-                  <Route
-                    path='/admin/product/create'
-                    element={<CreateProductScreen />}
-                  />
-                  <Route path='/admin/user-list' element={<UserListScreen />} />
-                  <Route path='/admin/user/:id' element={<UserEditScreen />} />
-                </Route>
+              <Route element={<AdminRoutes />}>
+                <Route path='/admin/order-list' element={<OrderListScreen />} />
+                <Route
+                  path='/admin/product-list'
+                  element={<ProductListScreen />}
+                />
+                <Route
+                  path='/admin/product/:id/edit'
+                  element={<ProductEditScreen />}
+                />
+                <Route
+                  path='/admin/product/create'
+                  element={<CreateProductScreen />}
+                />
+                <Route path='/admin/user-list' element={<UserListScreen />} />
+                <Route path='/admin/user/:id' element={<UserEditScreen />} />
               </Route>
             </Routes>
           </BrowserRouter>

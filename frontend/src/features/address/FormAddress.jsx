@@ -1,5 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { FieldGroup, FieldSet, Field, FieldLabel } from '@/components/ui/field';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  FieldGroup,
+  FieldSet,
+  Field,
+  FieldLabel,
+  FieldContent,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
 const FormAddress = ({
@@ -16,6 +23,8 @@ const FormAddress = ({
   setPostalCode,
   country,
   setCountry,
+  isDefault,
+  setIsDefault,
   submitHandler,
   isSubmitting,
 }) => {
@@ -100,6 +109,23 @@ const FormAddress = ({
               placeholder='Enter country'
             />
           </Field>
+
+          {action === 'update' ? (
+            <Field orientation='horizontal'>
+              <Checkbox
+                id='default'
+                checked={isDefault}
+                onCheckedChange={(checked) => setIsDefault(checked)}
+              />
+              <FieldContent>
+                <FieldLabel htmlFor='default'>
+                  Select Address Default
+                </FieldLabel>
+              </FieldContent>
+            </Field>
+          ) : (
+            ''
+          )}
 
           <Field orientation='horizontal'>
             <Button size='lg' disabled={isSubmitting} type='submit'>

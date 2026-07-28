@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useCreateOrder } from '@/features/order/hooks/useOrders';
+import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
+import { clearCartItems } from '../../cart/cartSlice';
+
 import StepCheckout from '../components/StepCheckout';
 import { Field, FieldGroup, FieldSet, FieldTitle } from '@/components/ui/field';
 import Row from '@/components/ui/Row';
@@ -8,35 +12,34 @@ import Col from '@/components/ui/Col';
 import { Message } from '@/components/ui/Message';
 import ListItems from '../components/ListItems';
 import PlaceOrderSummary from '../components/PlaceOrderSummary';
-import { useCreateOrder } from '@/features/order/hooks/useOrders';
-import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
-import { clearCartItems } from '../../cart/cartSlice';
 import { toast } from 'sonner';
 
 const PlaceOrderPage = () => {
   const { createOrderItems, isPending } = useCreateOrder();
-  const { currentAddress } = useGetDefaultAddress();
+  const { currentAddress, isPending: isAddressPending } =
+    useGetDefaultAddress();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const cart = useSelector((state) => state.cart);
 
   useEffect(() => {
-    if (!cart.shippingAddress.address) {
-      navigate('/shipping');
-    } else if (!cart.paymentMethod) {
+    if (isAddressPending) return;
+
+    if (!currentAddress) {
+      navigate('/shipping', { state: { action: 'create' } });
+      return;
+    }
+    if (!cart.paymentMethod) {
       navigate('/payment');
     }
-  }, [navigate, cart.paymentMethod, cart.shippingAddress.address]);
+  }, [navigate, cart.paymentMethod, currentAddress, isAddressPending]);
 
   function placeOrderHandler() {
     createOrderItems(
       {
         orderItems: cart.cartItems,
-        addressId:
-          cart.shippingAddress?.addressId ||
-          cart.shippingAddress?._id ||
-          currentAddress?._id,
+        addressId: currentAddress?._id,
         paymentMethod: cart.paymentMethod,
         itemsPrice: cart.itemsPrice,
         shippingPrice: cart.shippingPrice,
@@ -66,10 +69,9 @@ const PlaceOrderPage = () => {
               <Field className='flex flex-row'>
                 <FieldTitle className='text-md'>Address:</FieldTitle>
                 <p>
-                  {cart.shippingAddress.name}, {cart.shippingAddress.phone},{' '}
-                  {cart.shippingAddress.address}, {cart.shippingAddress.city},{' '}
-                  {cart.shippingAddress.postalCode},{' '}
-                  {cart.shippingAddress.country}
+                  {currentAddress?.name}, {currentAddress?.phone},{' '}
+                  {currentAddress?.address}, {currentAddress?.city},{' '}
+                  {currentAddress?.postalCode}, {currentAddress?.country}
                 </p>
               </Field>
             </FieldGroup>

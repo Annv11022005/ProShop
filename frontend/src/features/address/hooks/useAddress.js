@@ -34,7 +34,16 @@ export function useGetDefaultAddress() {
     data: currentAddress,
   } = useQuery({
     queryKey: ['address', 'default'],
-    queryFn: () => getDefaultAddress(),
+    queryFn: async () => {
+      try {
+        return await getDefaultAddress();
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          return null;
+        }
+        throw err;
+      }
+    },
     retry: false,
   });
 

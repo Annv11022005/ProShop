@@ -84,7 +84,7 @@ const ProfilePage = () => {
 
   if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
 
-  if (errDefault && errDefault?.response?.status !== 404) {
+  if (errDefault) {
     return <Message>Không tải được địa chỉ, thử lại sau</Message>;
   }
 
@@ -131,10 +131,12 @@ const ProfilePage = () => {
 
   function deleteAddressHandler(id) {
     deletedAddress(id, {
-      onSuccess: () =>
+      onSuccess: () => {
         toast.success('Đã xoá địa chỉ', {
           position: 'top-center',
-        }),
+        });
+        refetch();
+      },
       onError: (err) =>
         toast(err.response?.data?.message, { position: 'top-center' }),
     });
