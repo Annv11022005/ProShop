@@ -5,6 +5,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
 } from '../controller/productController.js';
 import {
   createProductSchema,
@@ -32,5 +33,9 @@ router
     updateProduct,
   )
   .delete(protect, admin, validateParams(mongoIdParamSchema), deleteProduct);
+
+router
+  .route('/:id/reviews')
+  .post(protect, validateParams(mongoIdParamSchema), createProductReview);
 
 export default router;

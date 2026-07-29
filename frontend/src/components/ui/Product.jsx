@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import Rating from './Rating';
+import { Rating } from '../reui/rating';
 
 const Product = ({ product }) => {
   return (
@@ -23,10 +23,10 @@ const Product = ({ product }) => {
         <Link to={`/product/${product.slug || product._id}`}>
           <h1 className='product-title'>{product.name}</h1>
         </Link>
-        <Rating
-          value={product.rating}
-          text={`${product.numberViews} reviews`}
-        />
+        <div className='flex items-center gap-3'>
+          <Rating rating={product.rating} />
+          <p className='rating-text'> {product.numberViews} reviews</p>
+        </div>
       </CardContent>
       <CardFooter>
         <div className='flex items-center w-full justify-between'>

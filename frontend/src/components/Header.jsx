@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { toast } from 'sonner';
+import Search from './Search';
 
 const Header = () => {
   const { logoutUser, isPending } = useLogout();
@@ -42,6 +43,10 @@ const Header = () => {
             <div className='glyph'></div>
           </div>
           <Link to='/'>ProShop</Link>
+        </div>
+
+        <div>
+          <Search />
         </div>
 
         <div className='flex gap-3 action'>

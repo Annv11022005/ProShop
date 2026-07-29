@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-export async function getProducts() {
-  const res = await axios.get('/api/products');
+export async function getProducts({ pageNumber = 1, keyword = '' } = {}) {
+  const { data } = await axios.get('/api/products', {
+    params: { pageNumber, keyword },
+  });
 
-  return res.data;
+  return data;
 }
 
 export async function getProduct(idOrSlug) {
@@ -37,6 +39,12 @@ export async function uploadProductImage(file) {
 
 export async function deleteProduct(id) {
   const res = await axios.delete(`/api/products/${id}`);
+
+  return res.data;
+}
+
+export async function createReview({ id, data }) {
+  const res = await axios.post(`/api/products/${id}/reviews`, data);
 
   return res.data;
 }

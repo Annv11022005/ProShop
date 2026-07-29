@@ -1,16 +1,11 @@
 import { getProducts } from '../api/apiProducts';
 import { useQuery } from '@tanstack/react-query';
 
-export function useProducts() {
-  const {
-    isPending,
-    error,
-    refetch,
-    data: products,
-  } = useQuery({
-    queryKey: ['product'],
-    queryFn: () => getProducts(),
+export function useProducts({ pageNumber = 1, keyword = '' } = {}) {
+  const { isPending, error, refetch, data } = useQuery({
+    queryKey: ['product', pageNumber, keyword],
+    queryFn: () => getProducts({ pageNumber, keyword }),
   });
 
-  return { isPending, error, data: products, refetch };
+  return { isPending, error, data, refetch };
 }

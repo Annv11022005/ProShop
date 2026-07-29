@@ -1,5 +1,5 @@
 import { useProducts } from '@/features/product/hooks/useProducts';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDeleteProduct } from '../product/hooks/useProduct';
 
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,18 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import { Plus, SquarePenIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import Paginate from '@/components/Paginate';
 
 const ProductListPage = () => {
-  const { isPending, error, data: products, refetch } = useProducts();
+  const { pageNumber } = useParams();
+  const { isPending, error, data, refetch } = useProducts({ pageNumber });
   const { isPending: pendingDelete, deletedProduct } = useDeleteProduct();
 
   const navigate = useNavigate();
@@ -65,7 +68,7 @@ const ProductListPage = () => {
           </TableHeader>
 
           <TableBody>
-            {products.map((product) => (
+            {data.products.map((product) => (
               <TableRow key={product._id}>
                 <TableCell className='text-center'>{product._id}</TableCell>
                 <TableCell className='text-center font-semibold'>
@@ -100,6 +103,13 @@ const ProductListPage = () => {
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={6}>
+                <Paginate page={data.page} pages={data.pages} isAdmin={true} />
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       )}
     </>
