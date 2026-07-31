@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export async function getAllAddress() {
-  const res = await axios.get('/api/address', {
+  const res = await axios.get('/api/v1/address', {
     withCredentials: true,
   });
 
@@ -9,7 +9,7 @@ export async function getAllAddress() {
 }
 
 export async function getDefaultAddress() {
-  const res = await axios.get('/api/address/default', {
+  const res = await axios.get('/api/v1/address/default', {
     withCredentials: true,
   });
 
@@ -17,7 +17,7 @@ export async function getDefaultAddress() {
 }
 
 export async function createAddress(data) {
-  const res = await axios.post('/api/address', data, {
+  const res = await axios.post('/api/v1/address', data, {
     withCredentials: true,
   });
 
@@ -26,7 +26,7 @@ export async function createAddress(data) {
 
 export async function updateDefaultAddress(id) {
   const res = await axios.put(
-    `/api/address/${id}/default`,
+    `/api/v1/address/${id}/default`,
     {},
     {
       withCredentials: true,
@@ -37,7 +37,7 @@ export async function updateDefaultAddress(id) {
 }
 
 export async function updateAddress({ id, data }) {
-  const res = await axios.put(`/api/address/${id}`, data, {
+  const res = await axios.put(`/api/v1/address/${id}`, data, {
     withCredentials: true,
   });
 
@@ -45,7 +45,7 @@ export async function updateAddress({ id, data }) {
 }
 
 export async function deleteAddress(id) {
-  const res = await axios.delete(`/api/address/${id}`, {
+  const res = await axios.delete(`/api/v1/address/${id}`, {
     withCredentials: true,
   });
 

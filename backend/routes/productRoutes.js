@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
   createProductReview,
+  getTopProducts,
 } from '../controller/productController.js';
 import {
   createProductSchema,
@@ -20,6 +21,8 @@ router
   .route('/')
   .get(getProducts)
   .post(protect, admin, validate(createProductSchema), createProduct);
+
+router.get('/top', getTopProducts);
 
 router.get('/:slugOrId', getProductBySlugOrId);
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export async function login(data) {
-  const res = await axios.post('/api/users/login', data, {
+  const res = await axios.post('/api/v1/users/login', data, {
     withCredentials: true,
   });
 
@@ -10,7 +10,7 @@ export async function login(data) {
 
 export async function logout() {
   const res = await axios.post(
-    '/api/users/logout',
+    '/api/v1/users/logout',
     {},
     { withCredentials: true },
   );
@@ -19,7 +19,7 @@ export async function logout() {
 }
 
 export async function register(data) {
-  const res = await axios.post('/api/users', data, {
+  const res = await axios.post('/api/v1/users', data, {
     withCredentials: true,
   });
 
@@ -27,7 +27,7 @@ export async function register(data) {
 }
 
 export async function profile(data) {
-  const res = await axios.put('/api/users/profile', data, {
+  const res = await axios.put('/api/v1/users/profile', data, {
     withCredentials: true,
   });
 

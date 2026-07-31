@@ -1,22 +1,43 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Product from '../model/productsModel.js';
+import APIFeatures from '../utils/apiFeatures.js';
 
 // @desc fetch all products
 // GET /api/products
 // @access public
 export const getProducts = asyncHandler(async (req, res) => {
-  const pageSize = 1;
+  const pageSize = 6;
   const page = Number(req.query.pageNumber) || 1;
 
   const keyword = req.query.keyword
     ? { name: { $regex: req.query.keyword, $options: 'i' } }
     : {};
 
-  const count = await Product.countDocuments({ ...keyword });
+  const queryObj = { ...req.query };
+  const excludedFields = [
+    'page',
+    'sort',
+    'limit',
+    'fields',
+    'pageNumber',
+    'keyword',
+  ];
+  excludedFields.forEach((el) => delete queryObj[el]);
 
-  const products = await Product.find({ ...keyword })
-    .limit(pageSize)
-    .skip(pageSize * (page - 1));
+  let queryStr = JSON.stringify(queryObj);
+  queryStr = queryStr.replace(/(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  const filterQuery = JSON.parse(queryStr);
+
+  const count = await Product.countDocuments({ ...keyword, ...filterQuery });
+
+  const features = new APIFeatures(Product.find({ ...keyword }), req.query)
+    .filter()
+    .sort()
+    .limitFields();
+
+  const products = await features.query
+    .skip(pageSize * (page - 1))
+    .limit(pageSize);
 
   res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
@@ -37,6 +58,15 @@ export const getProductBySlugOrId = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Resource not found');
   }
+});
+
+// @desc Get top rated products
+// GET /api/products/top
+// @access public
+export const getTopProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({}).sort({ rating: -1 }).limit(3);
+
+  res.status(200).json(products);
 });
 
 // @desc create a product
