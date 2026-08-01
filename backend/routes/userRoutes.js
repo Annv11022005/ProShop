@@ -9,6 +9,7 @@ import {
   registerUser,
   updateUser,
   updateUserProfile,
+  verifyUser,
 } from '../controller/userController.js';
 import { admin, protect } from '../middleware/authMiddleware.js';
 import { loginSchema, registerSchema } from '../validator/userValidator.js';
@@ -21,8 +22,11 @@ router
   .get(protect, admin, getUsers)
   .post(validate(registerSchema), registerUser);
 
+router.route('/register/verify').post(verifyUser);
+
 router.route('/logout').post(LogoutUser);
 router.route('/login').post(validate(loginSchema), loginUser);
+
 router
   .route('/profile')
   .get(protect, getUserProfile)

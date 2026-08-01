@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { setCredentials } from './authSlice';
 import { useRegister } from './hooks/useAuth';
 
 import useToggle from '@/lib/handleToggle';
@@ -27,7 +26,6 @@ function RegisterForm() {
   const [isPassword, handleToggle] = useToggle(false);
   const [isConfirmPassword, handleToggleConfirm] = useToggle(false);
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { userInfo } = useSelector((state) => state.auth);
@@ -48,9 +46,8 @@ function RegisterForm() {
     registerUser(
       { name, email, password },
       {
-        onSuccess: (data) => {
-          dispatch(setCredentials(data));
-          navigate(redirect);
+        onSuccess: () => {
+          navigate(`/register/verify?email=${encodeURIComponent(email)}`);
         },
         onError: (err) => {
           toast(err.response?.data?.message, { position: 'top-center' });

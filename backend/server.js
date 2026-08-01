@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -7,8 +8,11 @@ import helmet from 'helmet';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+
 dotenv.config();
+
 import connectDB from './config/db.js';
+import transporter from './config/mailer.js';
 
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';

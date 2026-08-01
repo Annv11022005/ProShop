@@ -1,6 +1,8 @@
+import transporter from '../config/mailer.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../model/userModel.js';
 import { generateToken } from '../utils/generateToken.js';
+import generateOTP from '../utils/generateOTP.js';
 
 // @desc Auth user & get token
 // POST /api/users/login
@@ -8,19 +10,24 @@ export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
-
-    res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    });
-  } else {
+  if (!user && !(await user.matchPassword(password))) {
     res.status(401);
     throw new Error('Invalid email or password');
   }
+
+  if (!user.isVerified) {
+    res.status(403);
+    throw new Error('Account not verified. Please verify your email first.');
+  }
+
+  generateToken(res, user._id);
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  });
 });
 
 // @desc Register user
@@ -35,14 +42,33 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
 
+  const otp = generateOTP();
+  const otpExpires = Date.now() + 5 * 60 * 1000;
+
   const user = await User.create({
     name,
     email,
     password,
+    otp,
+    otpExpires,
   });
 
   if (user) {
     generateToken(res, user._id);
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: user.email,
+      subject: 'Account registration confirmation code',
+      text: `Hello ${user.name},\n\nYour One-Time Password (OTP) is: ${otp}\n\nThis code will expire in 5 minutes. Please do not share this code with anyone.\n\nBest regards.`,
+    };
+
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent:', info.response);
+    } catch (err) {
+      console.log('Error sending email:', err);
+    }
 
     res.status(200).json({
       _id: user._id,
@@ -54,6 +80,41 @@ export const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Invalid user data');
   }
+});
+
+// @desc Verify OTP
+// POST /api/register/verify
+export const verifyUser = asyncHandler(async (req, res) => {
+  const { otp, email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (user.otp !== otp) {
+    res.status(400);
+    throw new Error('Invalid OTP!');
+  }
+
+  if (Date.now() > user.otpExpires) {
+    res.status(400);
+    throw new Error('OTP has expired');
+  }
+
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpires = undefined;
+  await user.save();
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  });
 });
 
 // @desc Logout user & clear token

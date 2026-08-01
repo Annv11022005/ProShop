@@ -26,6 +26,18 @@ export async function register(data) {
   return res.data;
 }
 
+export async function verifyOTP({ email, otp }) {
+  const res = await axios.post(
+    '/api/v1/users/register/verify',
+    { email, otp },
+    {
+      withCredentials: true,
+    },
+  );
+
+  return res.data;
+}
+
 export async function profile(data) {
   const res = await axios.put('/api/v1/users/profile', data, {
     withCredentials: true,

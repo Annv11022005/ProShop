@@ -25,6 +25,7 @@ import ProductEditScreen from '@/screens/admin/ProductEditScreen';
 import CreateProductScreen from '@/screens/admin/CreateProductScreen';
 import UserListScreen from '@/screens/admin/UserListScreen';
 import UserEditScreen from '@/screens/admin/UserEditScreen';
+import OTPRegisterScreen from './screens/OTPRegisterScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,10 @@ const App = () => {
                 <Route path='/product/:slug' element={<ProductScreen />} />
                 <Route path='/login' element={<LoginScreen />} />
                 <Route path='/register' element={<RegisterScreen />} />
+                <Route
+                  path='/register/verify'
+                  element={<OTPRegisterScreen />}
+                />
                 <Route path='/profile' element={<ProfileScreen />} />
 
                 <Route element={<PrivateRoutes />}>

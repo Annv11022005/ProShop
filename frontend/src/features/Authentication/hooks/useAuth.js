@@ -1,4 +1,4 @@
-import { login, logout, register } from '../api/apiUsers';
+import { login, logout, register, verifyOTP } from '../api/apiUsers';
 import { useMutation } from '@tanstack/react-query';
 
 export function useLogin() {
@@ -31,4 +31,12 @@ export function useRegister() {
   });
 
   return { registerUser, isPending };
+}
+
+export function useVerify() {
+  const { mutate: verifyUser, isPending } = useMutation({
+    mutationFn: verifyOTP,
+  });
+
+  return { verifyUser, isPending };
 }
