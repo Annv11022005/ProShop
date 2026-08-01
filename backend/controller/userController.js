@@ -117,6 +117,21 @@ export const verifyUser = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc login with facebook
+export const loginWithFacebook = asyncHandler(async (req, res) => {
+  generateToken(res, req.user._id);
+
+  const userData = {
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    isAdmin: req.user.isAdmin,
+  };
+
+  const encodedUser = encodeURIComponent(JSON.stringify(userData));
+  res.redirect(`http://localhost:5173?fbUser=${encodedUser}`);
+});
+
 // @desc Logout user & clear token
 // POST /api/users/logout
 export const LogoutUser = asyncHandler(async (req, res) => {

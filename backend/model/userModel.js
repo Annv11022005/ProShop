@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     otp: {
       type: String,
@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
+    facebookId: { type: String, default: null },
   },
   {
     timestamps: true,

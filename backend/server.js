@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+import passport from './config/passport.js';
 
 dotenv.config();
 
@@ -60,6 +61,8 @@ app.use(
 
 // Cookie parser middleware
 app.use(cookieParser());
+
+app.use(passport.initialize());
 
 app.get('/', (req, res) => {
   res.send('API is running...');

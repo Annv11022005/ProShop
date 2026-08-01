@@ -10,11 +10,15 @@ import {
   updateUser,
   updateUserProfile,
   verifyUser,
+  loginWithFacebook,
 } from '../controller/userController.js';
 import { admin, protect } from '../middleware/authMiddleware.js';
 import { loginSchema, registerSchema } from '../validator/userValidator.js';
 import { validate, validateParams } from '../middleware/validateMiddleware.js';
 import { mongoIdParamSchema } from '../validator/commonValidator.js';
+import passport from '../config/passport.js';
+import { generateToken } from '../utils/generateToken.js';
+
 const router = express.Router();
 
 router
@@ -37,5 +41,19 @@ router
   .delete(protect, admin, validateParams(mongoIdParamSchema), deleteUser)
   .get(protect, admin, validateParams(mongoIdParamSchema), getUserById)
   .put(protect, admin, validateParams(mongoIdParamSchema), updateUser);
+
+router.get(
+  '/auth/facebook',
+  passport.authenticate('facebook', { scope: ['email'], session: false }),
+);
+
+router.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', {
+    session: false,
+    failureRedirect: '/login',
+  }),
+  loginWithFacebook,
+);
 
 export default router;
