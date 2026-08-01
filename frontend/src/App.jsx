@@ -41,10 +41,10 @@ const App = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const fbUser = params.get('fbUser');
+    const authUser = params.get('authUser');
 
-    if (fbUser) {
-      const userData = JSON.parse(decodeURIComponent(fbUser));
+    if (authUser) {
+      const userData = JSON.parse(decodeURIComponent(authUser));
       dispatch(setCredentials(userData));
       window.history.replaceState({}, '', '/');
     }

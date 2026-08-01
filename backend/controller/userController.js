@@ -129,7 +129,22 @@ export const loginWithFacebook = asyncHandler(async (req, res) => {
   };
 
   const encodedUser = encodeURIComponent(JSON.stringify(userData));
-  res.redirect(`http://localhost:5173?fbUser=${encodedUser}`);
+  res.redirect(`http://localhost:5173?authUser=${encodedUser}`);
+});
+
+// @desc login with google
+export const loginWithGoogle = asyncHandler(async (req, res) => {
+  generateToken(res, req.user._id);
+
+  const userData = {
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    isAdmin: req.user.isAdmin,
+  };
+
+  const encodedUser = encodeURIComponent(JSON.stringify(userData));
+  res.redirect(`http://localhost:5173?authUser=${encodedUser}`);
 });
 
 // @desc Logout user & clear token

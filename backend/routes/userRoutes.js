@@ -11,6 +11,7 @@ import {
   updateUserProfile,
   verifyUser,
   loginWithFacebook,
+  loginWithGoogle,
 } from '../controller/userController.js';
 import { admin, protect } from '../middleware/authMiddleware.js';
 import { loginSchema, registerSchema } from '../validator/userValidator.js';
@@ -56,4 +57,20 @@ router.get(
   loginWithFacebook,
 );
 
+router.route('/auth/google').get(
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  }),
+);
+
+router
+  .route('/auth/google/callback')
+  .get(
+    passport.authenticate('google', {
+      session: false,
+      failureRedirect: '/login',
+    }),
+    loginWithGoogle,
+  );
 export default router;
