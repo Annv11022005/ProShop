@@ -16,6 +16,10 @@ import {
   createOrderSchema,
   payOrderSchema,
 } from '../validator/orderValidator.js';
+import {
+  createPayment,
+  VNPayCallback,
+} from '../controller/paymentController.js';
 
 router
   .route('/')
@@ -40,5 +44,10 @@ router
 router
   .route('/:id/deliver')
   .put(protect, validateParams(mongoIdParamSchema), updateOrderToDelivered);
+
+router
+  .route('/:id/vnpay/create')
+  .post(protect, validateParams(mongoIdParamSchema), createPayment);
+router.route('/vnpay/callback').get(VNPayCallback);
 
 export default router;

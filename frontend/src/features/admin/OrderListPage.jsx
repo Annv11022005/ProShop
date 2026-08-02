@@ -12,6 +12,7 @@ import { Message } from '@/components/ui/Message';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 const OrderListPage = () => {
   const { isPending, error, allOrders } = useGetOrders();
@@ -48,7 +49,7 @@ const OrderListPage = () => {
                   {order.createdAt.substring(0, 10)}
                 </TableCell>
                 <TableCell className='text-center'>
-                  $ {order.totalPrice}
+                  {formatCurrency(order.totalPrice)}
                 </TableCell>
                 <TableCell className='text-center'>
                   {order.isPaid ? (

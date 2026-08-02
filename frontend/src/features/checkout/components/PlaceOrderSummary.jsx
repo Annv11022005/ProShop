@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { formatCurrency } from '@/lib/utils';
 
 const PlaceOrderSummary = ({ cart, placeOrderHandler, isLoading }) => {
   return (
@@ -23,19 +24,19 @@ const PlaceOrderSummary = ({ cart, placeOrderHandler, isLoading }) => {
       <CardContent className='flex flex-col gap-y-3 divide-y divide-primary'>
         <div className='flex flex-row justify-between'>
           <p>Items:</p>
-          <p>$ {cart.itemsPrice}</p>
+          <p>{formatCurrency(cart.itemsPrice)}</p>
         </div>
         <div className='flex flex-row justify-between'>
           <p>Shipping:</p>
-          <p>$ {cart.shippingPrice}</p>
+          <p>{formatCurrency(cart.shippingPrice)}</p>
         </div>
         <div className='flex flex-row justify-between'>
           <p>Tax:</p>
-          <p>$ {cart.taxPrice}</p>
+          <p>{formatCurrency(cart.taxPrice)}</p>
         </div>
         <div className='flex flex-row justify-between'>
           <p>Total:</p>
-          <p>$ {cart.totalPrice}</p>
+          <p>{formatCurrency(cart.totalPrice)}</p>
         </div>
       </CardContent>
 

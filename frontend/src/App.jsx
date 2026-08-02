@@ -26,7 +26,8 @@ import ProductEditScreen from '@/screens/admin/ProductEditScreen';
 import CreateProductScreen from '@/screens/admin/CreateProductScreen';
 import UserListScreen from '@/screens/admin/UserListScreen';
 import UserEditScreen from '@/screens/admin/UserEditScreen';
-import OTPRegisterScreen from './screens/OTPRegisterScreen';
+import OTPRegisterScreen from '@/screens/OTPRegisterScreen';
+import VnpaySuccess from '@/features/checkout/pages/VnpaySuccess';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ const App = () => {
                 <Route path='/payment' element={<PaymentScreen />} />
                 <Route path='/place-order' element={<PlaceOrderScreen />} />
                 <Route path='/order/:id' element={<OrderScreen />} />
+                <Route path='/vnpay-return' element={<VnpaySuccess />} />
               </Route>
             </Route>
 

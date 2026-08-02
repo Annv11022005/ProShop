@@ -18,6 +18,7 @@ import ListReview from './components/ListReview.jsx';
 import { Rating } from '@/components/reui/rating';
 import { toast } from 'sonner';
 import FormReview from './components/FormReview.jsx';
+import { formatCurrency } from '@/lib/utils';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -93,7 +94,7 @@ const ProductDetail = () => {
 
               <span className='line' />
 
-              <h2 className='product-detail'>$ {product.price}</h2>
+              <h2 className='product-detail'>{formatCurrency(product.price)}</h2>
 
               <span className='line' />
 

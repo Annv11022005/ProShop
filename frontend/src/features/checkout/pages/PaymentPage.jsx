@@ -62,6 +62,13 @@ const PaymentPage = () => {
                   </FieldLabel>
                 </FieldContent>
               </Field>
+
+              <Field orientation='horizontal'>
+                <RadioGroupItem name='paymentMethod' value='VNPay' id='VNPay' />
+                <FieldContent>
+                  <FieldLabel htmlFor='VNPay'>VNPay</FieldLabel>
+                </FieldContent>
+              </Field>
             </RadioGroup>
 
             <Field orientation='horizontal'>

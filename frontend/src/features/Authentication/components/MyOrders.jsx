@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/table';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatCurrency } from '@/lib/utils';
 
 const MyOrders = ({ orders }) => {
   return (
@@ -32,7 +33,7 @@ const MyOrders = ({ orders }) => {
             <TableCell className='text-center'>
               {order.createdAt.substring(0, 10)}
             </TableCell>
-            <TableCell className='text-center'>{order.totalPrice}</TableCell>
+            <TableCell className='text-center'>{formatCurrency(order.totalPrice)}</TableCell>
             <TableCell className='text-center'>
               {order.isPaid ? (
                 order.paidAt.substring(0, 10)

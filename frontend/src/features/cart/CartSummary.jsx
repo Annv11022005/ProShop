@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/utils';
 
 const CartSummary = ({ cartItems, checkoutHandler }) => {
   return (
@@ -10,10 +11,9 @@ const CartSummary = ({ cartItems, checkoutHandler }) => {
             Subtotal {cartItems.reduce((acc, item) => acc + item.qty, 0)} items
           </h3>
           <p className='text-muted-foreground font-medium text-xl italic'>
-            ${' '}
-            {cartItems
-              .reduce((acc, item) => acc + item.qty * item.price, 0)
-              .toFixed(2)}
+            {formatCurrency(
+              cartItems.reduce((acc, item) => acc + item.qty * item.price, 0)
+            )}
           </p>
         </CardTitle>
       </CardHeader>

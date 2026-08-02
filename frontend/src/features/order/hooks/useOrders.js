@@ -6,6 +6,7 @@ import {
   payOrder,
   getPaypalClientId,
   getMyOrders,
+  createVnpayPayment,
 } from '../api/apiOrders';
 
 export function useCreateOrder() {
@@ -84,4 +85,16 @@ export function useOrderHistory() {
   });
 
   return { isPending, error, myOrders };
+}
+
+export function useCreateVnpayPayment() {
+  const {
+    isPending,
+    error,
+    mutateAsync: createPayment,
+  } = useMutation({
+    mutationFn: createVnpayPayment,
+  });
+
+  return { isPending, error, createPayment };
 }

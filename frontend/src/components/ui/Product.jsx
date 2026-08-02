@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Rating } from '../reui/rating';
+import { formatCurrency } from '@/lib/utils';
 
 const Product = ({ product }) => {
   return (
@@ -30,7 +31,7 @@ const Product = ({ product }) => {
       </CardContent>
       <CardFooter>
         <div className='flex items-center w-full justify-between'>
-          <h2 className='product-price'>$ {product.price}</h2>
+          <h2 className='product-price'>{formatCurrency(product.price)}</h2>
           <Link to={`/product/${product.slug || product._id}`}>
             <Button>Mua ngay</Button>
           </Link>

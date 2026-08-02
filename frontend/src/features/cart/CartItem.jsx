@@ -7,6 +7,7 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 const CartItem = ({ item, addToCartHandler, removeCart }) => {
   const { image, name, price, qty, countInStock } = item;
@@ -16,7 +17,7 @@ const CartItem = ({ item, addToCartHandler, removeCart }) => {
 
       <div className='flex flex-col justify-around w-[50%]'>
         <h3 className='text-primary text-xl font-semibold'>{name}</h3>
-        <p className='product-price'>$ {price}</p>
+        <p className='product-price'>{formatCurrency(price)}</p>
       </div>
 
       <div className='w-32 h-auto my-auto'>

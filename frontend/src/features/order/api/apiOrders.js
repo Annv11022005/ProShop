@@ -37,3 +37,9 @@ export async function getMyOrders() {
 
   return res.data;
 }
+
+export async function createVnpayPayment(id) {
+  const res = await axios.post(`/api/v1/orders/${id}/vnpay/create`);
+
+  return res.data;
+}

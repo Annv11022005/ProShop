@@ -17,6 +17,7 @@ import {
 import { Plus, SquarePenIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Paginate from '@/components/Paginate';
+import { formatCurrency } from '@/lib/utils';
 
 const ProductListPage = () => {
   const { pageNumber } = useParams();
@@ -75,7 +76,7 @@ const ProductListPage = () => {
                   {product.name}
                 </TableCell>
                 <TableCell className='text-center font-semibold'>
-                  $ {product.price}
+                  {formatCurrency(product.price)}
                 </TableCell>
                 <TableCell className='text-center'>
                   {product.category}

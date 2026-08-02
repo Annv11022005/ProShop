@@ -13,6 +13,7 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 const ProductActionCard = ({ product, qty, setQty, onAddToCart }) => {
   return (
@@ -20,7 +21,7 @@ const ProductActionCard = ({ product, qty, setQty, onAddToCart }) => {
       <CardHeader className='border-b border-primary'>
         <CardTitle className='flex-between-center'>
           <p>Price:</p>
-          <p>$ {product.price}</p>
+          <p>{formatCurrency(product.price)}</p>
         </CardTitle>
       </CardHeader>
 

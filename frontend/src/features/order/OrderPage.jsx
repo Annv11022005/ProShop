@@ -6,6 +6,7 @@ import {
   useGetOrderDetail,
   usePayOrder,
   useGetPayPalClientById,
+  useCreateVnpayPayment,
 } from './hooks/useOrders';
 
 import Item from '../checkout/components/Item';
@@ -24,6 +25,7 @@ import {
 import { toast } from 'sonner';
 import { useUpdateOrder } from '../admin/hook/useAdmin';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
@@ -36,6 +38,8 @@ const OrderPage = () => {
   } = useGetOrderDetail(orderId);
 
   const { payOrderItem } = usePayOrder();
+
+  const { createPayment } = useCreateVnpayPayment();
 
   const [{ isPending: isPaypalScriptPending }, paypalDispatch] =
     usePayPalScriptReducer();
@@ -117,6 +121,17 @@ const OrderPage = () => {
       await deliverOrder(orderId);
       refetch();
       toast.success('Order delivered', { position: 'top-center' });
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || 'payment error', {
+        position: 'top-center',
+      });
+    }
+  }
+
+  async function createPaymentHandler() {
+    try {
+      const payment = await createPayment(orderId);
+      window.location.href = payment.paymentUrl;
     } catch (error) {
       toast.error(error?.data?.message || error?.message || 'payment error', {
         position: 'top-center',
@@ -229,19 +244,19 @@ const OrderPage = () => {
               <CardContent className='flex flex-col gap-y-3 divide-y divide-primary'>
                 <div className='flex flex-row justify-between'>
                   <p>Items:</p>
-                  <p>$ {order.itemsPrice}</p>
+                  <p>{formatCurrency(order.itemsPrice)}</p>
                 </div>
                 <div className='flex flex-row justify-between'>
                   <p>Shipping:</p>
-                  <p>$ {order.shippingPrice}</p>
+                  <p>{formatCurrency(order.shippingPrice)}</p>
                 </div>
                 <div className='flex flex-row justify-between'>
                   <p>Tax:</p>
-                  <p>$ {order.taxPrice}</p>
+                  <p>{formatCurrency(order.taxPrice)}</p>
                 </div>
                 <div className='flex flex-row justify-between'>
                   <p>Total:</p>
-                  <p>$ {order.totalPrice}</p>
+                  <p>{formatCurrency(order.totalPrice)}</p>
                 </div>
               </CardContent>
 
@@ -255,12 +270,17 @@ const OrderPage = () => {
                       {/* <Button size='lg' onClick={onApproveTest}>
                         {pendingPay ? <Spinner /> : 'Test Pay order'}
                       </Button> */}
-
-                      <PayPalButtons
-                        createOrder={createOrder}
-                        onApprove={onApprove}
-                        onError={onError}
-                      />
+                      {order.paymentMethod === 'Paypal' ? (
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        />
+                      ) : (
+                        <Button size='lg' onClick={createPaymentHandler}>
+                          Tiến hành thanh toán
+                        </Button>
+                      )}
                     </div>
                   )}
                 </CardFooter>
