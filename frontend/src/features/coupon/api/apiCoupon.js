@@ -12,8 +12,10 @@ export async function getALlCategory() {
   return res.data;
 }
 
-export async function getCoupon(id) {
-  const res = await axios.get(`/api/v1/coupons/${id}`);
+export async function getCoupon(code) {
+  const res = await axios.get('/api/v1/coupons/code', {
+    params: { code },
+  });
 
   return res.data;
 }

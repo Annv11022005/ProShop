@@ -15,19 +15,19 @@ export default function CartItemRow({ item }) {
         />
       </div>
 
-      <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+      <div className='flex min-w-0 flex-1 flex-col  gap-0.5'>
         <Link to={`/product/${productId}`}>
           <div className='truncate hover:underline hover:italic text-sm font-medium text-neutral-900'>
             {name}
           </div>
         </Link>
-        <p className='flex min-w-0 items-center gap-1.5 text-sm text-neutral-500'>
-          <span className='shrink-0'>Qty {qty}</span>
+        <p className='min-w-0 text-sm text-neutral-500'>
+          <span>Qty {qty}</span>
         </p>
       </div>
 
       <div className='flex shrink-0 flex-col items-end gap-1'>
-        <span className='text-sm font-medium tabular-nums text-neutral-900'>
+        <span className='text-[16px] font-medium tabular-nums text-neutral-900'>
           {formatCurrency(price)}
         </span>
         {/* {item.originalPrice && (

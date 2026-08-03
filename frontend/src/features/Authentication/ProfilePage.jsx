@@ -85,7 +85,7 @@ const ProfilePage = () => {
   if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
 
   if (errDefault) {
-    return <Message>Không tải được địa chỉ, thử lại sau</Message>;
+    return <Message>Failed to load address, try again later</Message>;
   }
 
   if (errUp) {
@@ -118,7 +118,7 @@ const ProfilePage = () => {
   function updateDefaultAddressHandler(id) {
     replaceDefaultAddress(id, {
       onSuccess: () => {
-        toast.success('Đã đặt làm địa chỉ mặc định', {
+        toast.success('Set as default address', {
           position: 'top-center',
         });
         refetch();
@@ -132,7 +132,7 @@ const ProfilePage = () => {
   function deleteAddressHandler(id) {
     deletedAddress(id, {
       onSuccess: () => {
-        toast.success('Đã xoá địa chỉ', {
+        toast.success('Address deleted', {
           position: 'top-center',
         });
         refetch();
@@ -155,9 +155,10 @@ const ProfilePage = () => {
               Shipping Address Default
             </CardTitle>
             <CardDescription>
-              {!currentAddress ? (
-                'Anh/chị chưa có địa chỉ nào.'
-              ) : (
+              {allAddress?.length === 0
+                ? 'You do not have any addresses.'
+                : 'Manage your saved shipping addresses.'}
+              {currentAddress && (
                 <>
                   {currentAddress.name}, {currentAddress.phone},
                   {currentAddress.address}, {currentAddress.city},{' '}
@@ -215,6 +216,8 @@ const ProfilePage = () => {
                     </CommandItem>
                     <Button
                       variant='outline'
+                      size='sm'
+                      className='text-xs'
                       onClick={() => {
                         navigate('/shipping', {
                           state: { action: 'update', address: addr },
@@ -222,13 +225,16 @@ const ProfilePage = () => {
                         setOpen(false);
                       }}
                     >
-                      Sửa
+                      Edit
                     </Button>
                     <Button
+                      variant='outline'
+                      size='sm'
+                      className='text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200'
                       disabled={pendingDelete}
                       onClick={() => deleteAddressHandler(addr._id)}
                     >
-                      Xoá
+                      Delete
                     </Button>
                   </div>
                 ))}

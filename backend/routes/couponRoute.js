@@ -7,7 +7,7 @@ import {
   deleteCoupon,
   getAllCategory,
   getAllCoupon,
-  getCouponById,
+  getCouponByCode,
   toggleCoupon,
   updateCoupon,
 } from '../controller/couponController.js';
@@ -17,9 +17,10 @@ router.route('/').get(getAllCoupon).post(admin, createCoupon);
 
 router.route('/category').get(getAllCategory);
 
+router.route('/code').get(getCouponByCode);
+
 router
   .route('/:id')
-  .get(validateParams(mongoIdParamSchema), getCouponById)
   .put(admin, validateParams(mongoIdParamSchema), updateCoupon)
   .delete(admin, validateParams(mongoIdParamSchema), deleteCoupon);
 

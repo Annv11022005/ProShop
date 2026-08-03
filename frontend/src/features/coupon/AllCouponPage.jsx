@@ -16,10 +16,10 @@ export default function AllCouponPage() {
     coupons,
   } = useGetAllCoupon();
 
-  const [activeCategory, setActiveCategory] = useState('Tất cả');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   const filtered =
-    activeCategory === 'Tất cả'
+    activeCategory === 'All'
       ? coupons
       : coupons.filter((c) => c.category === activeCategory);
 
@@ -32,22 +32,20 @@ export default function AllCouponPage() {
       <section className='mx-auto w-full max-w-6xl'>
         <header className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
           <div className='flex min-w-0 flex-col gap-2'>
-            <span className='inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-foreground'>
-              <Ticket className='size-3.5' aria-hidden='true' />
-              Ưu đãi
-            </span>
-            <h1 className='text-2xl font-semibold tracking-tight text-primary sm:text-3xl'>
-              Các ưu đãi hiện có
+            <h1 className='text-xs font-semibold tracking-widest text-neutral-500 uppercase'>
+              Offers
             </h1>
-            <p className='max-w-prose text-sm leading-5 text-muted-foreground'>
-              Xem các ưu đãi hiện tại và sao chép mã trực tiếp vào bộ nhớ tạm.
+            <h2 className='mt-2 text-2xl font-bold text-neutral-900'>
+              Current Offers
+            </h2>
+            <p className='mt-2 text-sm text-neutral-600'>
+              View current offers and copy codes directly to clipboard.
             </p>
           </div>
           <div className='inline-flex shrink-0 items-baseline gap-1.5 self-start text-sm tabular-nums text-muted-foreground sm:self-auto'>
-            <strong className='text-base font-semibold text-primary'>
-              {filtered.length}
-            </strong>
-            <span>ưu đãi</span>
+            <p className='text-sm text-neutral-500'>
+              Showing {filtered.length} <span>offers</span>
+            </p>
           </div>
         </header>
 

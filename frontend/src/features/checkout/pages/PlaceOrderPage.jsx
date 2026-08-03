@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useCreateOrder } from '@/features/order/hooks/useOrders';
 import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
-import { clearCartItems } from '../../cart/cartSlice';
+import { clearCartItems, applyCoupon } from '../../cart/cartSlice';
 
 import StepCheckout from '../components/StepCheckout';
 import { Field, FieldGroup, FieldSet, FieldTitle } from '@/components/ui/field';
@@ -43,6 +43,7 @@ const PlaceOrderPage = () => {
         shippingPrice: cart.shippingPrice,
         taxPrice: cart.taxPrice,
         totalPrice: cart.totalPrice,
+        coupon: cart.coupon?._id || null,
       },
       {
         onSuccess: (data) => {
@@ -94,6 +95,9 @@ const PlaceOrderPage = () => {
             cart={cart}
             placeOrderHandler={placeOrderHandler}
             isLoading={isPending}
+            discount={cart.discount || 0}
+            totalAfterDiscount={cart.totalPrice}
+            onApplyCoupon={(coupon) => dispatch(applyCoupon(coupon))}
           />
         </Col>
       </Row>

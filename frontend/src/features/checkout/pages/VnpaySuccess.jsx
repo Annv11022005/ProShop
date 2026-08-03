@@ -30,7 +30,7 @@ const VnpaySuccess = () => {
       .catch(() => setStatus('failed'));
   }, [orderId]);
 
-  if (status === 'checking') return <p>Đang xác nhận thanh toán...</p>;
+  if (status === 'checking') return <p>Confirming payment...</p>;
 
   return (
     <div>
@@ -48,20 +48,20 @@ const VnpaySuccess = () => {
                   </IconStack>
                 </EmptyMedia>
                 <EmptyTitle className='text-xl font-semibold'>
-                  Thanh toán thành công
+                  Payment Successful
                 </EmptyTitle>
                 <EmptyDescription>
-                  Đơn hàng {orderId} của bạn đã được thanh toán thành công!
+                  Your order {orderId} has been paid successfully!
                 </EmptyDescription>
               </EmptyHeader>
 
               <EmptyContent className='hover:underline hover:italic font-semibold text-lg'>
-                <Link to={`/order/${orderId}`}>Xem đơn hàng</Link>
+                <Link to={`/order/${orderId}`}>View Order</Link>
               </EmptyContent>
             </Empty>
           </div>
         ) : (
-          'Thanh toán thất bại'
+          'Payment Failed'
         )}
       </h2>
     </div>

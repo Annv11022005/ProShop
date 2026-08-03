@@ -78,7 +78,7 @@ const ShippingPage = () => {
             setAction('');
             setEditingId(null);
             navigate('/profile');
-            toast.success('Cập nhật địa chỉ thành công', {
+            toast.success('Address updated successfully', {
               position: 'top-center',
             });
           },

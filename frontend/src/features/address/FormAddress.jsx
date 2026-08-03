@@ -41,7 +41,7 @@ const FormAddress = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               type='text'
-              placeholder='VD: nhà riêng, công ty, ...'
+              placeholder='e.g., Home, Office, ...'
             />
           </Field>
 

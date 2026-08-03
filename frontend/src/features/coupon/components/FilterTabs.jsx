@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
 const FilterTabs = ({ categories, active, onChange }) => {
-  const allCategories = useMemo(() => ['Tất cả', ...categories], [categories]);
+  const allCategories = useMemo(() => ['All', ...categories], [categories]);
 
   return (
     <div
       role='group'
-      aria-label='Lọc ưu đãi theo danh mục'
+      aria-label='Filter offers by category'
       className='mt-6 flex flex-wrap gap-1.5'
     >
       {allCategories.map((cat) => {

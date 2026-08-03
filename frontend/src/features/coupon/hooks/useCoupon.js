@@ -7,15 +7,16 @@ import {
   updateCoupon,
 } from '../api/apiCoupon';
 
-export function useCouponById(id) {
+export function useGetCouponByCode(code) {
   const {
     isPending,
     error,
     data: coupon,
   } = useQuery({
-    queryKey: ['coupon', id],
-    queryFn: () => getCoupon(id),
-    enabled: !!id,
+    queryKey: ['coupon', code],
+    queryFn: () => getCoupon(code),
+    enabled: !!code,
+    retry: false,
   });
 
   return { isPending, error, coupon };

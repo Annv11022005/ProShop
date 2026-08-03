@@ -32,11 +32,12 @@ export const getAllCategory = asyncHandler(async (req, res) => {
   res.status(200).json(categories);
 });
 
-// @desc Get coupon by Id
-// GET /api/coupons/:id
+// @desc Get coupon by code
+// GET /api/coupons/code
 // @access public
-export const getCouponById = asyncHandler(async (req, res) => {
-  const coupon = await Coupon.findById(req.params.id);
+export const getCouponByCode = asyncHandler(async (req, res) => {
+  const { code } = req.query;
+  const coupon = await Coupon.findOne({ code });
 
   if (coupon) {
     res.status(200).json(coupon);

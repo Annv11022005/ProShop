@@ -278,7 +278,7 @@ const OrderPage = () => {
                         />
                       ) : (
                         <Button size='lg' onClick={createPaymentHandler}>
-                          Tiến hành thanh toán
+                          Proceed to Payment
                         </Button>
                       )}
                     </div>

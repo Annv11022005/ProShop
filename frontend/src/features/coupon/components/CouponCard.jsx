@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 import { Clock, ShoppingBag, Ticket } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -55,16 +56,16 @@ const CouponCard = ({ coupon }) => {
           <span className='inline-flex items-center gap-1.5'>
             <ShoppingBag className='size-3.5' aria-hidden='true' />
             <strong className='font-medium text-primary'>
-              {coupon.minSpend
-                ? `Tối thiểu ${coupon.minSpend}`
-                : 'Không giới hạn'}
+              {coupon.minSpend > 0
+                ? `Min. ${formatCurrency(coupon.minSpend)}`
+                : 'No limit'}
             </strong>
           </span>
           <span aria-hidden='true' className='size-1 rounded-full bg-border' />
           <span className='inline-flex items-center gap-1.5'>
             <Clock className='size-3.5' aria-hidden='true' />
             <strong className='font-medium text-primary'>
-              {coupon.expiry}
+              {new Date(coupon.expiry).toLocaleDateString()}
             </strong>
           </span>
         </div>
