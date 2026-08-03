@@ -67,9 +67,6 @@ const App = () => {
                 element={<HomeScreen />}
               />
               <Route path='/product/:slug' element={<ProductScreen />} />
-              <Route path='/login' element={<LoginScreen />} />
-              <Route path='/register' element={<RegisterScreen />} />
-              <Route path='/register/verify' element={<OTPRegisterScreen />} />
               <Route path='/coupon' element={<CouponScreen />} />
 
               <Route element={<PrivateRoutes />}>
@@ -82,6 +79,10 @@ const App = () => {
                 <Route path='/vnpay-return' element={<VnpaySuccess />} />
               </Route>
             </Route>
+
+            <Route path='/login' element={<LoginScreen />} />
+            <Route path='/register' element={<RegisterScreen />} />
+            <Route path='/register/verify' element={<OTPRegisterScreen />} />
 
             <Route element={<AdminRoutes />}>
               <Route path='/admin/order-list' element={<OrderListScreen />} />
