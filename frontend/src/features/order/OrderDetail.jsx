@@ -82,7 +82,6 @@ const SHIPPING = {
 };
 
 // Component: ReceiptHeader
-
 function ReceiptHeader({ receiptId }) {
   return (
     <header className='mb-6 flex flex-wrap items-center justify-between gap-4 '>

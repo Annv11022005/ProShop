@@ -9,8 +9,6 @@ import StepCheckout from '../components/StepCheckout';
 import { Field, FieldGroup, FieldSet, FieldTitle } from '@/components/ui/field';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
-import { Message } from '@/components/ui/Message';
-import ListItems from '../components/ListItems';
 import PlaceOrderSummary from '../components/PlaceOrderSummary';
 import { toast } from 'sonner';
 
@@ -60,44 +58,35 @@ const PlaceOrderPage = () => {
 
   return (
     <>
-      <StepCheckout step1 step2 step3 />
-
       <Row template='lg:grid-cols-[2fr_1fr]'>
-        <Col fluid className='divide-y divide-primary'>
-          <FieldSet className='w-full pb-4 mb-2'>
-            <FieldGroup>
-              <Field className='flex flex-row'>
-                <FieldTitle className='text-md'>Address:</FieldTitle>
-                <p>
-                  {currentAddress?.name}, {currentAddress?.phone},{' '}
-                  {currentAddress?.address}, {currentAddress?.city},{' '}
-                  {currentAddress?.postalCode}, {currentAddress?.country}
-                </p>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
+        <Col fluid>
+          <h2 className=' text-3xl font-bold text-primary/80 uppercase '>
+            Place Order
+          </h2>
+          <StepCheckout step1 step2 step3 />
+          <div className='divide-y divide-primary mt-10'>
+            <FieldSet className='w-full pb-4 mb-2'>
+              <FieldGroup>
+                <Field className='flex flex-row'>
+                  <FieldTitle className='text-md'>Address:</FieldTitle>
+                  <p>
+                    {currentAddress?.name}, {currentAddress?.phone},{' '}
+                    {currentAddress?.address}, {currentAddress?.city},{' '}
+                    {currentAddress?.postalCode}, {currentAddress?.country}
+                  </p>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
 
-          <FieldSet className='w-full pb-4 mb-2'>
-            <FieldGroup>
-              <Field className='flex flex-row'>
-                <FieldTitle className='text-md'>Payment Method:</FieldTitle>
-                <p>{cart.paymentMethod}</p>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-
-          <FieldSet className='w-full pb-4 mb-2'>
-            <FieldGroup>
-              <Field>
-                <FieldTitle className='text-md'>Order Items:</FieldTitle>
-                {cart.cartItems.length === 0 ? (
-                  <Message>Your cart is empty</Message>
-                ) : (
-                  <ListItems cart={cart} />
-                )}
-              </Field>
-            </FieldGroup>
-          </FieldSet>
+            <FieldSet className='w-full pb-4 mb-2'>
+              <FieldGroup>
+                <Field className='flex flex-row'>
+                  <FieldTitle className='text-md'>Payment Method:</FieldTitle>
+                  <p>{cart.paymentMethod}</p>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          </div>
         </Col>
 
         <Col fluid>
