@@ -1,0 +1,43 @@
+import axios from 'axios';
+
+export async function getALlCoupon() {
+  const res = await axios.get('/api/v1/coupons');
+
+  return res.data;
+}
+
+export async function getALlCategory() {
+  const res = await axios.get('/api/v1/coupons/category');
+
+  return res.data;
+}
+
+export async function getCoupon(id) {
+  const res = await axios.get(`/api/v1/coupons/${id}`);
+
+  return res.data;
+}
+
+export async function createCoupon(data) {
+  const res = await axios.post('/api/v1/coupons', data);
+
+  return res.data;
+}
+
+export async function toggleCoupon(id) {
+  const res = await axios.put(`/api/v1/coupons/${id}/toggle`);
+
+  return res.data;
+}
+
+export async function updateCoupon({ id, data }) {
+  const res = await axios.put(`/api/v1/coupons/${id}`, data);
+
+  return res.data;
+}
+
+export async function deleteCoupon(id) {
+  const res = await axios.delete(`/api/v1/coupons/${id}`);
+
+  return res.data;
+}

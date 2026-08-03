@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/authentication/authSlice';
 import { useLogout } from '@/features/authentication/hooks/useAuth';
@@ -50,14 +50,21 @@ const Header = () => {
         </div>
 
         <div className='flex gap-3 action'>
-          <NavLink to='/cart'>
+          <Link to='/cart'>
             <Button size='lg' className=' relative'>
               <ShoppingCart /> Cart
               {userInfo && cartItems.length > 0 && (
                 <span className='buble'>{cartItems.length}</span>
               )}
             </Button>
-          </NavLink>
+          </Link>
+
+          <Link to='/coupon'>
+            <Button size='lg' variant='outline'>
+              Coupon
+            </Button>
+          </Link>
+
           {userInfo && !userInfo.isAdmin ? (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -94,11 +101,11 @@ const Header = () => {
               {userInfo.name}
             </Button>
           ) : (
-            <NavLink to='/login'>
+            <Link to='/login'>
               <Button size='lg'>
                 <LogIn /> Sign in
               </Button>
-            </NavLink>
+            </Link>
           )}
         </div>
       </nav>

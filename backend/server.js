@@ -20,6 +20,7 @@ import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import addressRoutes from './routes/addressRoute.js';
+import couponRoutes from './routes/couponRoute.js';
 
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
@@ -73,6 +74,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/address', addressRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/v1/coupons', couponRoutes);
 
 app.get('/api/config/paypal', (req, res) => {
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID });

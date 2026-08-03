@@ -1,6 +1,3 @@
-// Title: Icon Stack
-// Description: Layered icon illustration container
-
 import { cn } from "@/lib/utils"
 
 function IconStack({

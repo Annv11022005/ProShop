@@ -27,6 +27,7 @@ import CreateProductScreen from '@/screens/admin/CreateProductScreen';
 import UserListScreen from '@/screens/admin/UserListScreen';
 import UserEditScreen from '@/screens/admin/UserEditScreen';
 import OTPRegisterScreen from '@/screens/OTPRegisterScreen';
+import CouponScreen from '@/screens/CouponScreen';
 import VnpaySuccess from '@/features/checkout/pages/VnpaySuccess';
 
 const queryClient = new QueryClient({
@@ -69,9 +70,10 @@ const App = () => {
               <Route path='/login' element={<LoginScreen />} />
               <Route path='/register' element={<RegisterScreen />} />
               <Route path='/register/verify' element={<OTPRegisterScreen />} />
-              <Route path='/profile' element={<ProfileScreen />} />
+              <Route path='/coupon' element={<CouponScreen />} />
 
               <Route element={<PrivateRoutes />}>
+                <Route path='/profile' element={<ProfileScreen />} />
                 <Route path='/cart' element={<CartScreen />} />
                 <Route path='/shipping' element={<ShippingScreen />} />
                 <Route path='/payment' element={<PaymentScreen />} />
