@@ -36,6 +36,7 @@ const cartSlice = createSlice({
     },
     clearCartItems: (state, action) => {
       state.cartItems = [];
+      state.coupon = null;
       return updateCart(state);
     },
     applyCoupon: (state, action) => {

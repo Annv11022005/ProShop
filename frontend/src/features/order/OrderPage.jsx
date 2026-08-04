@@ -37,6 +37,8 @@ const OrderPage = () => {
     refetch,
   } = useGetOrderDetail(orderId);
 
+  console.log(order);
+
   const { payOrderItem } = usePayOrder();
 
   const { createPayment } = useCreateVnpayPayment();
@@ -254,7 +256,13 @@ const OrderPage = () => {
                   <p>Tax:</p>
                   <p>{formatCurrency(order.taxPrice)}</p>
                 </div>
-                <div className='flex flex-row justify-between'>
+                {order.discount > 0 && (
+                  <div className='flex flex-row justify-between text-emerald-600 font-medium'>
+                    <p>Discount:</p>
+                    <p>-{formatCurrency(order.discount)}</p>
+                  </div>
+                )}
+                <div className='flex flex-row justify-between font-semibold'>
                   <p>Total:</p>
                   <p>{formatCurrency(order.totalPrice)}</p>
                 </div>

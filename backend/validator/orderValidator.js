@@ -49,10 +49,7 @@ export const createOrderSchema = Joi.object({
   paymentMethod: Joi.string().trim().required().messages({
     'any.required': 'Phương thức thanh toán là bắt buộc',
   }),
-  itemsPrice: Joi.number().min(0).required(),
-  taxPrice: Joi.number().min(0).required(),
-  shippingPrice: Joi.number().min(0).required(),
-  totalPrice: Joi.number().min(0).required(),
+  couponCode: Joi.string().allow(null, '').optional(),
 });
 
 // Validate body khi cập nhật đã thanh toán

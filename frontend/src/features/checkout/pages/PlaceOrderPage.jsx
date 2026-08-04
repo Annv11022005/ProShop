@@ -39,11 +39,7 @@ const PlaceOrderPage = () => {
         orderItems: cart.cartItems,
         addressId: currentAddress?._id,
         paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        taxPrice: cart.taxPrice,
-        totalPrice: cart.totalPrice,
-        coupon: cart.coupon?._id || null,
+        couponCode: cart.coupon?.code || null,
       },
       {
         onSuccess: (data) => {

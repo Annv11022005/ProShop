@@ -33,7 +33,7 @@ const Product = ({ product }) => {
         <div className='flex items-center w-full justify-between'>
           <h2 className='product-price'>{formatCurrency(product.price)}</h2>
           <Link to={`/product/${product.slug || product._id}`}>
-            <Button>Mua ngay</Button>
+            <Button>Buy Now</Button>
           </Link>
         </div>
       </CardFooter>

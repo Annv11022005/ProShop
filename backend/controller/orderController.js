@@ -1,62 +1,106 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../model/orderModel.js';
+import Product from '../model/productsModel.js';
+import Coupon from '../model/couponModel.js';
 import Address from '../model/addressModel.js';
+
+export const addDecimals = (num) => {
+  return (Math.round(num * 100) / 100).toFixed(2);
+};
 
 // @desc Create new order
 // POST /api/orders
 // @access private
 export const addOrderItems = asyncHandler(async (req, res) => {
-  const {
-    orderItems,
-    addressId,
+  const { orderItems, addressId, paymentMethod, couponCode } = req.body;
+
+  if (!orderItems || orderItems.length === 0) {
+    res.status(400);
+    throw new Error('No order item');
+  }
+
+  const productIds = orderItems.map((x) => x._id);
+  const products = await Product.find({ _id: { $in: productIds } });
+  const selectedAddress = await Address.findOne({
+    _id: addressId,
+    user: req.user._id,
+  });
+  const couponOrder = couponCode ? await Coupon.findOne({ code: couponCode }) : null;
+  let discount = 0;
+
+  if (!selectedAddress) {
+    res.status(404);
+    throw new Error('Shipping address not found');
+  }
+
+  const orderItemsData = orderItems.map((x) => {
+    const matchedProduct = products.find(
+      (p) => p._id.toString() === x._id.toString(),
+    );
+
+    if (!matchedProduct) {
+      res.status(404);
+      throw new Error(`Product not found with id: ${x._id}`);
+    }
+
+    return {
+      ...x,
+      product: matchedProduct._id,
+      price: matchedProduct.price,
+      qty: x.qty,
+      _id: undefined,
+    };
+  });
+
+  const itemsPrice = addDecimals(
+    orderItemsData.reduce((acc, item) => acc + item.price * item.qty, 0),
+  );
+
+  const shippingPrice = addDecimals(itemsPrice > 500000 ? 0 : 30000);
+
+  const taxPrice = addDecimals(Number(0.15 * itemsPrice).toFixed(2));
+  if (couponOrder) {
+    if (couponOrder.discountType === 'percentage') {
+      const rate = Math.min(Math.max(couponOrder.discountValue, 0), 100);
+      discount = (itemsPrice * rate) / 100;
+    } else if (couponOrder.discountType === 'fixed') {
+      discount = Math.min(couponOrder.discountValue, Number(itemsPrice));
+    }
+  }
+
+  const roundedDiscount = Number(addDecimals(discount));
+
+  const totalPrice = Math.max(
+    0,
+    Number(itemsPrice) +
+      Number(shippingPrice) +
+      Number(taxPrice) -
+      roundedDiscount,
+  ).toFixed(2);
+
+  const order = new Order({
+    orderItems: orderItemsData,
+    user: req.user._id,
+    shippingAddress: {
+      addressRef: selectedAddress._id,
+      name: selectedAddress.name,
+      phone: selectedAddress.phone,
+      address: selectedAddress.address,
+      city: selectedAddress.city,
+      postalCode: selectedAddress.postalCode,
+      country: selectedAddress.country,
+    },
     paymentMethod,
     itemsPrice,
     taxPrice,
     shippingPrice,
+    discount: roundedDiscount,
     totalPrice,
-  } = req.body;
+  });
 
-  if (orderItems && orderItems.length === 0) {
-    res.status(400);
-    throw new Error('No order item');
-  } else {
-    const selectedAddress = await Address.findOne({
-      _id: addressId,
-      user: req.user._id,
-    });
+  const createOrder = await order.save();
 
-    if (!selectedAddress) {
-      res.status(404);
-      throw new Error('Shipping address not found');
-    }
-
-    const order = new Order({
-      orderItems: orderItems.map((x) => ({
-        ...x,
-        product: x._id,
-        _id: undefined,
-      })),
-      user: req.user._id,
-      shippingAddress: {
-        addressRef: selectedAddress._id,
-        name: selectedAddress.name,
-        phone: selectedAddress.phone,
-        address: selectedAddress.address,
-        city: selectedAddress.city,
-        postalCode: selectedAddress.postalCode,
-        country: selectedAddress.country,
-      },
-      paymentMethod,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-    });
-
-    const createOrder = await order.save();
-
-    res.status(201).json(createOrder);
-  }
+  res.status(201).json(createOrder);
 });
 
 // @desc Get logged in user order

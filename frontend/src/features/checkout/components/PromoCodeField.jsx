@@ -15,13 +15,22 @@ export default function PromoCodeField({ onApply, price, initialCouponCode }) {
     if (coupon) {
       onApply?.(coupon);
     }
-  }, [coupon, onApply]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coupon]);
 
   useEffect(() => {
     if (error) {
       onApply?.(null);
     }
-  }, [error, onApply]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
+  useEffect(() => {
+    if (!initialCouponCode) {
+      setValue('');
+      setSubmittedCode('');
+    }
+  }, [initialCouponCode]);
 
   const appliedCode = coupon?.code;
 
