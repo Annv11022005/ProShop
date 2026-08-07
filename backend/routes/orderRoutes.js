@@ -21,21 +21,20 @@ import {
   VNPayCallback,
 } from '../controller/paymentController.js';
 
+router.use(protect);
+
 router
   .route('/')
-  .post(protect, validate(createOrderSchema), addOrderItems)
-  .get(protect, admin, getOrders);
+  .post(validate(createOrderSchema), addOrderItems)
+  .get(admin, getOrders);
 
-router.route('/mine').get(protect, getMyOrder);
+router.route('/mine').get(getMyOrder);
 
-router
-  .route('/:id')
-  .get(protect, validateParams(mongoIdParamSchema), getOrderByID);
+router.route('/:id').get(validateParams(mongoIdParamSchema), getOrderByID);
 
 router
   .route('/:id/pay')
   .put(
-    protect,
     validateParams(mongoIdParamSchema),
     validate(payOrderSchema),
     updateOrderToPaid,
@@ -43,11 +42,11 @@ router
 
 router
   .route('/:id/deliver')
-  .put(protect, validateParams(mongoIdParamSchema), updateOrderToDelivered);
+  .put(validateParams(mongoIdParamSchema), updateOrderToDelivered);
 
 router
   .route('/:id/vnpay/create')
-  .post(protect, validateParams(mongoIdParamSchema), createPayment);
+  .post(validateParams(mongoIdParamSchema), createPayment);
 router.route('/vnpay/callback').get(VNPayCallback);
 
 export default router;

@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/table';
 import { useGetOrders } from './hook/useAdmin';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';

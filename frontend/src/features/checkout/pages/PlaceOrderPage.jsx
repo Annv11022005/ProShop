@@ -6,11 +6,13 @@ import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
 import { clearCartItems, applyCoupon } from '../../cart/cartSlice';
 
 import StepCheckout from '../components/StepCheckout';
+import PlaceOrderSummary from '../components/PlaceOrderSummary';
 import { Field, FieldGroup, FieldSet, FieldTitle } from '@/components/ui/field';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
-import PlaceOrderSummary from '../components/PlaceOrderSummary';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { MoveRightIcon } from 'lucide-react';
 
 const PlaceOrderPage = () => {
   const { createOrderItems, isPending } = useCreateOrder();
@@ -83,6 +85,12 @@ const PlaceOrderPage = () => {
                 </Field>
               </FieldGroup>
             </FieldSet>
+          </div>
+          <div className='flex justify-end'>
+            <Button size='lg' disabled={isPending} onClick={placeOrderHandler}>
+              Place Order
+              <MoveRightIcon />
+            </Button>
           </div>
         </Col>
 

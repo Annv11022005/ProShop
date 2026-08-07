@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import { Spinner } from '@/components/ui/spinner.jsx';
-import { Message } from '@/components/ui/Message.jsx';
+import { Message } from '@/components/AlertMessage.jsx';
 import ProductActionCard from './ProductActionCard.jsx';
 import ListReview from './components/ListReview.jsx';
 import { Rating } from '@/components/reui/rating';
@@ -94,7 +94,9 @@ const ProductDetail = () => {
 
               <span className='line' />
 
-              <h2 className='product-detail'>{formatCurrency(product.price)}</h2>
+              <h2 className='product-detail'>
+                {formatCurrency(product.price)}
+              </h2>
 
               <span className='line' />
 

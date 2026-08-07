@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import {
   LogOutIcon,
+  MessageCircle,
   MoveLeft,
   Package,
   ShoppingCart,
@@ -28,6 +29,7 @@ const menuItems = [
   { title: 'Product', url: '/admin/product-list', icon: Package },
   { title: 'Order', url: '/admin/order-list', icon: ShoppingCart },
   { title: 'User', url: '/admin/user-list', icon: Users },
+  { title: 'Chat', url: '/admin/chat', icon: MessageCircle },
 ];
 
 export function AdminSidebar() {
@@ -63,14 +65,17 @@ export function AdminSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
-                    <Link
-                      to={item.url}
-                      className='flex items-center gap-5 w-[75%] mx-auto'
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
+                  <SidebarMenuButton
+                    render={
+                      <Link
+                        to={item.url}
+                        className='flex items-center gap-5 w-[75%] mx-auto'
+                      />
+                    }
+                    isActive={pathname === item.url}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

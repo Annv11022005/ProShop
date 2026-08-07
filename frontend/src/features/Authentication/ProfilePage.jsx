@@ -26,7 +26,7 @@ import Row from '@/components/ui/Row';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import {
   Card,
   CardAction,

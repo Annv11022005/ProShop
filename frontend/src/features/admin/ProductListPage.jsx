@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDeleteProduct } from '../product/hooks/useProduct';
 
 import { Button } from '@/components/ui/button';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Table,

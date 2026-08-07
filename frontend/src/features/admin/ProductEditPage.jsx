@@ -11,7 +11,7 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
 import { ChevronLeft } from 'lucide-react';
 

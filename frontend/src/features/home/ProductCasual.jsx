@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/carousel';
 import { useTopProduct } from '../product/hooks/useProducts';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { Link } from 'react-router-dom';
 
 const ProductCasual = () => {

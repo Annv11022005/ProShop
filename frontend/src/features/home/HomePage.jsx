@@ -7,10 +7,11 @@ import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import Product from '@/components/ui/Product';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import Paginate from '../../components/Paginate';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
+import ChatWidget from '../chat/ChatWidget';
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
@@ -65,6 +66,8 @@ const HomePage = () => {
           </Row>
         </>
       )}
+
+      <ChatWidget />
     </>
   );
 };

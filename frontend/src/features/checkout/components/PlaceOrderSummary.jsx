@@ -1,13 +1,9 @@
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { formatCurrency } from '@/lib/utils';
 import CartItemRow from './CartItemRow';
 import PromoCodeField from './PromoCodeField';
 import SummaryLine from './SummaryLine';
 const PlaceOrderSummary = ({
   cart,
-  placeOrderHandler,
-  isLoading,
   discount,
   totalAfterDiscount,
   onApplyCoupon,
@@ -41,10 +37,10 @@ const PlaceOrderSummary = ({
 
       <div className='h-px w-full bg-neutral-200' />
 
-      <PromoCodeField 
-        price={discount} 
-        onApply={onApplyCoupon} 
-        initialCouponCode={cart?.coupon?.code} 
+      <PromoCodeField
+        price={discount}
+        onApply={onApplyCoupon}
+        initialCouponCode={cart?.coupon?.code}
       />
 
       <div className='h-px w-full bg-neutral-200' />
@@ -86,10 +82,6 @@ const PlaceOrderSummary = ({
           <span className='inline-flex h-5 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 text-xs font-medium text-emerald-700'>
             Ready to place
           </span>
-
-          <Button size='lg' onClick={placeOrderHandler}>
-            {isLoading ? <Spinner /> : 'Place Order'}
-          </Button>
         </div>
       </div>
     </aside>

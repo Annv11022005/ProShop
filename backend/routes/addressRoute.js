@@ -12,17 +12,19 @@ import { validateParams } from '../middleware/validateMiddleware.js';
 import { mongoIdParamSchema } from '../validator/commonValidator.js';
 const router = express.Router();
 
-router.route('/').get(protect, getAddress).post(protect, createAddress);
+router.use(protect);
 
-router.route('/default').get(protect, getAddressDefault);
+router.route('/').get(getAddress).post(createAddress);
+
+router.route('/default').get(getAddressDefault);
 
 router
   .route('/:id/default')
-  .put(protect, validateParams(mongoIdParamSchema), updateAddressDefault);
+  .put(validateParams(mongoIdParamSchema), updateAddressDefault);
 
 router
   .route('/:id')
-  .delete(protect, validateParams(mongoIdParamSchema), deleteAddress)
-  .put(protect, validateParams(mongoIdParamSchema), updateAddress);
+  .delete(validateParams(mongoIdParamSchema), deleteAddress)
+  .put(validateParams(mongoIdParamSchema), updateAddress);
 
 export default router;

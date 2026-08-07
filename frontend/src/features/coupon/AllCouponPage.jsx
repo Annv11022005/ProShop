@@ -4,7 +4,7 @@ import FilterTabs from './components/FilterTabs';
 import CouponCard from './components/CouponCard';
 import { useGetCategory } from './hooks/useCoupons';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { useGetAllCoupon } from './hooks/useCoupons';
 
 export default function AllCouponPage() {

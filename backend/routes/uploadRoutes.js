@@ -1,33 +1,25 @@
-import path from 'path';
 import express from 'express';
 import multer from 'multer';
 
 import { admin, protect } from '../middleware/authMiddleware.js';
+import imagekit from '../config/imageKit.js';
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename(req, file, cb) {
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`,
-    );
-  },
-});
+// Dùng memoryStorage thay vì diskStorage vì không lưu file xuống ổ đĩa nữa
+const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
   const fileTypes = /jpg|jpeg|png/;
-  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-
+  const extname = fileTypes.test(
+    file.originalname.split('.').pop().toLowerCase(),
+  );
   const mimetype = fileTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Image only!');
+    cb(new Error('Image only!'));
   }
 }
 
@@ -38,11 +30,29 @@ const upload = multer({
   },
 });
 
-router.route('/').post(protect, admin, upload.single('image'), (req, res) => {
-  res.send({
-    message: 'Image Uploaded',
-    image: `/${req.file.path.replace(/\\/g, '/')}`,
+router
+  .route('/')
+  .post(protect, admin, upload.single('image'), async (req, res, next) => {
+    try {
+      if (!req.file) {
+        res.status(400);
+        throw new Error('No file uploaded');
+      }
+
+      const result = await imagekit.upload({
+        file: req.file.buffer.toString('base64'),
+        fileName: `${Date.now()}-${req.file.originalname}`,
+        folder: '/proshop',
+      });
+
+      res.send({
+        message: 'Image Uploaded',
+        image: result.url,
+        fileId: result.fileId,
+      });
+    } catch (error) {
+      next(error);
+    }
   });
-});
 
 export default router;

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
 import { ChevronLeft } from 'lucide-react';
 import { useGetUserById, useUpdateUser } from './hook/useUser';

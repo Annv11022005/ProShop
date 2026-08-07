@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { CheckIcon, SquarePenIcon, Trash2, X } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
 
 const UserListPage = () => {

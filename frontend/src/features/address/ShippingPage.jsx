@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useCreateAddress, useUpdateAddress } from './hooks/useAddress';
 
 import FormAddress from './FormAddress';
-import { Message } from '@/components/ui/Message';
+import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
 
 const ShippingPage = () => {

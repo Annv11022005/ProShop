@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { setCredentials } from './features/authentication/authSlice';
 import { useEffect } from 'react';
@@ -29,6 +29,7 @@ import UserEditScreen from '@/screens/admin/UserEditScreen';
 import OTPRegisterScreen from '@/screens/OTPRegisterScreen';
 import CouponScreen from '@/screens/CouponScreen';
 import VnpaySuccess from '@/features/checkout/pages/VnpaySuccess';
+import MessageScreen from '@/screens/admin/MessageScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +41,17 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      dispatch({ type: 'socket/connect', payload: userInfo._id });
+    }
+
+    return () => {
+      dispatch({ type: 'socket/disconnect' });
+    };
+  }, [userInfo, dispatch]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -104,6 +116,7 @@ const App = () => {
               />
               <Route path='/admin/user-list' element={<UserListScreen />} />
               <Route path='/admin/user/:id' element={<UserEditScreen />} />
+              <Route path='/admin/chat' element={<MessageScreen />} />
             </Route>
           </Routes>
         </BrowserRouter>
