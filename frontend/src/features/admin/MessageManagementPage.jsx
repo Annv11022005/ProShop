@@ -87,7 +87,7 @@ const MessageManagementPage = () => {
   if (errUsers) return <AlertMessage>{errUsers.message}</AlertMessage>;
 
   return (
-    <div className='flex h-[calc(100vh-4rem)] overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm'>
+    <div className='flex h-[calc(100vh-2rem)]'>
       <ChatSidebar
         users={chatUsers || []}
         selectedUserId={selectedUser?._id}

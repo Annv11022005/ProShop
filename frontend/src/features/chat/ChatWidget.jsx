@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { messageSentLocally, setMessages } from './chatSlice';
+import {
+  messageSendFailed,
+  messageSentLocally,
+  messageSentSuccess,
+  setMessages,
+} from './chatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useGetIdSeller,
@@ -41,7 +46,9 @@ const ChatWidget = () => {
   const messages = useSelector((state) => state.chat.messages);
   const [text, setText] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const { isPending: penSeller, error: errSeller, sellerId } = useGetIdSeller();
   const {
@@ -50,6 +57,18 @@ const ChatWidget = () => {
     HistoryMessages,
   } = useGetMessages(sellerId?.[0]?._id);
   const { sendedMessage } = useSendMessage();
+
+  // Create preview URL when imageFile changes
+  useEffect(() => {
+    if (imageFile) {
+      const url = URL.createObjectURL(imageFile);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [imageFile]);
 
   useEffect(() => {
     if (isOpen) {
@@ -82,12 +101,16 @@ const ChatWidget = () => {
     formData.append('text', text);
     if (imageFile) formData.append('image', imageFile);
 
+    const tempId = `chat-${Date.now()}`;
+    const localImageUrl = imageFile
+      ? URL.createObjectURL(imageFile)
+      : undefined;
     const optimisticMessage = {
-      _id: `chat-${Date.now()}`,
+      _id: tempId,
       senderId: userInfo._id,
       receiverId,
       text,
-      image: imageFile ? URL.createObjectURL(imageFile) : undefined,
+      image: localImageUrl,
       createdAt: new Date().toISOString(),
     };
     dispatch(messageSentLocally(optimisticMessage));
@@ -98,10 +121,18 @@ const ChatWidget = () => {
     sendedMessage(
       { user: receiverId, data: formData },
       {
-        onError: (err) =>
+        onSuccess: (savedMessage) => {
+          dispatch(messageSentSuccess({ tempId, message: savedMessage }));
+          if (localImageUrl) URL.revokeObjectURL(localImageUrl);
+        },
+        onError: (err) => {
+          // gỡ message tạm khỏi UI vì gửi thất bại
+          dispatch(messageSendFailed(tempId));
+          if (localImageUrl) URL.revokeObjectURL(localImageUrl);
           toast.error(err.message.data, {
             position: 'top-center',
-          }),
+          });
+        },
       },
     );
   }
@@ -113,11 +144,35 @@ const ChatWidget = () => {
     }
   }
 
+  function handleImageSelect(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are supported', { position: 'top-center' });
+      e.target.value = '';
+      return;
+    }
+
+    const MAX_SIZE_MB = 5;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      toast.error(`Image cannot exceed ${MAX_SIZE_MB}MB`, {
+        position: 'top-center',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    setImageFile(file);
+    // reset value để chọn lại cùng 1 file vẫn trigger onChange
+    e.target.value = '';
+  }
+
   return (
     <div className='fixed bottom-6 left-6 z-50 flex flex-col items-end'>
       {isOpen && (
-        <Card className='w-80 mb-4 p-0 gap-0 overflow-hidden border border-border/60 shadow-2xl shadow-black/10 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-200'>
-          <CardHeader className='flex flex-row items-center justify-between gap-3 border-b border-border/60 bg-muted/40 px-4 py-3'>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between  border-b border-border/60 bg-muted/40'>
             <div className='flex items-center gap-3'>
               <div className='relative'>
                 <Avatar className='h-9 w-9 border border-border/60'>
@@ -128,7 +183,7 @@ const ChatWidget = () => {
               </div>
               <div className='leading-tight'>
                 <CardTitle className='text-sm font-semibold'>
-                  Hỗ trợ khách hàng
+                  Customer Support
                 </CardTitle>
               </div>
             </div>
@@ -175,8 +230,15 @@ const ChatWidget = () => {
                           : 'rounded-2xl rounded-bl-sm border border-border/60 bg-muted/60'
                       }
                     >
-                      <BubbleContent className='text-sm leading-relaxed'>
-                        {m.text}
+                      <BubbleContent className='text-sm leading-relaxed flex flex-col gap-2'>
+                        {m.image && (
+                          <img
+                            src={m.image}
+                            alt='attachment'
+                            className='max-w-[200px] rounded-md object-cover'
+                          />
+                        )}
+                        {m.text && <span>{m.text}</span>}
                       </BubbleContent>
                     </Bubble>
                   </MessageContent>
@@ -188,15 +250,45 @@ const ChatWidget = () => {
           </CardContent>
 
           {/* Input */}
-          <CardFooter className='p-3 border-t border-border/60 bg-background'>
+          <CardFooter className='p-3 flex flex-col items-start gap-2 border-t border-border/60 bg-background'>
+            {imageFile && (
+              <div className='flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 p-2'>
+                <img
+                  src={previewUrl}
+                  alt='preview'
+                  className='h-12 w-12 rounded-md object-cover'
+                />
+                <span className='flex-1 truncate text-xs text-muted-foreground'>
+                  {imageFile.name}
+                </span>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  className='h-6 w-6 rounded-full'
+                  onClick={() => setImageFile(null)}
+                >
+                  <X className='h-3 w-3' />
+                </Button>
+              </div>
+            )}
+
             <InputGroup className='rounded-full border-border/60'>
               <InputGroupAddon align='inline-start'>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='hidden'
+                  ref={fileInputRef}
+                  onChange={handleImageSelect}
+                />
                 <InputGroupButton
-                  aria-label='Thêm ảnh'
+                  aria-label='Add image'
                   type='button'
                   size='icon-sm'
                   variant='ghost'
                   className='rounded-full hover:bg-muted'
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <PlusIcon />
                 </InputGroupButton>
