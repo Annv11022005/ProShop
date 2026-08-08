@@ -15,14 +15,12 @@ export default function PromoCodeField({ onApply, price, initialCouponCode }) {
     if (coupon) {
       onApply?.(coupon);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coupon]);
 
   useEffect(() => {
     if (error) {
       onApply?.(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   useEffect(() => {

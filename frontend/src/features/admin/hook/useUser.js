@@ -15,7 +15,7 @@ export function useGetUsers() {
   return { isPending, error, users, refetch };
 }
 
-export function useGetUserById(id) {
+export function useGetUserById(id, enabled = true) {
   const {
     isPending,
     error,
@@ -23,6 +23,7 @@ export function useGetUserById(id) {
   } = useQuery({
     queryKey: ['user', id],
     queryFn: () => getUserById(id),
+    enabled: !!id && enabled,
   });
 
   return { isPending, error, user };

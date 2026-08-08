@@ -1,3 +1,5 @@
+import { formatCurrency } from '@/lib/utils';
+import { useEffect } from 'react';
 import { useProducts } from '@/features/product/hooks/useProducts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDeleteProduct } from '../product/hooks/useProduct';
@@ -17,7 +19,6 @@ import {
 import { Plus, SquarePenIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Paginate from '@/components/Paginate';
-import { formatCurrency } from '@/lib/utils';
 
 const ProductListPage = () => {
   const { pageNumber } = useParams();
@@ -25,6 +26,12 @@ const ProductListPage = () => {
   const { isPending: pendingDelete, deletedProduct } = useDeleteProduct();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (data.products && data.pages >= 1 && data.page > data.pages) {
+      navigate(`/admin/coupon-list/${data.pages}`);
+    }
+  }, [data, navigate]);
 
   async function deleteHandler(id) {
     if (window.confirm('Are you sure?')) {
@@ -104,13 +111,19 @@ const ProductListPage = () => {
               </TableRow>
             ))}
           </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={6}>
-                <Paginate page={data.page} pages={data.pages} isAdmin={true} />
-              </TableCell>
-            </TableRow>
-          </TableFooter>
+          {data.pages >= 2 && (
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={6}>
+                  <Paginate
+                    page={data.page}
+                    pages={data.pages}
+                    basePath='/admin/product-list'
+                  />
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          )}
         </Table>
       )}
     </>

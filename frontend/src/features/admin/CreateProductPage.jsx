@@ -38,7 +38,7 @@ const CreateProductPage = () => {
   async function submitHandler(e) {
     e.preventDefault();
     try {
-      addProduct(formData);
+      await addProduct(formData);
       navigate('/admin/product-list');
       toast.success('Product created!', { position: 'top-center' });
     } catch (err) {

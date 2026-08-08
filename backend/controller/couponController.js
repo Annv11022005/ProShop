@@ -32,6 +32,20 @@ export const getAllCategory = asyncHandler(async (req, res) => {
   res.status(200).json(categories);
 });
 
+// @desc get coupon by Id
+// GET /api/v1/coupon/:id
+// @access private/admin
+export const getCouponById = asyncHandler(async (req, res) => {
+  const coupon = await Coupon.findById(req.params.id);
+
+  if (coupon) {
+    res.status(200).json(coupon);
+  } else {
+    res.status(404);
+    throw new Error('Coupon not found');
+  }
+});
+
 // @desc Get coupon by code
 // GET /api/coupons/code
 // @access public

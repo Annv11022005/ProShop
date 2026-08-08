@@ -61,7 +61,7 @@ const HomePage = () => {
             <Paginate
               pages={data.pages}
               page={data.page}
-              keyword={keyword ? keyword : ''}
+              basePath={keyword ? `/search/${keyword}/page` : '/page'}
             />
           </Row>
         </>

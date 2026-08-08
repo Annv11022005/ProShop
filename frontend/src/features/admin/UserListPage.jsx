@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useDeleteUser, useGetUsers } from './hook/useUser';
 
 import { Button } from '@/components/ui/button';
@@ -10,16 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CheckIcon, SquarePenIcon, Trash2, X } from 'lucide-react';
+import { CheckIcon, Trash2, X } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
+import UserEditDialog from './UserEditDialog';
 
 const UserListPage = () => {
   const { isPending, error, users, refetch } = useGetUsers();
   const { isPending: pendingUser, deletedUser } = useDeleteUser();
-
-  const navigate = useNavigate();
 
   if (isPending || pendingUser) return <Spinner />;
   if (error) return <Message>{error.message}</Message>;
@@ -40,7 +38,7 @@ const UserListPage = () => {
 
   return (
     <div>
-      <h1 className='text-3xl font-semibold text-primary'>Users</h1>
+      <h1 className='text-lg font-semibold text-primary'>Users</h1>
 
       <Table>
         <TableHeader>
@@ -73,12 +71,8 @@ const UserListPage = () => {
               </TableCell>
 
               <TableCell className='flex items-end justify-end gap-3'>
-                <Button
-                  variant='outline'
-                  onClick={() => navigate(`/admin/user/${user._id}`)}
-                >
-                  <SquarePenIcon />
-                </Button>
+                <UserEditDialog userId={user._id} onSuccess={refetch} />
+
                 <Button
                   className='bg-red-500'
                   onClick={() => deleteHandler(user._id)}

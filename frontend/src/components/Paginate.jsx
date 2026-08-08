@@ -7,7 +7,7 @@ import {
 
 import { useLocation } from 'react-router-dom';
 
-const Paginate = ({ page, pages, isAdmin = false, keyword = '' }) => {
+const Paginate = ({ page, pages, basePath }) => {
   const { search } = useLocation();
 
   return (
@@ -17,13 +17,7 @@ const Paginate = ({ page, pages, isAdmin = false, keyword = '' }) => {
           {[...Array(pages).keys()].map((x) => (
             <PaginationItem key={x + 1}>
               <PaginationLink
-                to={
-                  (!isAdmin
-                    ? keyword
-                      ? `/search/${keyword}/page/${x + 1}`
-                      : `/page/${x + 1}`
-                    : `/admin/product-list/${x + 1}`) + search
-                }
+                to={`${basePath}/${x + 1}${search}`}
                 isActive={x + 1 === page}
               >
                 {x + 1}

@@ -20,6 +20,7 @@ import {
   MoveLeft,
   Package,
   ShoppingCart,
+  Ticket,
   Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,6 +30,7 @@ const menuItems = [
   { title: 'Product', url: '/admin/product-list', icon: Package },
   { title: 'Order', url: '/admin/order-list', icon: ShoppingCart },
   { title: 'User', url: '/admin/user-list', icon: Users },
+  { title: 'Coupon', url: '/admin/coupon-list', icon: Ticket },
   { title: 'Chat', url: '/admin/chat', icon: MessageCircle },
 ];
 

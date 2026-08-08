@@ -25,11 +25,13 @@ import ProductListScreen from '@/screens/admin/ProductListScreen';
 import ProductEditScreen from '@/screens/admin/ProductEditScreen';
 import CreateProductScreen from '@/screens/admin/CreateProductScreen';
 import UserListScreen from '@/screens/admin/UserListScreen';
-import UserEditScreen from '@/screens/admin/UserEditScreen';
 import OTPRegisterScreen from '@/screens/OTPRegisterScreen';
 import CouponScreen from '@/screens/CouponScreen';
 import VnpaySuccess from '@/features/checkout/pages/VnpaySuccess';
 import MessageScreen from '@/screens/admin/MessageScreen';
+import CouponListScreen from '@/screens/admin/CouponListScreen';
+import CouponEditScreen from '@/screens/admin/CouponEditScreen';
+import CreateCouponScreen from '@/screens/admin/CreateCouponScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -115,7 +117,19 @@ const App = () => {
                 element={<CreateProductScreen />}
               />
               <Route path='/admin/user-list' element={<UserListScreen />} />
-              <Route path='/admin/user/:id' element={<UserEditScreen />} />
+              <Route path='/admin/coupon-list' element={<CouponListScreen />} />
+              <Route
+                path='/admin/coupon-list/:pageNumber'
+                element={<CouponListScreen />}
+              />
+              <Route
+                path='/admin/coupon/create'
+                element={<CreateCouponScreen />}
+              />
+              <Route
+                path='/admin/coupon/:id/edit'
+                element={<CouponEditScreen />}
+              />
               <Route path='/admin/chat' element={<MessageScreen />} />
             </Route>
           </Routes>

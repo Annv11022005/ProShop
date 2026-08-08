@@ -1,8 +1,9 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createCoupon,
   deleteCoupon,
   getCoupon,
+  getCouponById,
   toggleCoupon,
   updateCoupon,
 } from '../api/apiCoupon';
@@ -13,7 +14,7 @@ export function useGetCouponByCode(code) {
     error,
     data: coupon,
   } = useQuery({
-    queryKey: ['coupon', code],
+    queryKey: ['coupon', 'code', code],
     queryFn: () => getCoupon(code),
     enabled: !!code,
     retry: false,
@@ -32,6 +33,21 @@ export function useCreateCoupon() {
   });
 
   return { isPending, error, createdCoupon };
+}
+
+export function useGetCouponById(id) {
+  const {
+    isPending,
+    error,
+    data: coupon,
+  } = useQuery({
+    queryKey: ['coupon', 'id', id],
+    queryFn: () => getCouponById(id),
+    enabled: !!id,
+    retry: false,
+  });
+
+  return { isPending, error, coupon };
 }
 
 export function useToggleCoupon() {
@@ -59,12 +75,16 @@ export function useUpdateCoupon() {
 }
 
 export function useDeleteCoupon() {
+  const queryClient = useQueryClient();
   const {
     isPending,
     error,
     mutate: deletedCoupon,
   } = useMutation({
     mutationFn: deleteCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+    },
   });
 
   return { isPending, error, deletedCoupon };

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
-export async function getALlCoupon() {
-  const res = await axios.get('/api/v1/coupons');
+export async function getALlCoupon(pageNumber = 1) {
+  const res = await axios.get('/api/v1/coupons', {
+    params: {
+      pageNumber,
+    },
+  });
 
   return res.data;
 }
@@ -16,6 +20,12 @@ export async function getCoupon(code) {
   const res = await axios.get('/api/v1/coupons/code', {
     params: { code },
   });
+
+  return res.data;
+}
+
+export async function getCouponById(id) {
+  const res = await axios.get(`/api/v1/coupons/${id}`);
 
   return res.data;
 }

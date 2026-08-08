@@ -9,19 +9,30 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bubble, BubbleContent } from '@/components/ui/bubble';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MessageCircle, X, Send, PlusIcon } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
+import { Message as AlertMessage } from '@/components/AlertMessage';
+import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Message,
   MessageAvatar,
   MessageContent,
   MessageGroup,
 } from '@/components/ui/message';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MessageCircle, X, Send } from 'lucide-react';
-import { Spinner } from '@/components/ui/spinner';
-import { Message as AlertMessage } from '@/components/AlertMessage';
-import { toast } from 'sonner';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -177,23 +188,40 @@ const ChatWidget = () => {
           </CardContent>
 
           {/* Input */}
-          <div className='flex items-center gap-2 border-t border-border/60 bg-background p-3'>
-            <Input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder='Enter Messages ...'
-              className='h-9 flex-1 rounded-full border-border/60 text-sm focus-visible:ring-1'
-            />
-            <Button
-              size='icon'
-              onClick={handleSend}
-              disabled={!text.trim()}
-              className='h-9 w-9 shrink-0 rounded-full'
-            >
-              <Send className='h-4 w-4' />
-            </Button>
-          </div>
+          <CardFooter className='p-3 border-t border-border/60 bg-background'>
+            <InputGroup className='rounded-full border-border/60'>
+              <InputGroupAddon align='inline-start'>
+                <InputGroupButton
+                  aria-label='Thêm ảnh'
+                  type='button'
+                  size='icon-sm'
+                  variant='ghost'
+                  className='rounded-full hover:bg-muted'
+                >
+                  <PlusIcon />
+                </InputGroupButton>
+              </InputGroupAddon>
+              <InputGroupInput
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder='Enter Messages'
+                className='text-sm'
+              />
+              <InputGroupAddon align='inline-end'>
+                <InputGroupButton
+                  type='submit'
+                  variant='default'
+                  size='icon-sm'
+                  disabled={!text.trim() && !imageFile}
+                  onClick={handleSend}
+                  className='rounded-full bg-primary text-primary-foreground hover:bg-primary/90'
+                >
+                  <Send className='h-4 w-4' />
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          </CardFooter>
         </Card>
       )}
 

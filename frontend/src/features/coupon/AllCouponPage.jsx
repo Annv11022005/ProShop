@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Ticket } from 'lucide-react';
 import FilterTabs from './components/FilterTabs';
 import CouponCard from './components/CouponCard';
 import { useGetCategory } from './hooks/useCoupons';
