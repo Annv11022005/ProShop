@@ -1,4 +1,4 @@
-import CreateCouponPage from '@/features/admin/CreateCouponPage';
+import CreateCouponPage from '@/features/admin/page/coupon/CreateCouponPage';
 
 const CreateCouponScreen = () => {
   return <CreateCouponPage />;

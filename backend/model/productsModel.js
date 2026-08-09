@@ -1,3 +1,4 @@
+import { required } from 'joi';
 import mongoose from 'mongoose';
 import slugify from 'slugify';
 
@@ -41,6 +42,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    SKU: { type: String, required: true },
     image: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },

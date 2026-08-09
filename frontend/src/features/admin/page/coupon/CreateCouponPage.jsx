@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { useCreateCoupon } from '@/features/coupon/hooks/useCoupon';
 import { ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCreateCoupon } from '../coupon/hooks/useCoupon';
 import { toast } from 'sonner';
 
 const CreateCouponPage = () => {

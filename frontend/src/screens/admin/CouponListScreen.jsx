@@ -1,4 +1,4 @@
-import CouponListPage from '@/features/admin/CouponListPage';
+import CouponListPage from '@/features/admin/page/coupon/CouponListPage';
 
 const CouponListScreen = () => {
   return <CouponListPage />;

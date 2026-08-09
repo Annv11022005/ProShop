@@ -10,12 +10,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, SquarePenIcon, Trash2 } from 'lucide-react';
-import { useGetAllCoupon } from '../coupon/hooks/useCoupons';
+import { useGetAllCoupon } from '@/features/coupon/hooks/useCoupons';
 import { Spinner } from '@/components/ui/spinner';
 import { Message as AlertMessage } from '@/components/AlertMessage';
 import { useNavigate, useParams } from 'react-router-dom';
 import { formatCurrency } from '@/lib/utils';
-import { useDeleteCoupon } from '../coupon/hooks/useCoupon';
+import { useDeleteCoupon } from '@/features/coupon/hooks/useCoupon';
 import { useEffect } from 'react';
 
 const CouponListPage = () => {

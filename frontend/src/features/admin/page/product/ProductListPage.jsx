@@ -2,7 +2,7 @@ import { formatCurrency } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useProducts } from '@/features/product/hooks/useProducts';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDeleteProduct } from '../product/hooks/useProduct';
+import { useDeleteProduct } from '@/features/product/hooks/useProduct';
 
 import { Button } from '@/components/ui/button';
 import { Message } from '@/components/AlertMessage';

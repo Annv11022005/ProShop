@@ -1,4 +1,4 @@
-import CouponEditPage from '@/features/admin/CouponEditPage';
+import CouponEditPage from '@/features/admin/page/coupon/CouponEditPage';
 
 const CouponEditScreen = () => {
   return <CouponEditPage />;

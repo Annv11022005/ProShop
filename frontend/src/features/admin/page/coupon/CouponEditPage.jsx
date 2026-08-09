@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft } from 'lucide-react';
-import { useGetCouponById, useUpdateCoupon } from '../coupon/hooks/useCoupon';
+import {
+  useGetCouponById,
+  useUpdateCoupon,
+} from '@/features/coupon/hooks/useCoupon';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { Message as AlertMessage } from '@/components/AlertMessage';

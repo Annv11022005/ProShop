@@ -1,4 +1,4 @@
-import UserListPage from '@/features/admin/UserListPage';
+import UserListPage from '@/features/admin/page/user/UserListPage';
 
 const UserListScreen = () => {
   return <UserListPage />;

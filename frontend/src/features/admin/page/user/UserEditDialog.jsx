@@ -13,11 +13,11 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SquarePenIcon } from 'lucide-react';
-import { useGetUserById, useUpdateUser } from './hook/useUser';
 import { Spinner } from '@/components/ui/spinner';
 import { Message as AlertMessage } from '@/components/AlertMessage';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useGetUserById, useUpdateUser } from '../../hook/useUser';
 
 const UserEditDialog = ({ userId, onSuccess }) => {
   const [open, setOpen] = useState(false);

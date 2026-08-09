@@ -1,4 +1,4 @@
-import ProductEditPage from '@/features/admin/ProductEditPage';
+import ProductEditPage from '@/features/admin/page/product/ProductEditPage';
 
 const ProductEditScreen = () => {
   return <ProductEditPage />;

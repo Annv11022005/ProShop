@@ -1,4 +1,4 @@
-import ProductListPage from '@/features/admin/ProductListPage';
+import ProductListPage from '@/features/admin/page/product/ProductListPage';
 
 const ProductListScreen = () => {
   return <ProductListPage />;

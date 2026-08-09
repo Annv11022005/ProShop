@@ -1,4 +1,4 @@
-import { useDeleteUser, useGetUsers } from './hook/useUser';
+import { useDeleteUser, useGetUsers } from '../../hook/useUser';
 
 import { Button } from '@/components/ui/button';
 import {

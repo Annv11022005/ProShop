@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
-  useCreateProduct,
+  useProduct,
+  useUpdateProduct,
   useUploadProductImage,
-} from '../product/hooks/useProduct';
+} from '@/features/product/hooks/useProduct';
 
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
@@ -14,7 +15,11 @@ import { Message } from '@/components/AlertMessage';
 import { toast } from 'sonner';
 import { ChevronLeft } from 'lucide-react';
 
-const CreateProductPage = () => {
+const ProductEditPage = () => {
+  const { id: productId } = useParams();
+
+  const { isPending, error, data: product } = useProduct(productId);
+
   const [formData, setFormData] = useState({
     name: '',
     price: 0,
@@ -25,30 +30,42 @@ const CreateProductPage = () => {
     countInStock: 0,
   });
 
-  const { isPending, error, addProduct } = useCreateProduct();
-
+  const { isPending: pendingUpdate, updatedProduct } = useUpdateProduct();
   const {
     isPending: pendingUpload,
     error: errorUpload,
     uploadImage,
   } = useUploadProductImage();
 
+  useEffect(() => {
+    if (product) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData({
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        description: product.description,
+        brand: product.brand,
+        category: product.category,
+        countInStock: product.countInStock,
+      });
+    }
+  }, [product]);
+
   const navigate = useNavigate();
 
   async function submitHandler(e) {
     e.preventDefault();
     try {
-      await addProduct(formData);
+      await updatedProduct({ id: productId, data: { ...formData } });
+      toast.success('Product updated!', { position: 'top-center' });
       navigate('/admin/product-list');
-      toast.success('Product created!', { position: 'top-center' });
     } catch (err) {
       toast.error(err?.response?.data?.message || err.message, {
         position: 'top-center',
       });
     }
   }
-
-  if (error) return <Message>{error.message}</Message>;
 
   async function uploadFileHandler(e) {
     const file = e.target.files[0];
@@ -76,13 +93,15 @@ const CreateProductPage = () => {
         </Link>
 
         <h2 className=' flex-1 text-center font-semibold text-xl'>
-          Create Product
+          Edit Product
         </h2>
       </div>
 
       <div className='w-150 mx-auto'>
         {isPending ? (
           <Spinner />
+        ) : error ? (
+          <Message>{error.message}</Message>
         ) : (
           <form onSubmit={submitHandler}>
             <FieldSet>
@@ -212,8 +231,8 @@ const CreateProductPage = () => {
                 </Field>
 
                 <Field orientation='horizontal'>
-                  <Button size='lg' disabled={isPending} type='submit'>
-                    Create
+                  <Button size='lg' disabled={pendingUpdate} type='submit'>
+                    Update
                   </Button>
                 </Field>
               </FieldGroup>
@@ -225,4 +244,4 @@ const CreateProductPage = () => {
   );
 };
 
-export default CreateProductPage;
+export default ProductEditPage;
