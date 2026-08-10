@@ -1,8 +1,7 @@
-import CreateProduct from '@/features/admin/page/product/CreateProduct';
-// import CreateProductPage from '@/features/admin/page/product/CreateProductPage';
+import CreateProductPage from '@/features/admin/page/product/CreateProductPage';
 
 const CreateProductScreen = () => {
-  return <CreateProduct />;
+  return <CreateProductPage />;
 };
 
 export default CreateProductScreen;

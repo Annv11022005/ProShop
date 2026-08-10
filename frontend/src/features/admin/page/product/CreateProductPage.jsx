@@ -41,7 +41,7 @@ const plans = [
   { name: 'Schedule', description: 'Public when the launch window opens.' },
 ];
 
-const CreateProduct = () => {
+const CreateProductPage = () => {
   const [name, setName] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [description, setDescription] = useState('');
@@ -70,10 +70,10 @@ const CreateProduct = () => {
     ]);
   const removeVariant = (id) =>
     setVariants((v) => v.filter((x) => x.id !== id));
-    
+
   const updateVariant = (id, field, value) => {
     setVariants((v) =>
-      v.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+      v.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -108,14 +108,14 @@ const CreateProduct = () => {
         brand,
         status: status.name,
         image: images,
-        variants: variants.map(v => ({
+        variants: variants.map((v) => ({
           sku: v.sku,
           size: v.size,
           color: v.color,
           price: Number(v.price) || 0,
           originalPrice: Number(v.originalPrice) || Number(v.price) || 0,
-          countInStock: Number(v.countInStock) || 0
-        }))
+          countInStock: Number(v.countInStock) || 0,
+        })),
       };
 
       await addProduct(productData);
@@ -135,9 +135,18 @@ const CreateProduct = () => {
               New product
             </h1>
             <div className='flex shrink-0 items-center gap-2'>
-              <Button variant='outline' onClick={() => navigate('/admin/product-list')}>Cancel</Button>
-              <Button variant='default' onClick={submitHandler} disabled={isPending}>
-                {isPending && <Spinner className="mr-2 h-4 w-4" />}
+              <Button
+                variant='outline'
+                onClick={() => navigate('/admin/product-list')}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant='default'
+                onClick={submitHandler}
+                disabled={isPending}
+              >
+                {isPending && <Spinner className='mr-2 h-4 w-4' />}
                 Create product
               </Button>
             </div>
@@ -228,19 +237,32 @@ const CreateProduct = () => {
                       disabled={pendingUpload}
                     />
                     <span className='pointer-events-none inline-flex h-7 items-center gap-1 rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium text-foreground'>
-                      {pendingUpload ? <Spinner className='size-3.5' /> : <Plus className='size-3.5' />}
+                      {pendingUpload ? (
+                        <Spinner className='size-3.5' />
+                      ) : (
+                        <Plus className='size-3.5' />
+                      )}
                       Add files
                     </span>
                     <span className='flex items-center gap-1.5 text-sm text-muted-foreground'>
                       <UploadCloud className='size-4' />
-                      {pendingUpload ? 'Uploading...' : 'Drop product photos here or click to browse.'}
+                      {pendingUpload
+                        ? 'Uploading...'
+                        : 'Drop product photos here or click to browse.'}
                     </span>
                   </label>
                   {images.length > 0 && (
                     <div className='mt-4 grid grid-cols-4 gap-4'>
                       {images.map((img, index) => (
-                        <div key={index} className='relative group rounded-md overflow-hidden border border-border'>
-                          <img src={img.url} alt={`Preview ${index}`} className='w-full aspect-square object-cover' />
+                        <div
+                          key={index}
+                          className='relative group rounded-md overflow-hidden border border-border'
+                        >
+                          <img
+                            src={img.url}
+                            alt={`Preview ${index}`}
+                            className='w-full aspect-square object-cover'
+                          />
                           <button
                             type='button'
                             onClick={() => removeImage(index)}
@@ -265,7 +287,11 @@ const CreateProduct = () => {
                       Add variant
                     </Button>
                   </div>
-                  <VariantTable variants={variants} onRemove={removeVariant} onUpdate={updateVariant} />
+                  <VariantTable
+                    variants={variants}
+                    onRemove={removeVariant}
+                    onUpdate={updateVariant}
+                  />
                 </FramePanel>
               </Frame>
             </div>
@@ -276,7 +302,11 @@ const CreateProduct = () => {
                 </FrameHeader>
                 <FramePanel>
                   <Field className='max-w-xs'>
-                    <Select items={plans} value={status} onValueChange={setStatus}>
+                    <Select
+                      items={plans}
+                      value={status}
+                      onValueChange={setStatus}
+                    >
                       <SelectTrigger className='h-auto! w-full'>
                         <SelectValue>
                           {(value) => <SelectPlanItem plan={value} />}
@@ -334,4 +364,4 @@ const CreateProduct = () => {
   );
 };
 
-export default CreateProduct;
+export default CreateProductPage;
