@@ -30,6 +30,18 @@ const orderSchema = new mongoose.Schema(
           required: true,
           ref: 'Product',
         },
+        variantId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        sku: {
+          type: String,
+        },
+        size: {
+          type: String,
+        },
+        color: {
+          type: String,
+        },
       },
     ],
     shippingAddress: {

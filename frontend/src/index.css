@@ -207,7 +207,7 @@
 }
 
 .product-title {
-  @apply text-primary text-base font-medium hover:underline text-ellipsis overflow-hidden whitespace-nowrap;
+  @apply text-primary text-xl font-medium hover:underline text-ellipsis overflow-hidden whitespace-nowrap;
 }
 
 .product-price {

@@ -6,19 +6,25 @@ import { useCreateReview } from './hooks/useReviews.js';
 
 import { useProduct } from './hooks/useProduct';
 
-import { ChevronLeft } from 'lucide-react';
+import {
+  ChevronLeft,
+  RotateCcw,
+  ShieldCheck,
+  ShoppingBag,
+  Truck,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
 import { Spinner } from '@/components/ui/spinner.jsx';
 import { Message } from '@/components/AlertMessage.jsx';
-import ProductActionCard from './ProductActionCard.jsx';
 import ListReview from './components/ListReview.jsx';
 import { Rating } from '@/components/reui/rating';
 import { toast } from 'sonner';
 import FormReview from './components/FormReview.jsx';
-import { formatCurrency } from '@/lib/utils';
+import ProductGallery from './components/ProductGallery.jsx';
+import ProductPrice from './components/ProductPrice.jsx';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -27,15 +33,30 @@ const ProductDetail = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [qty, setQty] = useState(1);
+  const qty = 1;
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
 
   const userInfo = useSelector((state) => state.auth);
 
+  const selectedVariant = product?.variants?.[selectedVariantIndex] || null;
+  const countInStock = selectedVariant?.countInStock ?? product?.countInStock;
+
   function addToCartHandler() {
-    dispatch(addToCart({ ...product, qty }));
+    dispatch(
+      addToCart({
+        ...product,
+        qty,
+        price: selectedVariant?.price ?? product.price,
+        countInStock: countInStock,
+        variantId: selectedVariant?._id,
+        color: selectedVariant?.color,
+        size: selectedVariant?.size,
+        sku: selectedVariant?.sku,
+      })
+    );
 
     navigate('/cart');
   }
@@ -73,50 +94,105 @@ const ProductDetail = () => {
             </Button>
           </Link>
 
-          <Row template='lg:grid-cols-[0.75fr_1fr_0.5fr]'>
-            <Col fluid>
-              <img
-                src={product.image}
-                alt={product.name}
-                className=' rounded-md'
+          <Row template='lg:grid-cols-[0.75fr_1fr]' className='gap-8'>
+            <Col fluid className='my-auto'>
+              <ProductGallery
+                images={
+                  product.images?.map((image) => image.url) || [product.image]
+                }
+                productName={product.name}
               />
             </Col>
 
-            <Col fluid className='flex justify-around items-start flex-col'>
-              <h1 className='product-detail'>{product.name}</h1>
-
-              <span className='line' />
+            <Col fluid className='flex items-start flex-col gap-5 py-4'>
+              <h1 className='text-3xl font-bold tracking-tight'>
+                {product.name}
+              </h1>
 
               <div className='flex items-center gap-3'>
                 <Rating rating={product.rating} />
-                <p className='rating-text'> {product.numberViews} reviews</p>
+                <p className='text-sm text-muted-foreground'>
+                  {' '}
+                  {product.numberViews} reviews
+                </p>
               </div>
 
-              <span className='line' />
+              <span className='text-sm text-muted-foreground'>
+                {product.subtitle}
+              </span>
 
-              <h2 className='product-detail'>
-                {formatCurrency(product.price)}
-              </h2>
-
-              <span className='line' />
-
-              <p className=' text-sm text-muted-foreground'>
-                {product.description}
-              </p>
-            </Col>
-
-            <Col fluid className='self-center'>
-              <ProductActionCard
-                product={product}
-                qty={qty}
-                setQty={setQty}
-                onAddToCart={addToCartHandler}
+              <ProductPrice
+                price={selectedVariant?.price}
+                originalPrice={selectedVariant?.originalPrice}
               />
+
+              {product.variants?.length > 1 && (
+                <div className='flex flex-col gap-2'>
+                  <span className='text-sm font-medium text-muted-foreground'>
+                    Variants
+                  </span>
+                  <div className='flex flex-wrap gap-2'>
+                    {product.variants.map((variant, index) => (
+                      <Button
+                        key={variant._id || index}
+                        variant={
+                          selectedVariantIndex === index ? 'default' : 'outline'
+                        }
+                        size='sm'
+                        onClick={() => setSelectedVariantIndex(index)}
+                      >
+                        {variant.color}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className='flex justify-between gap-5 '>
+                <p>Status:</p>
+                <p>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</p>
+              </div>
+
+              <Button
+                size='lg'
+                disabled={countInStock == 0}
+                className='w-full rounded-lg mt-auto gap-7'
+                onClick={addToCartHandler}
+              >
+                <ShoppingBag size={16} />
+                Add To Cart
+              </Button>
+
+              <div className='flex justify-around w-full text-primary font-normal text-sm'>
+                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+                  <Truck size={16} />
+                  Free shipping
+                </div>
+                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+                  <RotateCcw size={16} />
+                  30-days returns
+                </div>
+                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+                  <ShieldCheck size={16} />
+                  1-year warranty
+                </div>
+              </div>
             </Col>
           </Row>
 
           <Row template='lg:grid-cols-[1fr_0.5fr]'>
             <Col fluid>
+              <div className='flex flex-col items-start gap-1.5 text-md font-normal text-primary mb-15'>
+                <span>
+                  <strong>Category: </strong>
+                  {product.category}
+                </span>
+
+                <span>
+                  <strong>Description: </strong> {product.description}
+                </span>
+              </div>
+
               <h2 className='text-xl mb-3 font-semibold'>Reviews</h2>
 
               {product.reviews.length === 0 && (

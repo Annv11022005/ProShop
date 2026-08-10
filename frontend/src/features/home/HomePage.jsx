@@ -12,8 +12,10 @@ import Paginate from '../../components/Paginate';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import ChatWidget from '../chat/ChatWidget';
+import { useSelector } from 'react-redux';
 
 const HomePage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
   const { pageNumber, keyword } = useParams();
 
@@ -67,7 +69,7 @@ const HomePage = () => {
         </>
       )}
 
-      <ChatWidget />
+      {userInfo && <ChatWidget />}
     </>
   );
 };

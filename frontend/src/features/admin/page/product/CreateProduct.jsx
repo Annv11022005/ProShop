@@ -23,24 +23,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, UploadCloud } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
+import { Plus, UploadCloud, X } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { SelectPlanItem } from '../../component/SelectPlanItem';
 import VariantTable from '../../component/VariantTable';
+import {
+  useCreateProduct,
+  useUploadProductImage,
+} from '@/features/product/hooks/useProduct';
 
 const plans = [
-  {
-    name: 'Draft',
-    description: 'Hidden until product details are approved.',
-  },
-  {
-    name: 'Active',
-    description: 'Available in selected sales chanel.',
-  },
-  {
-    name: 'Schedule',
-    description: 'Public when the launch window opens.',
-  },
+  { name: 'Draft', description: 'Hidden until product details are approved.' },
+  { name: 'Active', description: 'Available in selected sales chanel.' },
+  { name: 'Schedule', description: 'Public when the launch window opens.' },
 ];
 
 const CreateProduct = () => {
@@ -49,20 +47,13 @@ const CreateProduct = () => {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [brand, setBrand] = useState('');
-  const [variants, setVariants] = useState([
-    {
-      id: 1,
-      sku: 'AFR-CHR-M',
-      price: '100000',
-      countInStock: 42,
-    },
-    {
-      id: 2,
-      sku: 'AFR-CHR-L',
-      price: '100000',
-      countInStock: 17,
-    },
-  ]);
+  const [status, setStatus] = useState(plans[0]);
+  const [images, setImages] = useState([]);
+  const [variants, setVariants] = useState([]);
+
+  const navigate = useNavigate();
+  const { isPending, addProduct } = useCreateProduct();
+  const { isPending: pendingUpload, uploadImage } = useUploadProductImage();
 
   const addVariant = () =>
     setVariants((v) => [
@@ -72,32 +63,86 @@ const CreateProduct = () => {
         color: 'New color',
         size: '—',
         sku: '—',
-        price: '$0.00',
-        inventory: 0,
+        price: 0,
+        originalPrice: 0,
+        countInStock: 0,
       },
     ]);
-
   const removeVariant = (id) =>
     setVariants((v) => v.filter((x) => x.id !== id));
+    
+  const updateVariant = (id, field, value) => {
+    setVariants((v) =>
+      v.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const uploadFileHandler = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    try {
+      const uploadedImages = [];
+      for (const file of files) {
+        const res = await uploadImage(file);
+        uploadedImages.push({ url: res.image, fileId: res.fileId });
+      }
+      setImages((prev) => [...prev, ...uploadedImages]);
+      toast.success('Images uploaded successfully');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    }
+  };
+
+  const removeImage = (indexToRemove) => {
+    setImages((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const submitHandler = async () => {
+    try {
+      const productData = {
+        name,
+        subtitle,
+        description,
+        category,
+        brand,
+        status: status.name,
+        image: images,
+        variants: variants.map(v => ({
+          sku: v.sku,
+          size: v.size,
+          color: v.color,
+          price: Number(v.price) || 0,
+          originalPrice: Number(v.originalPrice) || Number(v.price) || 0,
+          countInStock: Number(v.countInStock) || 0
+        }))
+      };
+
+      await addProduct(productData);
+      toast.success('Product created successfully');
+      navigate('/admin/product-list');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    }
+  };
 
   return (
     <main className='min-h-screen w-full bg-background'>
       <div className='mx-auto w-full max-w-7xl p-4'>
         <div className='flex flex-col gap-4'>
-          {/* Header */}
           <header className='flex justify-between'>
             <h1 className='text-lg font-semibold tracking-tight text-foreground '>
               New product
             </h1>
             <div className='flex shrink-0 items-center gap-2'>
-              <Button variant='outline'>Cancel</Button>
-              <Button variant='default'>Create product</Button>
+              <Button variant='outline' onClick={() => navigate('/admin/product-list')}>Cancel</Button>
+              <Button variant='default' onClick={submitHandler} disabled={isPending}>
+                {isPending && <Spinner className="mr-2 h-4 w-4" />}
+                Create product
+              </Button>
             </div>
           </header>
-
-          {/* Content */}
           <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]'>
-            {/* Left */}
             <div className='flex min-w-0 flex-col gap-4'>
               <Frame dense>
                 <FrameHeader>
@@ -123,7 +168,6 @@ const CreateProduct = () => {
                         required
                       />
                     </Field>
-
                     <FieldSeparator />
                     <Field orientation='responsive'>
                       <FieldContent>
@@ -143,11 +187,10 @@ const CreateProduct = () => {
                         required
                       />
                     </Field>
-
                     <FieldSeparator />
                     <Field orientation='responsive'>
                       <FieldContent>
-                        <FieldLabel htmlFor='product-subtitle'>
+                        <FieldLabel htmlFor='product-description'>
                           Description
                         </FieldLabel>
                         <FieldDescription>
@@ -166,8 +209,6 @@ const CreateProduct = () => {
                   </FieldGroup>
                 </FramePanel>
               </Frame>
-
-              {/* Media */}
               <Frame dense>
                 <FrameHeader>
                   <FrameTitle>Media</FrameTitle>
@@ -183,20 +224,36 @@ const CreateProduct = () => {
                       accept='image/*'
                       multiple
                       className='sr-only'
+                      onChange={uploadFileHandler}
+                      disabled={pendingUpload}
                     />
                     <span className='pointer-events-none inline-flex h-7 items-center gap-1 rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium text-foreground'>
-                      <Plus className='size-3.5' />
+                      {pendingUpload ? <Spinner className='size-3.5' /> : <Plus className='size-3.5' />}
                       Add files
                     </span>
                     <span className='flex items-center gap-1.5 text-sm text-muted-foreground'>
                       <UploadCloud className='size-4' />
-                      Drop product photos here or click to browse.
+                      {pendingUpload ? 'Uploading...' : 'Drop product photos here or click to browse.'}
                     </span>
                   </label>
+                  {images.length > 0 && (
+                    <div className='mt-4 grid grid-cols-4 gap-4'>
+                      {images.map((img, index) => (
+                        <div key={index} className='relative group rounded-md overflow-hidden border border-border'>
+                          <img src={img.url} alt={`Preview ${index}`} className='w-full aspect-square object-cover' />
+                          <button
+                            type='button'
+                            onClick={() => removeImage(index)}
+                            className='absolute top-1 right-1 bg-background/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
+                          >
+                            <X className='size-3.5 text-foreground' />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </FramePanel>
               </Frame>
-
-              {/* Variants */}
               <Frame dense>
                 <FrameHeader>
                   <FrameTitle>Variants</FrameTitle>
@@ -208,21 +265,18 @@ const CreateProduct = () => {
                       Add variant
                     </Button>
                   </div>
-                  <VariantTable variants={variants} onRemove={removeVariant} />
+                  <VariantTable variants={variants} onRemove={removeVariant} onUpdate={updateVariant} />
                 </FramePanel>
               </Frame>
             </div>
-
-            {/* Right  */}
             <div className='flex flex-col gap-4'>
-              {/* Status */}
               <Frame dense>
                 <FrameHeader>
                   <FrameTitle>Status</FrameTitle>
                 </FrameHeader>
                 <FramePanel>
                   <Field className='max-w-xs'>
-                    <Select items={plans}>
+                    <Select items={plans} value={status} onValueChange={setStatus}>
                       <SelectTrigger className='h-auto! w-full'>
                         <SelectValue>
                           {(value) => <SelectPlanItem plan={value} />}
@@ -241,8 +295,6 @@ const CreateProduct = () => {
                   </Field>
                 </FramePanel>
               </Frame>
-
-              {/* Organization */}
               <Frame dense>
                 <FrameHeader>
                   <FrameTitle>Organization</FrameTitle>
@@ -261,7 +313,6 @@ const CreateProduct = () => {
                         className='h-8 rounded-lg text-sm'
                       />
                     </Field>
-
                     <Field>
                       <FieldLabel htmlFor='product-brand'>Brand</FieldLabel>
                       <Input

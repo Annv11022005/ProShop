@@ -19,7 +19,7 @@ const CouponCard = ({ coupon }) => {
 
   return (
     <article
-      aria-labelledby={`${coupon.id}-name`}
+      aria-labelledby={`${coupon._id}-name`}
       className='flex flex-col gap-2 rounded-2xl border bg-muted/50 p-2'
     >
       <header className='px-2 pt-1'>
@@ -32,16 +32,18 @@ const CouponCard = ({ coupon }) => {
         <div className='flex flex-col gap-0.5'>
           <div className='flex flex-wrap items-center gap-x-2.5 gap-y-1'>
             <h2
-              id={`${coupon.id}-name`}
+              id={`${coupon._id}-name`}
               className='text-2xl font-semibold tracking-tight text-primary'
             >
               {coupon.title}
             </h2>
             {coupon.badge && (
               <span
-                className={`inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1.5 text-xs font-medium text-white ${coupon.badge.color}`}
+                className='inline-flex h-5 min-w-5 items-center justify-center rounded-sm bg-primary px-1.5 text-xs font-medium text-primary-foreground'
               >
-                {coupon.badge.label}
+                {typeof coupon.badge === 'string'
+                  ? coupon.badge
+                  : coupon.badge.label}
               </span>
             )}
           </div>

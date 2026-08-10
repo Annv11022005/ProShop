@@ -18,8 +18,8 @@ const CartPage = () => {
     dispatch(addToCart({ ...product, qty }));
   };
 
-  const removeFromCartHandler = async (id) => {
-    dispatch(removeFromCart(id));
+  const removeFromCartHandler = async (id, variantId) => {
+    dispatch(removeFromCart({ id, variantId }));
   };
 
   function checkoutHandler() {

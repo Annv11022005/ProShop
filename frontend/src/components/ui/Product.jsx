@@ -7,16 +7,21 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Rating } from '../reui/rating';
-import { formatCurrency } from '@/lib/utils';
+import ProductPrice from '@/features/product/components/ProductPrice';
 
 const Product = ({ product }) => {
   return (
-    <Card>
-      <CardHeader>
+    <Card className='flex h-full flex-col overflow-hidden p-0'>
+      <CardHeader className='p-0'>
         <CardTitle>
           <Link to={`/product/${product.slug || product._id}`}>
-            <img src={product.image} />
+            <div className='aspect-4/3 w-full overflow-hidden rounded-md bg-muted'>
+              <img
+                src={product.image}
+                alt={product.name}
+                className='h-full w-full object-cover transition-transform duration-300 hover:scale-105'
+              />
+            </div>
           </Link>
         </CardTitle>
       </CardHeader>
@@ -24,14 +29,15 @@ const Product = ({ product }) => {
         <Link to={`/product/${product.slug || product._id}`}>
           <h1 className='product-title'>{product.name}</h1>
         </Link>
-        <div className='flex items-center gap-3'>
-          <Rating rating={product.rating} />
-          <p className='rating-text'> {product.numberViews} reviews</p>
-        </div>
+
+        <p className='text-sm text-muted-foreground mt-1'>{product.subtitle}</p>
       </CardContent>
-      <CardFooter>
+      <CardFooter className='mt-auto'>
         <div className='flex items-center w-full justify-between'>
-          <h2 className='product-price'>{formatCurrency(product.price)}</h2>
+          <ProductPrice
+            price={product.variants[0].price}
+            originalPrice={product.variants[0].originalPrice}
+          />
           <Link to={`/product/${product.slug || product._id}`}>
             <Button>Buy Now</Button>
           </Link>

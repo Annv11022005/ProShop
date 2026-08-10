@@ -1,12 +1,13 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Product from '../model/productsModel.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import { normalizeProductInput, presentProduct } from '../utils/productPresenter.js';
 
 // @desc fetch all products
 // GET /api/products
 // @access public
 export const getProducts = asyncHandler(async (req, res) => {
-  const pageSize = 6;
+  const pageSize = 8;
   const page = Number(req.query.pageNumber) || 1;
 
   const keyword = req.query.keyword
@@ -21,6 +22,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     'fields',
     'pageNumber',
     'keyword',
+    'stock',
   ];
   excludedFields.forEach((el) => delete queryObj[el]);
 
@@ -28,9 +30,20 @@ export const getProducts = asyncHandler(async (req, res) => {
   queryStr = queryStr.replace(/(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   const filterQuery = JSON.parse(queryStr);
 
-  const count = await Product.countDocuments({ ...keyword, ...filterQuery });
+  // Build stock filter on variants array
+  let stockFilter = {};
+  if (req.query.stock === 'countInStock') {
+    stockFilter = { variants: { $elemMatch: { countInStock: { $gt: 0 } } } };
+  } else if (req.query.stock === 'countOfStock') {
+    stockFilter = { variants: { $not: { $elemMatch: { countInStock: { $gt: 0 } } } } };
+  }
 
-  const features = new APIFeatures(Product.find({ ...keyword }), req.query)
+  const isAdmin = req.user && req.user.isAdmin;
+  const statusFilter = isAdmin ? {} : { status: 'Active' };
+
+  const count = await Product.countDocuments({ ...keyword, ...filterQuery, ...stockFilter, ...statusFilter });
+
+  const features = new APIFeatures(Product.find({ ...keyword, ...stockFilter, ...statusFilter }), req.query)
     .filter()
     .sort()
     .limitFields();
@@ -39,7 +52,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1))
     .limit(pageSize);
 
-  res.json({ products, page, pages: Math.ceil(count / pageSize) });
+  res.json({ products: products.map(presentProduct), page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc fetch a product
@@ -47,13 +60,18 @@ export const getProducts = asyncHandler(async (req, res) => {
 // @access public
 export const getProductBySlugOrId = asyncHandler(async (req, res) => {
   const isObjectId = req.params.slugOrId.match(/^[0-9a-fA-F]{24}$/);
+  const isAdmin = req.user && req.user.isAdmin;
 
   const product = isObjectId
     ? await Product.findById(req.params.slugOrId)
     : await Product.findOne({ slug: req.params.slugOrId });
 
   if (product) {
-    return res.json(product);
+    if (!isAdmin && product.status !== 'Active') {
+      res.status(404);
+      throw new Error('Resource not found');
+    }
+    return res.json(presentProduct(product));
   } else {
     res.status(404);
     throw new Error('Resource not found');
@@ -66,56 +84,58 @@ export const getProductBySlugOrId = asyncHandler(async (req, res) => {
 export const getTopProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({}).sort({ rating: -1 }).limit(3);
 
-  res.status(200).json(products);
+  res.status(200).json(products.map(presentProduct));
 });
 
 // @desc create a product
 // POST /api/products
 // @access private/admin
 export const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, image, brand, category, countInStock } =
-    req.body;
+  const { name, subtitle, description, image, brand, category, variants, status } =
+    normalizeProductInput(req.body);
 
   const product = new Product({
-    name: name,
-    price: price,
+    name,
+    subtitle,
     user: req.user._id,
-    image: image,
-    brand: brand,
-    category: category,
-    countInStock: countInStock,
+    image,
+    brand,
+    category,
+    variants,
+    status,
     numberViews: 0,
-    description: description,
+    description,
   });
 
   const createdProduct = await product.save();
 
-  res.status(201).json(createdProduct);
+  res.status(201).json(presentProduct(createdProduct));
 });
 
 // @desc update product
 // PUT /api/products/:id
 // @access Private/Admin
 export const updateProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, image, brand, category, countInStock } =
-    req.body;
+  const { name, subtitle, description, image, brand, category, variants, status } =
+    normalizeProductInput(req.body);
 
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    product.name = name;
-    product.price = price;
-    product.description = description;
-    product.image = image;
-    product.brand = brand;
-    product.category = category;
-    product.countInStock = countInStock;
+    if (name !== undefined) product.name = name;
+    if (subtitle !== undefined) product.subtitle = subtitle;
+    if (description !== undefined) product.description = description;
+    if (image !== undefined) product.image = image;
+    if (brand !== undefined) product.brand = brand;
+    if (category !== undefined) product.category = category;
+    if (variants !== undefined) product.variants = variants;
+    if (status !== undefined) product.status = status;
 
     const updatedProduct = await product.save();
-    res.status(200).json(updatedProduct);
+    res.status(200).json(presentProduct(updatedProduct));
   } else {
     res.status(404);
-    throw new Error('Resource not fount');
+    throw new Error('Resource not found');
   }
 });
 

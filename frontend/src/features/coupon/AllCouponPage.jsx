@@ -12,10 +12,11 @@ export default function AllCouponPage() {
   const {
     isPending: pendCoupon,
     error: errCoupon,
-    coupons,
+    coupons: couponResponse,
   } = useGetAllCoupon();
 
   const [activeCategory, setActiveCategory] = useState('All');
+  const coupons = couponResponse?.coupons ?? [];
 
   const filtered =
     activeCategory === 'All'
@@ -24,7 +25,8 @@ export default function AllCouponPage() {
 
   if (isPending || pendCoupon) return <Spinner />;
 
-  if (error || errCoupon) return <Message>{error.message}</Message>;
+  if (error || errCoupon)
+    return <Message>{error?.message || errCoupon?.message}</Message>;
 
   return (
     <div>
@@ -56,7 +58,7 @@ export default function AllCouponPage() {
 
         <div className='mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5'>
           {filtered.map((coupon) => (
-            <CouponCard key={coupon.id} coupon={coupon} />
+            <CouponCard key={coupon._id} coupon={coupon} />
           ))}
         </div>
       </section>

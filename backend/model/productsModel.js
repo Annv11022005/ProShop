@@ -1,4 +1,3 @@
-import { required } from 'joi';
 import mongoose from 'mongoose';
 import slugify from 'slugify';
 
@@ -27,6 +26,37 @@ const reviewsSchema = mongoose.Schema(
   },
 );
 
+const VariantSchema = new mongoose.Schema({
+  size: { type: String, required: true },
+  color: { type: String, required: true },
+  sku: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  originalPrice: {
+    type: Number,
+    required: true,
+  },
+  countInStock: {
+    type: Number,
+    required: true,
+  },
+});
+
+const imageSchema = new mongoose.Schema({
+  url: {
+    type: String,
+    required: true,
+  },
+  fileId: {
+    type: String,
+  },
+});
+
 const productSchema = new mongoose.Schema(
   {
     user: {
@@ -38,21 +68,28 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    subtitle: { type: String, required: false },
     slug: {
       type: String,
       unique: true,
     },
-    SKU: { type: String, required: true },
-    image: { type: String, required: true },
+    image: [imageSchema],
     brand: { type: String, required: true },
     category: { type: String, required: true },
     description: { type: String, required: true },
     reviews: [reviewsSchema],
     rating: { type: Number, required: true, default: 0 },
     numberViews: { type: Number, required: true, default: 0 },
-    price: { type: Number, required: true, default: 0 },
-    countInStock: { type: Number, required: true, default: 0 },
-    isDeleted: { type: Boolean, default: false },
+    variants: [VariantSchema],
+    status: {
+      type: String,
+      enum: ['Draft', 'Active', 'Schedule'],
+      default: 'Draft',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -68,6 +105,11 @@ productSchema.pre('save', function () {
 
 productSchema.pre(/^find/, function () {
   this.where({ isDeleted: { $ne: true } });
+});
+
+productSchema.virtual('minPrice').get(function () {
+  if (!this.variants.length) return 0;
+  return Math.min(...this.variants.map((v) => v.price));
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import colors from 'colors';
+import slugify from 'slugify';
 import users from './data/user.js';
 import products from './data/products.js';
 import User from './model/userModel.js';
@@ -27,10 +28,12 @@ const importData = async () => {
     const adminUser = createUser[0]._id;
 
     const sampleProducts = products.map((product) => {
-      return { ...product, user: adminUser };
+      const _id = new mongoose.Types.ObjectId();
+      const slug = slugify(product.name, { lower: true }) + '-' + _id.toString().slice(-6);
+      return { ...product, _id, user: adminUser, slug };
     });
 
-    await Product.create(sampleProducts);
+    await Product.insertMany(sampleProducts);
 
     console.log('Data imported!'.green.inverse);
     process.exit();

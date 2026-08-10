@@ -3,17 +3,8 @@ import axios from 'axios';
 function mapSort(sort) {
   if (!sort) return undefined;
   const [field, order] = sort.split('-');
-  return order === 'desc' ? `-${field}` : field;
-}
-
-function mapStockFilter(stock) {
-  if (stock === 'countInStock') {
-    return { 'countInStock[gt]': '0' };
-  }
-  if (stock === 'countOfStock') {
-    return { countInStock: 0 };
-  }
-  return {};
+  const mappedField = field === 'price' ? 'variants.price' : field;
+  return order === 'desc' ? `-${mappedField}` : mappedField;
 }
 
 export async function getProducts({
@@ -28,7 +19,7 @@ export async function getProducts({
       pageNumber,
       keyword,
       sort: mapSort(sort),
-      ...mapStockFilter(stock),
+      stock: stock === 'all' ? undefined : stock,
       ...restFilters,
     },
   });

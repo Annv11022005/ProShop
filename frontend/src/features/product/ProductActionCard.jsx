@@ -15,28 +15,31 @@ import {
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 
-const ProductActionCard = ({ product, qty, setQty, onAddToCart }) => {
+const ProductActionCard = ({ product, qty, setQty, onAddToCart, selectedVariant }) => {
+  const price = selectedVariant?.price ?? product.price;
+  const countInStock = selectedVariant?.countInStock ?? product.countInStock;
+
   return (
     <Card>
       <CardHeader className='border-b border-primary'>
         <CardTitle className='flex-between-center'>
           <p>Price:</p>
-          <p>{formatCurrency(product.price)}</p>
+          <p>{formatCurrency(price)}</p>
         </CardTitle>
       </CardHeader>
 
       <CardContent className='flex-between-center border-b border-primary pb-5'>
         <p>Status:</p>
-        <p>{product.countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</p>
+        <p>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</p>
       </CardContent>
 
-      {product.countInStock > 0 ? (
+      {countInStock > 0 ? (
         <CardContent className='flex-between-center'>
           <p className='mb-1'>Quantity:</p>
           <div className='w-32'>
             <Combobox
               items={[
-                ...Array(product.countInStock)
+                ...Array(countInStock)
                   .keys()
                   .map((x) => x + 1),
               ]}
@@ -62,7 +65,7 @@ const ProductActionCard = ({ product, qty, setQty, onAddToCart }) => {
 
       <CardFooter>
         <Button
-          disabled={product.countInStock == 0}
+          disabled={countInStock == 0}
           onClick={onAddToCart}
           size='lg'
         >

@@ -4,7 +4,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useDispatch, useSelector } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { setCredentials } from './features/authentication/authSlice';
+import { logout } from './features/authentication/authSlice';
 import { useEffect } from 'react';
+import axios from 'axios';
 
 import AdminRoutes from '@/components/AdminRoutes';
 import PrivateRoutes from '@/components/PrivateRoutes';
@@ -65,6 +67,17 @@ const App = () => {
       window.history.replaceState({}, '', '/');
     }
   }, [dispatch]);
+
+  // Redux is persisted locally while the JWT is an HTTP-only cookie. Validate
+  // the cookie on refresh so a deleted/expired account does not look logged in.
+  useEffect(() => {
+    if (!userInfo) return;
+
+    axios
+      .get('/api/v1/users/profile')
+      .then(({ data }) => dispatch(setCredentials(data)))
+      .catch(() => dispatch(logout()));
+  }, [dispatch, userInfo?._id]);
 
   return (
     <PayPalScriptProvider deferLoading={true}>

@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 
 import { admin, protect } from '../middleware/authMiddleware.js';
-import imagekit from '../config/imageKit.js';
+import imagekitConfig from '../config/imageKit.js';
 
 const router = express.Router();
 
@@ -39,10 +39,10 @@ router
         throw new Error('No file uploaded');
       }
 
-      const result = await imagekit.upload({
+      const result = await imagekitConfig.imagekit.upload({
         file: req.file.buffer.toString('base64'),
         fileName: `${Date.now()}-${req.file.originalname}`,
-        folder: '/proshop',
+        folder: '/proshop/product',
       });
 
       res.send({

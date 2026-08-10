@@ -155,9 +155,7 @@ const ProfilePage = () => {
               Shipping Address Default
             </CardTitle>
             <CardDescription>
-              {allAddress?.length === 0
-                ? 'You do not have any addresses.'
-                : 'Manage your saved shipping addresses.'}
+              {allAddress?.length === 0 ? 'You do not have any addresses.' : ''}
               {currentAddress && (
                 <>
                   {currentAddress.name}, {currentAddress.phone},

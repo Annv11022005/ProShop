@@ -43,10 +43,24 @@ export const addOrderItems = asyncHandler(async (req, res) => {
       throw new Error(`Product not found with id: ${x._id}`);
     }
 
+    const selectedVariant = matchedProduct.variants.find(
+      (v) => (v._id && x.variantId && v._id.toString() === x.variantId.toString()) || 
+             (v.sku && x.sku && v.sku === x.sku)
+    ) || matchedProduct.variants[0];
+
+    if (!selectedVariant) {
+      res.status(404);
+      throw new Error(`Variant not found for product: ${matchedProduct.name}`);
+    }
+
     return {
       ...x,
       product: matchedProduct._id,
-      price: matchedProduct.price,
+      price: selectedVariant.price,
+      variantId: selectedVariant._id,
+      sku: selectedVariant.sku,
+      size: selectedVariant.size,
+      color: selectedVariant.color,
       qty: x.qty,
       _id: undefined,
     };
