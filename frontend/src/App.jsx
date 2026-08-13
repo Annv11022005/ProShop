@@ -95,6 +95,7 @@ const App = () => {
               />
               <Route path='/product/:slug' element={<ProductScreen />} />
               <Route path='/coupon' element={<CouponScreen />} />
+              <Route path='/coupon/:pageNumber' element={<CouponScreen />} />
 
               <Route element={<PrivateRoutes />}>
                 <Route path='/profile' element={<ProfileScreen />} />

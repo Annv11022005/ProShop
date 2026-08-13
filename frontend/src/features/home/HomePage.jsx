@@ -32,7 +32,9 @@ const HomePage = () => {
   return (
     <>
       {!keyword ? (
-        <ProductCasual />
+        <div className='mx-auto'>
+          <ProductCasual />
+        </div>
       ) : (
         <Link to='/'>
           <Button size='lg'>

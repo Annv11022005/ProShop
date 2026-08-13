@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { getALlCategory, getALlCoupon } from '../api/apiCoupon';
 
-export function useGetAllCoupon(pageNumber = 1) {
+export function useGetAllCoupon(pageNumber = 1, category = '') {
   const {
     isPending,
     error,
     data: coupons,
   } = useQuery({
-    queryKey: ['coupons', pageNumber],
-    queryFn: () => getALlCoupon(pageNumber),
+    queryKey: ['coupons', pageNumber, category],
+    queryFn: () => getALlCoupon(pageNumber, category),
   });
 
   return { isPending, error, coupons };

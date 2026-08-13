@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-export async function getALlCoupon(pageNumber = 1) {
-  const res = await axios.get('/api/v1/coupons', {
-    params: {
-      pageNumber,
-    },
-  });
+export async function getALlCoupon(pageNumber = 1, category = '') {
+  const params = { pageNumber };
+  if (category && category !== 'All') {
+    params.category = category;
+  }
+  const res = await axios.get('/api/v1/coupons', { params });
 
   return res.data;
 }

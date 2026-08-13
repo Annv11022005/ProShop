@@ -18,7 +18,7 @@ const ProductCasual = () => {
 
   if (error) return <Message>{error.message}</Message>;
   return (
-    <Carousel className='w-full max-w-md mx-auto'>
+    <Carousel className='w-full max-w-md'>
       <CarouselContent>
         {products.map((product) => (
           <CarouselItem key={product._id}>

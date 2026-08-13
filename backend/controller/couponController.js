@@ -20,7 +20,7 @@ export const getAllCoupon = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1))
     .limit(pageSize);
 
-  res.status(200).json({ coupons, page, pages: Math.ceil(count / pageSize) });
+  res.status(200).json({ coupons, page, pages: Math.ceil(count / pageSize), count });
 });
 
 // @desc get all Category

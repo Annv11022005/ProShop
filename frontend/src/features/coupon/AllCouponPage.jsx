@@ -1,27 +1,33 @@
 import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useGetAllCoupon } from './hooks/useCoupons';
+
 import FilterTabs from './components/FilterTabs';
 import CouponCard from './components/CouponCard';
 import { useGetCategory } from './hooks/useCoupons';
 import { Spinner } from '@/components/ui/spinner';
 import { Message } from '@/components/AlertMessage';
-import { useGetAllCoupon } from './hooks/useCoupons';
+import Paginate from '@/components/Paginate';
 
 export default function AllCouponPage() {
+  const { pageNumber } = useParams();
+  const navigate = useNavigate();
   const { isPending, error, categories } = useGetCategory();
+
+  const [activeCategory, setActiveCategory] = useState('All');
 
   const {
     isPending: pendCoupon,
     error: errCoupon,
     coupons: couponResponse,
-  } = useGetAllCoupon();
+  } = useGetAllCoupon(pageNumber, activeCategory);
 
-  const [activeCategory, setActiveCategory] = useState('All');
   const coupons = couponResponse?.coupons ?? [];
 
-  const filtered =
-    activeCategory === 'All'
-      ? coupons
-      : coupons.filter((c) => c.category === activeCategory);
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+    navigate('/coupon');
+  };
 
   if (isPending || pendCoupon) return <Spinner />;
 
@@ -45,7 +51,8 @@ export default function AllCouponPage() {
           </div>
           <div className='inline-flex shrink-0 items-baseline gap-1.5 self-start text-sm tabular-nums text-muted-foreground sm:self-auto'>
             <p className='text-sm text-neutral-500'>
-              Showing {filtered.length} <span>offers</span>
+              Showing {coupons.length} of{' '}
+              {couponResponse?.count ?? coupons.length} <span>offers</span>
             </p>
           </div>
         </header>
@@ -53,14 +60,22 @@ export default function AllCouponPage() {
         <FilterTabs
           categories={categories}
           active={activeCategory}
-          onChange={setActiveCategory}
+          onChange={handleCategoryChange}
         />
 
-        <div className='mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5'>
-          {filtered.map((coupon) => (
+        <div className='my-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5'>
+          {coupons.map((coupon) => (
             <CouponCard key={coupon._id} coupon={coupon} />
           ))}
         </div>
+
+        {couponResponse.pages > 1 && (
+          <Paginate
+            page={couponResponse.page}
+            pages={couponResponse.pages}
+            basePath='/coupon'
+          />
+        )}
       </section>
     </div>
   );
