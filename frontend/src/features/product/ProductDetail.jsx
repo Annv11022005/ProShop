@@ -1,9 +1,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../cart/cartSlice.js';
 import { useCreateReview } from './hooks/useReviews.js';
-
 import { useProduct } from './hooks/useProduct';
 
 import {
@@ -13,7 +12,6 @@ import {
   ShoppingBag,
   Truck,
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import Row from '@/components/ui/Row';
 import Col from '@/components/ui/Col';
@@ -35,6 +33,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const qty = 1;
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -43,6 +42,27 @@ const ProductDetail = () => {
 
   const selectedVariant = product?.variants?.[selectedVariantIndex] || null;
   const countInStock = selectedVariant?.countInStock ?? product?.countInStock;
+
+  const galleryImages = useMemo(() => {
+    const productImages = (product?.images || []).map((img) => ({
+      url: img.url,
+      variantIndex: null,
+    }));
+
+    const variantImages = (product?.variants || []).flatMap((v, vIndex) =>
+      (v.images || []).map((img) => ({
+        url: img.url,
+        variantIndex: vIndex,
+      })),
+    );
+
+    const merged = [...productImages, ...variantImages];
+
+    // loại trùng theo url, giữ lại bản ghi đầu tiên gặp
+    return merged.filter(
+      (img, index, self) => index === self.findIndex((t) => t.url === img.url),
+    );
+  }, [product]);
 
   function addToCartHandler() {
     dispatch(
@@ -55,7 +75,7 @@ const ProductDetail = () => {
         color: selectedVariant?.color,
         size: selectedVariant?.size,
         sku: selectedVariant?.sku,
-      })
+      }),
     );
 
     navigate('/cart');
@@ -79,6 +99,27 @@ const ProductDetail = () => {
     }
   }
 
+  const handleSelectImage = (index) => {
+    setSelectedImageIndex(index);
+
+    const variantIndex = galleryImages[index]?.variantIndex;
+    if (variantIndex !== null && variantIndex !== undefined) {
+      setSelectedVariantIndex(variantIndex);
+    }
+  };
+
+  const handlerSelectVariant = (index) => {
+    setSelectedVariantIndex(index);
+
+    // tìm ảnh đầu tiên trong gallery thuộc variant này
+    const imageIndex = galleryImages.findIndex(
+      (img) => img.variantIndex === index,
+    );
+    if (imageIndex !== -1) {
+      setSelectedImageIndex(imageIndex);
+    }
+  };
+
   return (
     <>
       {isPending ? (
@@ -97,9 +138,9 @@ const ProductDetail = () => {
           <Row template='lg:grid-cols-[0.75fr_1fr]' className='gap-8'>
             <Col fluid className='my-auto'>
               <ProductGallery
-                images={
-                  product.images?.map((image) => image.url) || [product.image]
-                }
+                images={galleryImages.map((image) => image.url)}
+                selectedIndex={selectedImageIndex}
+                onSelectImage={handleSelectImage}
                 productName={product.name}
               />
             </Col>
@@ -139,7 +180,7 @@ const ProductDetail = () => {
                           selectedVariantIndex === index ? 'default' : 'outline'
                         }
                         size='sm'
-                        onClick={() => setSelectedVariantIndex(index)}
+                        onClick={() => handlerSelectVariant(index)}
                       >
                         {variant.color}
                       </Button>

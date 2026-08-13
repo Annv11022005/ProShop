@@ -26,9 +26,20 @@ const reviewsSchema = mongoose.Schema(
   },
 );
 
+const imageSchema = new mongoose.Schema({
+  url: {
+    type: String,
+    required: true,
+  },
+  fileId: {
+    type: String,
+  },
+});
+
 const VariantSchema = new mongoose.Schema({
   size: { type: String, required: true },
   color: { type: String, required: true },
+  images: { type: [imageSchema], required: false },
   sku: {
     type: String,
     required: true,
@@ -44,16 +55,6 @@ const VariantSchema = new mongoose.Schema({
   countInStock: {
     type: Number,
     required: true,
-  },
-});
-
-const imageSchema = new mongoose.Schema({
-  url: {
-    type: String,
-    required: true,
-  },
-  fileId: {
-    type: String,
   },
 });
 

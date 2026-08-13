@@ -6,11 +6,10 @@ import imagekitConfig from '../config/imageKit.js';
 
 const router = express.Router();
 
-// Dùng memoryStorage thay vì diskStorage vì không lưu file xuống ổ đĩa nữa
 const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
-  const fileTypes = /jpg|jpeg|png/;
+  const fileTypes = /jpg|jpeg|png|webp/;
   const extname = fileTypes.test(
     file.originalname.split('.').pop().toLowerCase(),
   );

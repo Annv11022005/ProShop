@@ -62,12 +62,14 @@ const CreateProductPage = () => {
         id: Date.now(),
         color: 'New color',
         size: '—',
+        images: [],
         sku: '—',
         price: 0,
         originalPrice: 0,
         countInStock: 0,
       },
     ]);
+
   const removeVariant = (id) =>
     setVariants((v) => v.filter((x) => x.id !== id));
 
@@ -98,6 +100,28 @@ const CreateProductPage = () => {
     setImages((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
+  const uploadImagesVariants = async (variantId, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const res = await uploadImage(file);
+      const uploaded = { url: res.image, fileId: res.fileId };
+      setVariants((v) =>
+        v.map((item) =>
+          item.id === variantId ? { ...item, images: [uploaded] } : item,
+        ),
+      );
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    }
+  };
+
+  const removeVariantImage = (variantId) => {
+    setVariants((v) =>
+      v.map((item) => (item.id === variantId ? { ...item, images: [] } : item)),
+    );
+  };
+
   const submitHandler = async () => {
     try {
       const productData = {
@@ -112,6 +136,7 @@ const CreateProductPage = () => {
           sku: v.sku,
           size: v.size,
           color: v.color,
+          images: v.images || [],
           price: Number(v.price) || 0,
           originalPrice: Number(v.originalPrice) || Number(v.price) || 0,
           countInStock: Number(v.countInStock) || 0,
@@ -291,6 +316,9 @@ const CreateProductPage = () => {
                     variants={variants}
                     onRemove={removeVariant}
                     onUpdate={updateVariant}
+                    uploadImagesVariants={uploadImagesVariants}
+                    pendingUpload={pendingUpload}
+                    removeVariantImage={removeVariantImage}
                   />
                 </FramePanel>
               </Frame>

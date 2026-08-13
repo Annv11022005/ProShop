@@ -1,9 +1,11 @@
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export default function ProductGallery({ images, productName }) {
-  const [selectedImage, setSelectedImage] = useState(0);
-
+export default function ProductGallery({
+  images,
+  productName,
+  selectedIndex,
+  onSelectImage,
+}) {
   return (
     <div className='lg:sticky lg:top-6'>
       <div className='flex gap-3 sm:gap-4'>
@@ -13,12 +15,12 @@ export default function ProductGallery({ images, productName }) {
             <button
               key={image}
               type='button'
-              onClick={() => setSelectedImage(index)}
+              onClick={() => onSelectImage(index)}
               className={cn(
                 'relative size-14 overflow-hidden rounded-md border sm:size-16',
                 'focus-visible:outline-none focus-visible:ring-2',
                 'focus-visible:ring-ring',
-                selectedImage === index
+                selectedIndex === index
                   ? 'border-foreground'
                   : 'border-border hover:border-foreground/40',
               )}
@@ -35,7 +37,7 @@ export default function ProductGallery({ images, productName }) {
         {/* Main image */}
         <div className='relative aspect-square flex-1 overflow-hidden rounded-md bg-muted'>
           <img
-            src={images[selectedImage]}
+            src={images[selectedIndex]}
             alt={productName}
             className='absolute inset-0 h-full w-full object-cover'
           />

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
-import { Trash2 } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 const EditableCell = ({
@@ -24,6 +24,7 @@ const EditableCell = ({
   const inputRef = useRef(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVal(value);
   }, [value]);
 
@@ -77,14 +78,22 @@ const EditableCell = ({
   );
 };
 
-const VariantTable = ({ variants, onRemove, onUpdate }) => {
+const VariantTable = ({
+  variants,
+  onRemove,
+  onUpdate,
+  uploadImagesVariants,
+  pendingUpload,
+  removeVariantImage,
+}) => {
   const columns = [
     'size',
     'color',
+    'image',
     'SKU',
     'Price',
     'originalPrice',
-    'Count In Stock',
+    'Inventory',
     '',
   ];
 
@@ -121,11 +130,51 @@ const VariantTable = ({ variants, onRemove, onUpdate }) => {
                   onSave={(val) => onUpdate(v.id, 'size', val)}
                   className='text-center text-muted-foreground'
                 />
+
                 <EditableCell
                   value={v.color}
                   onSave={(val) => onUpdate(v.id, 'color', val)}
                   className='text-center text-muted-foreground'
                 />
+
+                <TableCell>
+                  <input
+                    id={`variant-media-${v.id}`}
+                    type='file'
+                    accept='image/*'
+                    className='sr-only'
+                    onChange={(e) => uploadImagesVariants(v.id, e)}
+                    disabled={pendingUpload}
+                  />
+                  <label
+                    htmlFor={`variant-media-${v.id}`}
+                    className='cursor-pointer flex items-center justify-center'
+                  >
+                    {v.images?.[0] ? (
+                      <>
+                        <div className='relative group rounded-md overflow-hidden border border-border'>
+                          <img
+                            src={v.images[0].url}
+                            alt={'Preview'}
+                            className='size-16 aspect-square object-cover'
+                          />
+                          <button
+                            type='button'
+                            onClick={() => removeVariantImage(v._id)}
+                            className='absolute top-1 right-1 bg-background/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity'
+                          >
+                            <X className='size-3.5 text-foreground' />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <span className='text-xs text-muted-foreground underline'>
+                        Thêm ảnh
+                      </span>
+                    )}
+                  </label>
+                </TableCell>
+
                 <EditableCell
                   value={v.sku}
                   onSave={(val) => onUpdate(v.id, 'sku', val)}

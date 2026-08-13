@@ -18,6 +18,7 @@ const variantsSchema = Joi.array().items(
     price: Joi.number().min(0).required(),
     originalPrice: Joi.number().min(0).required(),
     countInStock: Joi.number().integer().min(0).required(),
+    images: imageSchema,
   }),
 );
 
