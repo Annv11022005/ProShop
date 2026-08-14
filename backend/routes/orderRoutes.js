@@ -21,6 +21,7 @@ import {
   VNPayCallback,
 } from '../controller/paymentController.js';
 
+router.route('/vnpay/callback').get(VNPayCallback);
 router.use(protect);
 
 router
@@ -47,6 +48,5 @@ router
 router
   .route('/:id/vnpay/create')
   .post(validateParams(mongoIdParamSchema), createPayment);
-router.route('/vnpay/callback').get(VNPayCallback);
 
 export default router;

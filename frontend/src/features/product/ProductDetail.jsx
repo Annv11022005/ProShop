@@ -192,6 +192,7 @@ const ProductDetail = () => {
               <div className='flex justify-between gap-5 '>
                 <p>Status:</p>
                 <p>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</p>
+                <p>({countInStock})</p>
               </div>
 
               <Button

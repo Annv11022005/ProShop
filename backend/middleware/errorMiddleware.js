@@ -8,6 +8,8 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
 
+  console.error('🔥 BACKEND ERROR:', err);
+
   //check for mongoose bad objectId
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     message = `Resource not found`;

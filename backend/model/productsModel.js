@@ -43,6 +43,7 @@ const VariantSchema = new mongoose.Schema({
   sku: {
     type: String,
     required: true,
+    unique: true,
   },
   price: {
     type: Number,
@@ -55,7 +56,9 @@ const VariantSchema = new mongoose.Schema({
   countInStock: {
     type: Number,
     required: true,
+    default: 0,
   },
+  reserved: { type: Number, required: true, default: 0 },
 });
 
 const productSchema = new mongoose.Schema(
@@ -111,6 +114,10 @@ productSchema.pre(/^find/, function () {
 productSchema.virtual('minPrice').get(function () {
   if (!this.variants.length) return 0;
   return Math.min(...this.variants.map((v) => v.price));
+});
+
+VariantSchema.virtual('available').get(function () {
+  return this.countInStock - this.reserved;
 });
 
 const Product = mongoose.model('Product', productSchema);

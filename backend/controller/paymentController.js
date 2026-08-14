@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../model/orderModel.js';
+import { processOrderPayment, cancelOrderPayment } from './orderController.js';
 import { VNPay, ignoreLogger, VnpLocale, ProductCode, dateFormat } from 'vnpay';
 
 function generatePayID() {
@@ -70,7 +71,6 @@ export const createPayment = asyncHandler(async (req, res) => {
 export const VNPayCallback = asyncHandler(async (req, res) => {
   const {
     vnp_ResponseCode,
-    vnp_OrderInfo,
     vnp_TxnRef,
     vnp_Amount,
     vnp_TransactionNo,
@@ -87,17 +87,24 @@ export const VNPayCallback = asyncHandler(async (req, res) => {
     loggerFn: ignoreLogger,
   });
 
-  const verify = await vnpay.verifyIpnCall(req.query);
+  const verify = vnpay.verifyReturnUrl(req.query);
 
-  if (!verify.success) {
-    res.status(200).json({ RspCode: '97', Message: 'Invalid signature' });
+  if (!verify.isVerified) {
+    return res
+      .status(200)
+      .json({ RspCode: '97', Message: 'Invalid signature' });
   }
 
-  if (vnp_ResponseCode !== '00') {
-    throw new Error('Thanh toán thất bại');
+  if (!verify.isVerified || vnp_ResponseCode !== '00') {
+    if (orderId) {
+      await cancelOrderPayment(orderId);
+    }
+    return res
+      .status(400)
+      .json({ Message: 'Payment failed and returned to warehouse.' });
   }
 
-  const orderId = vnp_OrderInfo.split(' ')[4];
+  const orderId = vnp_TxnRef?.split('_')[0];
   const order = await Order.findById(orderId);
 
   if (!order) {
@@ -110,20 +117,11 @@ export const VNPayCallback = asyncHandler(async (req, res) => {
       .json({ RspCode: '02', Message: 'Order already confirmed' });
   }
 
-  if (Number(order.totalPrice) !== Number(vnp_Amount) / 100) {
-    return res.status(200).json({ RspCode: '04', Message: 'Invalid amount' });
-  }
+  await processOrderPayment(orderId, {
+    id: vnp_TransactionNo,
+    status: vnp_ResponseCode,
+    update_time: vnp_PayDate,
+  });
 
-  if (vnp_ResponseCode === '00') {
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: vnp_TransactionNo,
-      status: vnp_ResponseCode,
-      update_time: vnp_PayDate,
-    };
-
-    await order.save();
-    res.status(200).json({ RspCode: '00', Message: 'Confirm Success' });
-  }
+  return res.status(200).json({ RspCode: '00', Message: 'Confirm Success' });
 });

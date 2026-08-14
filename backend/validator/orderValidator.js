@@ -25,7 +25,11 @@ const orderItemSchema = Joi.object({
       'string.pattern.base': 'ID sản phẩm không hợp lệ',
       'any.required': 'ID sản phẩm là bắt buộc',
     }),
-});
+  variantId: Joi.string().allow(null, '').optional(),
+  sku: Joi.string().allow(null, '').optional(),
+  color: Joi.string().allow(null, '').optional(),
+  size: Joi.string().allow(null, '').optional(),
+}).unknown(true);
 
 // Schema con: kết quả thanh toán (PayPal/Stripe trả về)
 const paymentResultSchema = Joi.object({
