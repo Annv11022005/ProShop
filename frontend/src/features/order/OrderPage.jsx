@@ -37,8 +37,6 @@ const OrderPage = () => {
     refetch,
   } = useGetOrderDetail(orderId);
 
-  console.log(order);
-
   const { payOrderItem } = usePayOrder();
 
   const { createPayment } = useCreateVnpayPayment();

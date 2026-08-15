@@ -211,16 +211,48 @@ export const getOrderByID = asyncHandler(async (req, res) => {
 export const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
-  if (order) {
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+
+  if (order.isDelivered) {
+    res.status(400);
+    throw new Error('Order is delivered');
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    for (const item of order.orderItems) {
+      const stockResult = await Product.updateOne(
+        { _id: item.product, 'variants._id': item.variantId },
+        {
+          $inc: {
+            qtySold: item.qty,
+          },
+        },
+        { session },
+      );
+
+      if (stockResult.matchedCount === 0) {
+        throw new Error(
+          `No product found to deduct from inventory: ${item.name}`,
+        );
+      }
+    }
+
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
-    const updateOrder = await order.save();
-
+    const updateOrder = await order.save({ session });
+    await session.commitTransaction();
     res.status(200).json(updateOrder);
-  } else {
-    res.status(404);
-    throw new Error('Order not found');
+  } catch (err) {
+    await session.abortTransaction();
+    throw err;
+  } finally {
+    session.endSession();
   }
 });
 

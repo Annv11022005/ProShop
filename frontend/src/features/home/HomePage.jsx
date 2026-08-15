@@ -1,6 +1,9 @@
-import { useProducts } from '@/features/product/hooks/useProducts';
+import {
+  useProducts,
+  useTopProduct,
+} from '@/features/product/hooks/useProducts';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import ProductCasual from './ProductCasual';
+// import ProductCasual from './ProductCasual';
 import ProductFilter from './ProductFilter';
 
 import Row from '@/components/ui/Row';
@@ -13,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import ChatWidget from '../chat/ChatWidget';
 import { useSelector } from 'react-redux';
+import HomeBanner from './HomeBanner';
 
 const HomePage = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -21,6 +25,8 @@ const HomePage = () => {
 
   const sort = searchParams.get('sortBy');
   const stock = searchParams.get('stock');
+
+  const { products, isPending: pendingTop, error: errTop } = useTopProduct();
 
   const { isPending, error, data } = useProducts({
     pageNumber,
@@ -33,7 +39,7 @@ const HomePage = () => {
     <>
       {!keyword ? (
         <div className='mx-auto'>
-          <ProductCasual />
+          <HomeBanner product={products} />
         </div>
       ) : (
         <Link to='/'>
@@ -43,9 +49,9 @@ const HomePage = () => {
           </Button>
         </Link>
       )}
-      {isPending ? (
+      {isPending || pendingTop ? (
         <Spinner />
-      ) : error ? (
+      ) : error || errTop ? (
         <Message>{error?.data?.message || error.error}</Message>
       ) : (
         <>

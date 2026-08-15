@@ -85,6 +85,7 @@ const productSchema = new mongoose.Schema(
     rating: { type: Number, required: true, default: 0 },
     numberViews: { type: Number, required: true, default: 0 },
     variants: [VariantSchema],
+    qtySold: { type: Number, required: true, default: 0 },
     status: {
       type: String,
       enum: ['Draft', 'Active', 'Schedule'],

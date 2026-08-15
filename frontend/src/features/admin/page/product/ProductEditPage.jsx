@@ -152,6 +152,7 @@ const ProductEditPage = () => {
           sku: v.sku,
           size: v.size,
           color: v.color,
+          images: v.images || [],
           price: Number(v.price) || 0,
           originalPrice: Number(v.originalPrice) || Number(v.price) || 0,
           countInStock: Number(v.countInStock) || 0,
