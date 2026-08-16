@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+    ],
     password: {
       type: String,
       required: false,

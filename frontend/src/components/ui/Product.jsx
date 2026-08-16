@@ -9,6 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import ProductPrice from '@/features/product/components/ProductPrice';
 import { Star } from 'lucide-react';
+import WishlistIcon from '../WishlistIcon';
+import {
+  useAddToWishlist,
+  useGetWishlist,
+  useRemoveFromWishlist,
+} from '@/features/authentication/hooks/useWishlist';
+import { Spinner } from './spinner';
 
 function formatCompact(num) {
   if (num >= 1000) {
@@ -19,19 +26,51 @@ function formatCompact(num) {
 }
 
 const Product = ({ product }) => {
+  const { isPending, wishlist } = useGetWishlist();
+  const { addToWishlist } = useAddToWishlist();
+  const { removeFromWishlist } = useRemoveFromWishlist();
+
+  const isInWishlist = wishlist?.some((item) => item._id === product._id);
+
+  const handleToggleWishlist = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isInWishlist) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(product._id);
+    }
+  };
+
+  const imageUrl =
+    typeof product.image === 'string'
+      ? product.image
+      : product.image?.[0]?.url || product.images?.[0]?.url || '';
+
+  const price = product.price ?? product.variants?.[0]?.price ?? 0;
+  const originalPrice = product.originalPrice ?? product.variants?.[0]?.originalPrice;
+
+  if (isPending) return <Spinner />;
+
   return (
     <Card className='flex h-full flex-col overflow-hidden p-0'>
       <CardHeader className='p-0'>
         <CardTitle>
-          <Link to={`/product/${product.slug || product._id}`}>
-            <div className='aspect-4/3 w-full overflow-hidden rounded-md bg-muted'>
+          <div className='aspect-4/3 relative w-full overflow-hidden rounded-md bg-muted'>
+            <Link to={`/product/${product.slug || product._id}`}>
               <img
-                src={product.image}
+                src={imageUrl}
                 alt={product.name}
                 className='h-full w-full object-cover transition-transform duration-300'
               />
-            </div>
-          </Link>
+            </Link>
+
+            <WishlistIcon
+              isActive={isInWishlist}
+              onClick={handleToggleWishlist}
+            />
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -55,8 +94,8 @@ const Product = ({ product }) => {
       <CardFooter className='mt-auto'>
         <div className='flex items-center w-full justify-between'>
           <ProductPrice
-            price={product.variants[0].price}
-            originalPrice={product.variants[0].originalPrice}
+            price={price}
+            originalPrice={originalPrice}
           />
           <Link to={`/product/${product.slug || product._id}`}>
             <Button>Buy Now</Button>

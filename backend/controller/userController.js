@@ -3,6 +3,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../model/userModel.js';
 import { generateToken } from '../utils/generateToken.js';
 import generateOTP from '../utils/generateOTP.js';
+import { presentProduct } from '../utils/productPresenter.js';
 
 // @desc Auth user & get token
 // POST /api/users/login
@@ -26,6 +27,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    wishlist: user.wishlist,
     isAdmin: user.isAdmin,
     createdAt: user.createdAt,
   });
@@ -277,4 +279,62 @@ export const updateUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
+});
+
+// @desc Add to Wishlist
+// POST /api/v1/users/wishlist
+// @access public
+export const addToWishlist = asyncHandler(async (req, res) => {
+  const { productId } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { wishlist: productId } },
+    { new: true },
+  );
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  res.status(200).json(user.wishlist);
+});
+
+// @desc Remove to Wishlist
+// DELETE /api/v1/users/wishlist/:productId
+// @access private
+export const removeFromWishlist = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $pull: { wishlist: productId } },
+    { new: true },
+  );
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  res.status(200).json(user.wishlist);
+});
+
+// @desc Get all Wishlist
+// GET /api/v1/users/wishlist
+// @access private
+export const getWishlist = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate('wishlist');
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const presentedWishlist = (user.wishlist || []).map((item) =>
+    presentProduct(item),
+  );
+
+  res.status(200).json(presentedWishlist);
 });

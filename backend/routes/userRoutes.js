@@ -12,6 +12,9 @@ import {
   verifyUser,
   loginWithFacebook,
   loginWithGoogle,
+  getWishlist,
+  addToWishlist,
+  removeFromWishlist,
 } from '../controller/userController.js';
 import { admin, protect } from '../middleware/authMiddleware.js';
 import { loginSchema, registerSchema } from '../validator/userValidator.js';
@@ -36,6 +39,13 @@ router
   .route('/profile')
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
+
+router
+  .route('/wishlist')
+  .get(protect, getWishlist)
+  .post(protect, addToWishlist);
+
+router.route('/wishlist/:productId').delete(protect, removeFromWishlist);
 
 router
   .route('/:id')
@@ -64,13 +74,11 @@ router.route('/auth/google').get(
   }),
 );
 
-router
-  .route('/auth/google/callback')
-  .get(
-    passport.authenticate('google', {
-      session: false,
-      failureRedirect: '/login',
-    }),
-    loginWithGoogle,
-  );
+router.route('/auth/google/callback').get(
+  passport.authenticate('google', {
+    session: false,
+    failureRedirect: '/login',
+  }),
+  loginWithGoogle,
+);
 export default router;

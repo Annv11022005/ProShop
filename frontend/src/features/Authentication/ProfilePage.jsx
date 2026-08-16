@@ -26,6 +26,7 @@ import {
   User,
   Check,
   Truck,
+  Heart,
 } from 'lucide-react';
 import { Message } from '@/components/AlertMessage';
 import {
@@ -44,9 +45,12 @@ import {
 } from '@/components/ui/dialog';
 import FormInformation from './components/FormInformation';
 import { formatCurrency } from '@/lib/utils';
+import { useGetWishlist } from './hooks/useWishlist';
+import Product from '@/components/ui/Product';
 
 const navTabs = [
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'wishlist', label: 'Wishlist', icon: Heart },
   { id: 'orders', label: 'Orders', icon: Package },
 ];
 
@@ -65,6 +69,8 @@ const ProfilePage = () => {
   const { isPending: pendingDelete, deletedAddress } = useDeleteAddress();
 
   const { isPending: pendingGet, allAddress } = useGetAllAddress();
+
+  const { isPending: pendingWishlist, wishlist } = useGetWishlist();
 
   const {
     isPending: pendingDefault,
@@ -201,6 +207,31 @@ const ProfilePage = () => {
       </Col>
 
       <Col fluid>
+        {activeTab === 'wishlist' && (
+          <div>
+            {pendingWishlist ? (
+              <Spinner />
+            ) : !wishlist || wishlist.length === 0 ? (
+              <div className='flex flex-col items-center justify-center py-12 border border-dashed border-border rounded-xl text-center text-muted-foreground'>
+                <Heart size={48} className='mb-3 text-muted-foreground/40' />
+                <h3 className='text-base font-semibold text-foreground'>
+                  Your wishlist is empty.
+                </h3>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  Click the heart icon on the products to save them to your
+                  favorites list!
+                </p>
+              </div>
+            ) : (
+              <div className='grid grid-cols-[380px_380px] gap-4'>
+                {wishlist.map((item) => (
+                  <Product key={item._id} product={item} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'profile' && (
           <div>
             {/* Quick facts */}
