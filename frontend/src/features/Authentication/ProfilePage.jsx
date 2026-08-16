@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import useToggle from '@/lib/handleToggle';
 import { useOrderHistory } from '../order/hooks/useOrders';
 import { setCredentials } from './authSlice';
 import { useProfileMutation } from './hooks/useProfile';
@@ -15,17 +14,19 @@ import {
 
 import { Button } from '@/components/ui/button';
 import Col from '@/components/ui/Col';
-import { FieldGroup, FieldSet, Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
 import Row from '@/components/ui/Row';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import {
+  MapPin,
+  Pencil,
+  Trash2,
+  Plus,
+  Package,
+  User,
+  Check,
+  Truck,
+} from 'lucide-react';
 import { Message } from '@/components/AlertMessage';
 import {
   Card,
@@ -36,27 +37,32 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Command,
-  CommandDialog,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import FormInformation from './components/FormInformation';
+import { formatCurrency } from '@/lib/utils';
+
+const navTabs = [
+  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'orders', label: 'Orders', icon: Package },
+];
 
 const ProfilePage = () => {
+  const [activeTab, setActiveTab] = useState('profile');
   const [open, setOpen] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
+  const avatar = userInfo?.name.charAt(0);
+  const memberSince = new Date(userInfo.createdAt).getFullYear();
 
   const [name, setName] = useState(userInfo?.name || '');
   const [email, setEmail] = useState(userInfo?.email || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const {
-    isPending: pendingDelete,
-    // error: errDelete,
-    deletedAddress,
-  } = useDeleteAddress();
+  const { isPending: pendingDelete, deletedAddress } = useDeleteAddress();
 
   const { isPending: pendingGet, allAddress } = useGetAllAddress();
 
@@ -73,14 +79,20 @@ const ProfilePage = () => {
     replaceDefaultAddress,
   } = useUpdateDefaultAddress();
 
-  const [isPassword, handleToggle] = useToggle(false);
-  const [isConfirmPassword, handleToggleConfirm] = useToggle(false);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { isPending, profileUser } = useProfileMutation();
   const { isPending: pendingMyOrder, error, myOrders } = useOrderHistory();
+  const OrderedAmount = myOrders?.reduce(
+    (sum, order) => sum + order.totalPrice,
+    0,
+  );
+  const latestOrder = myOrders?.reduce(
+    (latest, order) =>
+      new Date(order.createdAt) > new Date(latest.createdAt) ? order : latest,
+    myOrders[0],
+  );
 
   if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
 
@@ -143,195 +155,319 @@ const ProfilePage = () => {
   }
 
   return (
-    <Row template='lg:grid-cols-[1fr_2fr]' className='gap-3'>
+    <Row template='lg:grid-cols-[0.7fr_2fr]' className='gap-3'>
+      {/* Sidebar Profile */}
       <Col fluid>
-        <h2 className='w-full text-center mb-2 uppercase font-semibold'>
-          Reset Information
-        </h2>
+        <div className='flex flex-col h-80 gap-4 p-4 sm:p-5 rounded-xl border border-border bg-card shadow-xs'>
+          {/* User info  */}
+          <div className='flex items-center gap-3 pb-2 border-b border-border/50'>
+            <div className='w-12 h-12 rounded-full bg-bg-blue text-blue-avt font-bold text-base flex items-center justify-center shrink-0 '>
+              {avatar}
+            </div>
+            <div className='min-w-0 flex-1'>
+              <h3 className='font-bold text-base text-foreground truncate'>
+                {userInfo?.name}
+              </h3>
+              <p className='text-xs text-muted-foreground truncate'>
+                {userInfo?.email}
+              </p>
+            </div>
+          </div>
 
-        <Card className='rounded-none'>
-          <CardHeader>
-            <CardTitle className='font-semibold'>
-              Shipping Address Default
-            </CardTitle>
-            <CardDescription>
-              {allAddress?.length === 0 ? 'You do not have any addresses.' : ''}
-              {currentAddress && (
-                <>
-                  {currentAddress.name}, {currentAddress.phone},
-                  {currentAddress.address}, {currentAddress.city},{' '}
-                  {currentAddress.postalCode}, {currentAddress.country}
-                </>
-              )}
-            </CardDescription>
-            <CardAction className='my-auto'>
-              <Button
-                variant='link'
-                onClick={() => {
-                  if (!currentAddress) {
-                    navigate('/shipping', { state: { action: 'create' } });
-                  } else {
-                    setOpen(true);
-                  }
-                }}
-              >
-                {!currentAddress ? 'Create Address' : 'Change Address'}
-              </Button>
-            </CardAction>
-          </CardHeader>
-
-          <CardFooter>
-            <Button
-              onClick={() =>
-                navigate('/shipping', { state: { action: 'create' } })
-              }
-            >
-              Create New Address
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <CommandDialog
-          open={open}
-          onOpenChange={setOpen}
-          className='sm:max-w-160 p-3'
-        >
-          <Command>
-            <CommandList>
-              <CommandGroup heading='Shipping Address'>
-                {allAddress.map((addr) => (
-                  <div
-                    key={addr._id}
-                    className='flex flex-row gap-3 items-center'
-                  >
-                    <CommandItem
-                      disabled={pendingUp}
-                      onSelect={() => updateDefaultAddressHandler(addr._id)}
-                      className='p-2 mb-2 text-sm font-medium w-125'
-                    >
-                      {addr.name}, {addr.phone}, {addr.address}, {addr.city},{' '}
-                      {addr.postalCode}, {addr.country}
-                    </CommandItem>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      className='text-xs'
-                      onClick={() => {
-                        navigate('/shipping', {
-                          state: { action: 'update', address: addr },
-                        });
-                        setOpen(false);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      className='text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200'
-                      disabled={pendingDelete}
-                      onClick={() => deleteAddressHandler(addr._id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </CommandDialog>
-
-        <form onSubmit={submitHandler}>
-          <FieldSet>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor='name' className='text-md'>
-                  Name
-                </FieldLabel>
-                <Input
-                  id='name'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  type='text'
-                  placeholder='Enter name'
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor='email' className='text-md'>
-                  Email address
-                </FieldLabel>
-                <Input
-                  id='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type='email'
-                  placeholder='Enter Email'
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor='password' className='text-md'>
-                  Password
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id='password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    type={isPassword ? 'text' : 'password'}
-                    placeholder='Enter password'
+          <nav className='flex flex-col gap-3'>
+            {navTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type='button'
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                    isActive
+                      ? 'bg-bg-blue text-blue-avt font-semibold'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  }`}
+                >
+                  <Icon
+                    className={`w-4 h-4 ${isActive ? 'text-blue-avt' : 'text-muted-foreground'}`}
                   />
-                  <InputGroupAddon
-                    className='cursor-pointer'
-                    align='inline-end'
-                    onClick={handleToggle}
-                  >
-                    {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
-                  </InputGroupAddon>
-                </InputGroup>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor='confirmPassword' className='text-md'>
-                  Confirm Password
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id='confirmPassword'
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    type={isConfirmPassword ? 'text' : 'password'}
-                    placeholder='Enter confirm password'
-                  />
-                  <InputGroupAddon
-                    className='cursor-pointer'
-                    align='inline-end'
-                    onClick={handleToggleConfirm}
-                  >
-                    {!isConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
-                  </InputGroupAddon>
-                </InputGroup>
-              </Field>
-
-              <Field orientation='horizontal'>
-                <Button size='lg' type='submit' disabled={isPending}>
-                  {isPending ? <Spinner /> : 'Update'}
-                </Button>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-        </form>
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
       </Col>
 
       <Col fluid>
-        <h2 className='w-full text-center mb-2 uppercase font-semibold'>
-          My Orders
-        </h2>
-        {pendingMyOrder ? (
-          <Spinner />
-        ) : error ? (
-          <Message>{error.message}</Message>
-        ) : (
-          <MyOrders orders={myOrders} />
+        {activeTab === 'profile' && (
+          <div>
+            {/* Quick facts */}
+            <div className='flex flex-row mb-5 gap-7 justify-between'>
+              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+                <h2 className='text-lg font-medium text-center'>
+                  Total Orders
+                </h2>
+                <p className='text-3xl font-semibold'>
+                  {Number(myOrders?.length)}
+                </p>
+              </div>
+              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+                <h2 className='text-lg font-medium text-center'>
+                  Ordered Amount
+                </h2>
+
+                <p className='text-3xl font-semibold'>
+                  {formatCurrency(OrderedAmount)}
+                </p>
+              </div>
+              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+                <h2 className='text-lg font-medium text-center'>
+                  Member Since
+                </h2>
+
+                <p className='text-3xl font-semibold'>{memberSince}</p>
+              </div>
+            </div>
+
+            {/* Address */}
+            <Card className='rounded-lg shadow-sm'>
+              <CardHeader>
+                <CardTitle className='font-semibold'>
+                  Shipping Address Default
+                </CardTitle>
+                <CardDescription>
+                  {allAddress?.length === 0
+                    ? 'You do not have any addresses.'
+                    : ''}
+                  {currentAddress && (
+                    <>
+                      {currentAddress.name}, {currentAddress.phone},
+                      {currentAddress.address}, {currentAddress.city},{' '}
+                      {currentAddress.postalCode}, {currentAddress.country}
+                    </>
+                  )}
+                </CardDescription>
+                <CardAction className='my-auto'>
+                  <Button
+                    variant='link'
+                    onClick={() => {
+                      if (!currentAddress) {
+                        navigate('/shipping', { state: { action: 'create' } });
+                      } else {
+                        setOpen(true);
+                      }
+                    }}
+                  >
+                    {!currentAddress ? 'Create Address' : 'Change Address'}
+                  </Button>
+                </CardAction>
+              </CardHeader>
+
+              <CardFooter>
+                <Button
+                  onClick={() =>
+                    navigate('/shipping', { state: { action: 'create' } })
+                  }
+                >
+                  Create New Address
+                </Button>
+              </CardFooter>
+            </Card>
+
+            {/* Dialog Address */}
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogContent className='sm:max-w-155 p-6 rounded-sm bg-popover text-popover-foreground shadow-xl border border-border outline-none'>
+                <DialogHeader className='flex flex-row items-center justify-between pb-1 space-y-0'>
+                  <DialogTitle className='text-lg sm:text-xl font-bold text-foreground'>
+                    Delivery address
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className='flex flex-col gap-3.5 my-2 max-h-[65vh] overflow-y-auto pr-1'>
+                  {allAddress?.map((addr) => {
+                    const isDefault = currentAddress?._id === addr._id;
+                    const addressString = [
+                      addr.phone,
+                      addr.address,
+                      addr.city,
+                      addr.postalCode,
+                      addr.country,
+                    ]
+                      .filter(Boolean)
+                      .join(', ');
+
+                    return (
+                      <div
+                        key={addr._id}
+                        className={`flex items-start justify-between gap-3 p-4 sm:p-5 rounded-sm border transition-colors ${
+                          isDefault
+                            ? 'border-primary/40 bg-card shadow-xs'
+                            : 'border-border bg-card hover:border-muted-foreground/40'
+                        }`}
+                      >
+                        {/* Left side: Pin icon + Title/Badge + Address */}
+                        <div
+                          className='flex items-start gap-3 flex-1 cursor-pointer select-none'
+                          onClick={() => {
+                            if (!isDefault && !pendingUp) {
+                              updateDefaultAddressHandler(addr._id);
+                            }
+                          }}
+                        >
+                          <MapPin
+                            className={`w-5 h-5 shrink-0 mt-0.5 ${
+                              isDefault
+                                ? 'text-primary'
+                                : 'text-muted-foreground'
+                            }`}
+                          />
+                          <div className='flex-1 min-w-0'>
+                            <div className='flex items-center gap-2 mb-1 flex-wrap'>
+                              <span className='font-bold text-base text-foreground'>
+                                {addr.name || 'Địa chỉ'}
+                              </span>
+                              {isDefault && (
+                                <span className='bg-primary/10 text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full'>
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className='text-sm text-muted-foreground leading-relaxed wrap-break-word font-normal'>
+                              {addressString}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Right side: Edit & Delete buttons */}
+                        <div className='flex items-center gap-2 shrink-0 pt-0.5'>
+                          <button
+                            type='button'
+                            title='Edit'
+                            className='p-2 sm:p-2.5 rounded-xl border border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/shipping', {
+                                state: { action: 'update', address: addr },
+                              });
+                              setOpen(false);
+                            }}
+                          >
+                            <Pencil className='w-4 h-4' />
+                          </button>
+                          <button
+                            type='button'
+                            title='Delete'
+                            disabled={pendingDelete}
+                            className='p-2 sm:p-2.5 rounded-xl border border-destructive/30 text-destructive hover:bg-destructive/10 transition-colors cursor-pointer disabled:opacity-50'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteAddressHandler(addr._id);
+                            }}
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type='button'
+                  className='w-full py-3 px-4 rounded-sm border border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer'
+                  onClick={() => {
+                    navigate('/shipping', { state: { action: 'create' } });
+                    setOpen(false);
+                  }}
+                >
+                  <Plus className='w-4 h-4' />
+                  Add a new address
+                </button>
+              </DialogContent>
+            </Dialog>
+
+            {/* Information */}
+            <FormInformation
+              userInfo={userInfo}
+              name={name}
+              setName={setName}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
+              submitHandler={submitHandler}
+              isPending={isPending}
+            />
+
+            {/* Recent orders */}
+            <div className='p-2 pb-5 bg-card border border-border mt-5 shadow-sm rounded-lg'>
+              <h2 className='text-lg font-medium text-primary px-5 py-3'>
+                Recent Orders
+              </h2>
+              {latestOrder ? (
+                <div className='flex gap-4 justify-between'>
+                  <div className='flex gap-5'>
+                    <img
+                      src={latestOrder.orderItems[0].image}
+                      alt={latestOrder.orderItems[0].name}
+                      className='w-35 h-20 object-cover'
+                    />
+
+                    <div className='flex justify-around flex-col'>
+                      <h2 className='text-lg font-semibold text-primary'>
+                        {latestOrder.orderItems[0].name}
+                      </h2>
+                      <div className='flex gap-5 text-sm text-muted-foreground'>
+                        <p>
+                          {new Date(latestOrder.createdAt).toLocaleDateString(
+                            'vi-VN',
+                          )}
+                        </p>
+                        <p>{formatCurrency(latestOrder.totalPrice)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {latestOrder.isDelivered ? (
+                    <div className='my-auto flex gap-2 justify-center items-center bg-green-rating/20 px-3 py-1 rounded-3xl text-green-900 font-semibold'>
+                      <Check size={16} />
+                      Delivered
+                    </div>
+                  ) : (
+                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-red-900 font-semibold'>
+                      <Truck size={16} />
+                      On the way
+                    </div>
+                  )}
+
+                  <Button size='lg' variant='outline' className='my-auto mr-10'>
+                    Detail
+                  </Button>
+                </div>
+              ) : (
+                <p>You don't have any orders yet.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div>
+            <h2 className='w-full text-center mb-2 uppercase font-semibold'>
+              My Orders
+            </h2>
+            {pendingMyOrder ? (
+              <Spinner />
+            ) : error ? (
+              <Message>{error.message}</Message>
+            ) : (
+              <MyOrders orders={myOrders} />
+            )}
+          </div>
         )}
       </Col>
     </Row>

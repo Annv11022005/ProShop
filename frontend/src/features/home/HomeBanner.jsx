@@ -37,93 +37,70 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
   const targetLink = `/product/${selectedProduct.slug || selectedProduct._id}`;
 
   return (
-    <div className='relative overflow-hidden rounded-xl bg-primary text-primary-foreground shadow-2xl border border-primary-foreground/10 my-4'>
-      {/* Background Decorative Ambient Glows */}
-      <div
-        aria-hidden
-        className='pointer-events-none absolute -right-16 -top-20 h-96 w-96 rounded-full bg-linear-to-br from-accent-primary to-accent-secondary opacity-25 blur-3xl'
-      />
-      <div
-        aria-hidden
-        className='pointer-events-none absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-linear-to-tr from-accent-secondary to-accent-primary opacity-20 blur-3xl'
-      />
+    <div className='relative overflow-hidden rounded-2xl bg-card text-card-foreground border border-border shadow-xs my-4 p-6 md:p-8 h-auto md:h-95 flex items-center'>
+      <div className='grid items-center gap-6 md:grid-cols-12 w-full h-full'>
+        <div className='flex flex-col justify-between h-full md:col-span-7 py-1 gap-3'>
+          <div className='flex flex-wrap items-center gap-2'>
+            <span className='inline-flex items-center gap-1.5 rounded-full bg-secondary text-secondary-foreground border border-border px-3 py-1 text-xs font-semibold'>
+              <Flame size={14} className='text-amber-500' />
+              {badge}
+            </span>
 
-      <div className='relative grid items-center gap-8 p-6 md:grid-cols-12 md:p-10 lg:p-12'>
-        {/* Left Column: Product Information & Action */}
-        <div className='flex flex-col gap-5 md:col-span-7 z-10'>
-          <div className='flex flex-wrap items-center gap-2.5'>
-            {badge && (
-              <span className='inline-flex items-center gap-1.5 rounded-full bg-accent-primary/15 border border-accent-primary/30 px-3.5 py-1 text-xs font-semibold text-accent-primary backdrop-blur-md'>
-                <Flame
-                  size={14}
-                  className='animate-pulse text-accent-primary'
-                />
-                {badge}
-              </span>
-            )}
-            {selectedProduct.brand && (
-              <span className='rounded-full bg-primary-foreground/30 border border-primary-foreground/15 px-3 py-1 text-xs font-medium text-primary-foreground/80 backdrop-blur-md'>
-                {selectedProduct.brand}
-              </span>
-            )}
+            <span className='rounded-full bg-muted text-muted-foreground border border-border px-3 py-1 text-xs font-medium'>
+              {selectedProduct.brand}
+            </span>
           </div>
 
           {/* Product Title & Subtitle */}
-          <div>
+          <div className='my-auto space-y-1.5'>
             <Link to={targetLink} className='group block'>
-              <h2 className='text-3xl font-extrabold tracking-tight text-primary-foreground transition-colors duration-200 group-hover:text-accent-primary md:text-4xl lg:text-5xl leading-tight line-clamp-2'>
+              <h2 className='text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary md:text-3xl lg:text-4xl leading-tight line-clamp-2'>
                 {selectedProduct.name}
               </h2>
             </Link>
             {selectedProduct.subtitle && (
-              <p className='mt-3 text-base text-primary-foreground/75 leading-relaxed md:text-lg line-clamp-2 max-w-xl'>
+              <p className='text-sm text-muted-foreground leading-relaxed md:text-base line-clamp-2 max-w-xl'>
                 {selectedProduct.subtitle}
               </p>
             )}
           </div>
 
           {/* Key Selling Highlights / Tags */}
-          <div className='flex flex-wrap items-center gap-3 pt-1 text-xs text-primary-foreground/80'>
+          <div className='flex flex-wrap items-center gap-2.5 text-xs text-muted-foreground'>
             {selectedProduct.rating > 0 && (
-              <div className='flex items-center gap-1 rounded-lg bg-primary-foreground/10 border border-primary-foreground/15 px-2.5 py-1.5 backdrop-blur-xs'>
-                <Star
-                  size={14}
-                  className='fill-green-rating text-green-rating'
-                />
-                <span className='font-bold text-primary-foreground'>
+              <div className='flex items-center justify-center gap-1 rounded-lg bg-muted/60 border border-border px-2.5 py-1 font-medium'>
+                <Star size={14} className='fill-amber-400 text-amber-400' />
+                <span className='font-bold text-foreground'>
                   {selectedProduct.rating}
                 </span>
                 {selectedProduct.numReviews > 0 && (
-                  <span className='text-primary-foreground/60'>
+                  <span className='text-muted-foreground'>
                     ({selectedProduct.numReviews})
                   </span>
                 )}
               </div>
             )}
-            <div className='flex items-center gap-1.5 rounded-lg bg-primary-foreground/10 border border-primary-foreground/15 px-2.5 py-1.5 backdrop-blur-xs'>
-              <ShieldCheck size={14} className='text-green-rating' />
+            <div className='flex items-center gap-1.5 rounded-lg bg-muted/60 border border-border px-2.5 py-1 font-medium'>
+              <ShieldCheck size={14} className='text-emerald-500' />
               <span>Genuine 100%</span>
             </div>
-            <div className='flex items-center gap-1.5 rounded-lg bg-primary-foreground/10 border border-primary-foreground/15 px-2.5 py-1.5 backdrop-blur-xs'>
-              <Zap size={14} className='text-accent-primary' />
+            <div className='flex items-center gap-1.5 rounded-lg bg-muted/60 border border-border px-2.5 py-1 font-medium'>
+              <Zap size={14} className='text-sky-500' />
               <span>Fast 12-hour delivery</span>
             </div>
           </div>
 
           {/* Price & Action Section */}
-          <div className='mt-2 flex flex-col items-start gap-4 sm:gap-6'>
+          <div className='flex flex-col items-start gap-3 pt-1'>
             <ProductPrice price={price} originalPrice={originalPrice} />
 
             <div className='flex items-center gap-3 w-full sm:w-auto'>
               <Button
                 asChild
                 size='lg'
-                className='w-full sm:w-auto bg-linear-to-br from-accent-primary to-accent-secondary text-white font-semibold shadow-lg shadow-accent-primary/20 transition-all duration-300  '
+                className='w-full sm:w-auto rounded-xl font-semibold shadow-xs'
               >
-                <Link
-                  to={targetLink}
-                  className='flex items-center justify-center gap-2'
-                >
+                <Link to={targetLink} className='flex items-center gap-2'>
                   <ShoppingBag size={18} />
                   <span>Buy Now</span>
                   <ArrowRight size={18} />
@@ -133,15 +110,16 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
           </div>
         </div>
 
-        <div className='relative flex items-center justify-center md:col-span-5 z-10'>
+        {/* Right Column: Fixed Height Product Image Showcase */}
+        <div className='flex items-center justify-center md:col-span-5 h-64 md:h-full overflow-hidden'>
           <Link
             to={targetLink}
-            className='group relative block w-full max-w-sm'
+            className='group relative h-full w-full max-w-sm overflow-hidden rounded-xl transition-colors flex items-center justify-center'
           >
             <img
               src={imageUrl}
               alt={selectedProduct.name}
-              className='h-64 sm:h-72 md:h-80 w-full object-contain transition-transform duration-500'
+              className='max-h-full max-w-full object-contain transition-transform duration-300'
             />
           </Link>
         </div>

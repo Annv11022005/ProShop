@@ -12,11 +12,12 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '@/lib/utils';
 
 const MyOrders = ({ orders }) => {
+  console.log(orders);
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className='text-center'>ID</TableHead>
+          <TableHead className='text-center'>ITEMS</TableHead>
           <TableHead className='text-center'>DATE</TableHead>
           <TableHead className='text-center'>TOTAL</TableHead>
           <TableHead className='text-center'>PAID</TableHead>
@@ -28,12 +29,14 @@ const MyOrders = ({ orders }) => {
         {(orders ?? []).map((order) => (
           <TableRow key={order._id}>
             <TableCell className='text-center font-semibold'>
-              {order._id}
+              {order.orderItems[0].name}
             </TableCell>
             <TableCell className='text-center'>
               {order.createdAt.substring(0, 10)}
             </TableCell>
-            <TableCell className='text-center'>{formatCurrency(order.totalPrice)}</TableCell>
+            <TableCell className='text-center'>
+              {formatCurrency(order.totalPrice)}
+            </TableCell>
             <TableCell className='text-center'>
               {order.isPaid ? (
                 order.paidAt.substring(0, 10)

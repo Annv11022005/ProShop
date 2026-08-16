@@ -27,6 +27,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     isAdmin: user.isAdmin,
+    createdAt: user.createdAt,
   });
 });
 
@@ -75,6 +76,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      createdAt: user.createdAt,
     });
   } else {
     res.status(400);
@@ -172,6 +174,7 @@ export const getUserProfile = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      createdAt: user.createdAt,
     });
   } else {
     res.status(401);
@@ -199,6 +202,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       name: updateUser.name,
       email: updateUser.email,
       isAdmin: updateUser.isAdmin,
+      createdAt: user.createdAt,
     });
   } else {
     res.status(404);
@@ -267,6 +271,7 @@ export const updateUser = asyncHandler(async (req, res) => {
       name: updateUser.name,
       email: updateUser.email,
       isAdmin: updateUser.isAdmin,
+      createdAt: user.createdAt,
     });
   } else {
     res.status(404);

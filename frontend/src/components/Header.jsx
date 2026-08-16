@@ -20,6 +20,8 @@ const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
+  const avatar = userInfo?.name.charAt(0);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -59,18 +61,16 @@ const Header = () => {
             </Button>
           </Link>
 
-          <Link to='/coupon'>
-            <Button size='lg' variant='outline'>
-              Coupon
-            </Button>
-          </Link>
-
           {userInfo && !userInfo.isAdmin ? (
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button variant='outline' size='lg'>
-                    {userInfo.name}
+                  <Button
+                    variant='outline'
+                    size='lg'
+                    className='rounded-full w-9 h-9'
+                  >
+                    {avatar}
                   </Button>
                 }
               />
@@ -82,6 +82,15 @@ const Header = () => {
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
+
+                <Link to='/coupon'>
+                  <DropdownMenuItem>
+                    <UserIcon />
+                    Coupon
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   variant='destructive'
                   disabled={isPending}
@@ -98,7 +107,7 @@ const Header = () => {
               onClick={() => navigate('/admin/product-list')}
               size='lg'
             >
-              {userInfo.name}
+              {userInfo?.name}
             </Button>
           ) : (
             <Link to='/login'>
