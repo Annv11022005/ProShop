@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '@/lib/utils';
 
 const MyOrders = ({ orders }) => {
-  console.log(orders);
   return (
     <Table>
       <TableHeader>

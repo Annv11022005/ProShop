@@ -1,33 +1,43 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 
 const CartSummary = ({ cartItems, checkoutHandler }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <h3 className='text-primary text-3xl font-semibold mb-3 text-center'>
-            Subtotal {cartItems.reduce((acc, item) => acc + item.qty, 0)} items
-          </h3>
-          <p className='text-muted-foreground font-medium text-xl italic'>
-            {formatCurrency(
-              cartItems.reduce((acc, item) => acc + item.qty * item.price, 0)
-            )}
-          </p>
-        </CardTitle>
-      </CardHeader>
+    <div className='p-5 w-full rounded-xl border border-border shadow-2xs'>
+      <div className='mb-4 flex flex-col gap-2'>
+        <h2 className='text-xl font-bold text-primary'>Order Summary</h2>
 
-      <CardFooter>
-        <Button
-          size='lg'
-          disable={cartItems.length === 0}
-          onClick={checkoutHandler}
-        >
-          Process To Checkout
-        </Button>
-      </CardFooter>
-    </Card>
+        <span className='p-[0.5px] bg-muted-foreground' />
+      </div>
+
+      {cartItems.length !== 0 && (
+        <div className='flex flex-col gap-4'>
+          <div className='flex items-center justify-between text-md text-primary p-3 border border-border rounded-xl'>
+            <p className=' font-semibold'>Product Quantity:</p>
+
+            <p>{cartItems.reduce((acc, item) => acc + item.qty, 0)} Products</p>
+          </div>
+
+          <div className='flex items-center justify-between text-md text-primary p-3 border border-border rounded-xl'>
+            <p className=' font-semibold'>Provisional Price:</p>
+
+            <p>
+              {formatCurrency(
+                cartItems.reduce((acc, item) => acc + item.qty * item.price, 0),
+              )}
+            </p>
+          </div>
+
+          <Button
+            size='lg'
+            disable={cartItems.length === 0}
+            onClick={checkoutHandler}
+          >
+            Process To Checkout
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 

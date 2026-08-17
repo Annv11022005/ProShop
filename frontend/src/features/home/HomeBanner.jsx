@@ -96,7 +96,6 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
 
             <div className='flex items-center gap-3 w-full sm:w-auto'>
               <Button
-                asChild
                 size='lg'
                 className='w-full sm:w-auto rounded-xl font-semibold shadow-xs'
               >

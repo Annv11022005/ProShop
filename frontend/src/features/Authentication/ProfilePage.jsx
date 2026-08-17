@@ -27,6 +27,8 @@ import {
   Check,
   Truck,
   Heart,
+  BellRing,
+  CircleX,
 } from 'lucide-react';
 import { Message } from '@/components/AlertMessage';
 import {
@@ -52,6 +54,7 @@ const navTabs = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'wishlist', label: 'Wishlist', icon: Heart },
   { id: 'orders', label: 'Orders', icon: Package },
+  { id: 'notifications', label: 'Notifications', icon: BellRing },
 ];
 
 const ProfilePage = () => {
@@ -164,7 +167,7 @@ const ProfilePage = () => {
     <Row template='lg:grid-cols-[0.7fr_2fr]' className='gap-3'>
       {/* Sidebar Profile */}
       <Col fluid>
-        <div className='flex flex-col h-80 gap-4 p-4 sm:p-5 rounded-xl border border-border bg-card shadow-xs'>
+        <div className='flex flex-col h-79 gap-4 p-4 sm:p-5 rounded-xl border border-border bg-card shadow-xs'>
           {/* User info  */}
           <div className='flex items-center gap-3 pb-2 border-b border-border/50'>
             <div className='w-12 h-12 rounded-full bg-bg-blue text-blue-avt font-bold text-base flex items-center justify-center shrink-0 '>
@@ -463,19 +466,31 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  {latestOrder.isDelivered ? (
+                  {latestOrder.isDelivered === true ? (
                     <div className='my-auto flex gap-2 justify-center items-center bg-green-rating/20 px-3 py-1 rounded-3xl text-green-900 font-semibold'>
                       <Check size={16} />
                       Delivered
                     </div>
+                  ) : latestOrder.isCancelled === true ? (
+                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-[#DF301C] font-semibold'>
+                      <CircleX size={16} />
+                      Has Been Cancelled
+                    </div>
                   ) : (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-red-900 font-semibold'>
+                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-[#DF301C] font-semibold'>
                       <Truck size={16} />
                       On the way
                     </div>
                   )}
 
-                  <Button size='lg' variant='outline' className='my-auto mr-10'>
+                  <Button
+                    size='lg'
+                    variant='outline'
+                    className='my-auto mr-10'
+                    onClick={() => {
+                      navigate(`/order/${latestOrder._id}`);
+                    }}
+                  >
                     Detail
                   </Button>
                 </div>

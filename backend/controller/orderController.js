@@ -33,7 +33,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     ? await Coupon.findOne({
         code: couponCode,
         isHidden: false,
-        expiryDate: { $gte: new Date() },
+        expiry: { $gte: new Date() },
       })
     : null;
 
@@ -41,6 +41,12 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('The discount code is invalid or has expired.');
   }
+
+  if (couponOrder && couponOrder.useCount >= couponOrder.usageLimit) {
+    res.status(400);
+    throw new Error('Coupon has reached its usage limit');
+  }
+
   let discount = 0;
 
   if (!selectedAddress) {
@@ -128,7 +134,24 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     const shippingPrice = addDecimals(itemsPrice > 500000 ? 0 : 30000);
 
     const taxPrice = addDecimals(Number(0.15 * itemsPrice).toFixed(2));
+
+    if (
+      couponOrder &&
+      couponOrder.minSpend &&
+      itemsPrice < couponOrder.minSpend
+    ) {
+      res.status(400);
+      throw new Error(
+        `The order must be at least ${couponOrder.minSpend.toLocaleString()} VND to apply this code.`,
+      );
+    }
+
     if (couponOrder) {
+      await Coupon.updateOne(
+        { _id: couponOrder._id },
+        { $inc: { useCount: 1 } },
+        { session },
+      );
       if (couponOrder.discountType === 'percentage') {
         const rate = Math.min(Math.max(couponOrder.discountValue, 0), 100);
         discount = (itemsPrice * rate) / 100;
@@ -165,6 +188,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
       shippingPrice,
       discount: roundedDiscount,
       totalPrice,
+      couponId: couponOrder ? couponOrder._id : null,
     });
 
     const createOrder = await order.save({ session });

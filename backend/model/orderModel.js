@@ -72,11 +72,24 @@ const orderSchema = new mongoose.Schema(
     paidAt: { type: Date },
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
+    isCancelled: { type: Boolean, required: true, default: false },
+    cancelledAt: { type: Date },
+    reservationExpiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 30 * 60 * 1000),
+    },
+    couponId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: 'Coupon',
+    },
   },
   {
     timestamps: true,
   },
 );
+
+orderSchema.index({ isPaid: 1, reservationExpiresAt: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
 

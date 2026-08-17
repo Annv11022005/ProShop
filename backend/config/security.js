@@ -7,18 +7,18 @@ import hpp from 'hpp';
 import passport from './passport.js';
 
 // Limit request from same API
-// const limiter = rateLimit({
-//   max: 100,
-//   windowMs: 60 * 60 * 1000,
-//   message: 'Too many request from this IP, please try again in an hour!',
-// });
+const limiter = rateLimit({
+  max: 10000,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, please try again in an hour!',
+});
 
 const applySecurityMiddleware = (app) => {
   // Set security HTTP Header
   app.use(helmet());
 
   // Rate limit cho các route /api
-  // app.use('/api', limiter);
+  app.use('/api', limiter);
 
   // Data sanitize against NoSQL query injection
   app.use(ExpressMongoSanitize());

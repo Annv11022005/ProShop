@@ -38,6 +38,7 @@ const PlaceOrderSummary = ({
       <div className='h-px w-full bg-neutral-200' />
 
       <PromoCodeField
+        itemsPrice={cart.itemsPrice}
         price={discount}
         onApply={onApplyCoupon}
         initialCouponCode={cart?.coupon?.code}

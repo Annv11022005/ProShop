@@ -207,6 +207,10 @@ const OrderPage = () => {
             <Field>
               {order.isPaid ? (
                 <Message variant='success'>Paid on {order.paidAt}</Message>
+              ) : order.isCancelled ? (
+                <Message variant='danger'>
+                  The payment deadline has passed.
+                </Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
               )}
@@ -263,7 +267,7 @@ const OrderPage = () => {
             </div>
           </CardContent>
 
-          {!order.isPaid && !userInfo.isAdmin && (
+          {!order.isPaid && !userInfo.isAdmin && order.isCancelled === false ? (
             <CardFooter>
               {pendingPaypal && <Spinner />}
               {isPaypalScriptPending ? (
@@ -286,6 +290,12 @@ const OrderPage = () => {
                   )}
                 </div>
               )}
+            </CardFooter>
+          ) : (
+            <CardFooter>
+              <p className='text-md font-medium text-primary text-center'>
+                You have missed the payment deadline.
+              </p>
             </CardFooter>
           )}
 

@@ -55,7 +55,7 @@ export const createPayment = asyncHandler(async (req, res) => {
       vnp_ReturnUrl: process.env.VNPAY_RETURN_URL,
       vnp_Locale: VnpLocale.VN,
       vnp_CreateDate: dateFormat(new Date()),
-      vnp_ExpireDate: dateFormat(tomorrow),
+      vnp_ExpireDate: dateFormat(new Date(Date.now() + 30 * 60 * 1000)),
     });
 
     res.status(200).json({
@@ -64,7 +64,7 @@ export const createPayment = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error('Phương thức thanh toán không tồn tại');
+    throw new Error('Payment method does not exist.');
   }
 });
 
@@ -88,6 +88,8 @@ export const VNPayCallback = asyncHandler(async (req, res) => {
   });
 
   const verify = vnpay.verifyReturnUrl(req.query);
+  const orderId = vnp_TxnRef?.split('_')[0];
+  const order = await Order.findById(orderId);
 
   if (!verify.isVerified) {
     return res
@@ -103,9 +105,6 @@ export const VNPayCallback = asyncHandler(async (req, res) => {
       .status(400)
       .json({ Message: 'Payment failed and returned to warehouse.' });
   }
-
-  const orderId = vnp_TxnRef?.split('_')[0];
-  const order = await Order.findById(orderId);
 
   if (!order) {
     return res.status(200).json({ RspCode: '01', Message: 'Order not found' });
