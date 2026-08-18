@@ -5,6 +5,7 @@ import uploadRoutes from './uploadRoutes.js';
 import addressRoutes from './addressRoute.js';
 import couponRoutes from './couponRoute.js';
 import messageRoutes from './messageRoute.js';
+import analyticsRoutes from './analyticsRoute.js';
 
 const mountRoutes = (app) => {
   app.get('/', (req, res) => {
@@ -18,6 +19,7 @@ const mountRoutes = (app) => {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/v1/coupons', couponRoutes);
   app.use('/api/v1/messages', messageRoutes);
+  app.use('/api/v1/dashboard', analyticsRoutes);
 
   app.get('/api/config/paypal', (req, res) => {
     res.send({ clientId: process.env.PAYPAL_CLIENT_ID });

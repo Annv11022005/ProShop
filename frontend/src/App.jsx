@@ -34,6 +34,7 @@ import MessageScreen from '@/screens/admin/MessageScreen';
 import CouponListScreen from '@/screens/admin/CouponListScreen';
 import CouponEditScreen from '@/screens/admin/CouponEditScreen';
 import CreateCouponScreen from '@/screens/admin/CreateCouponScreen';
+import DashboardScreen from '@/screens/admin/DashboardScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,7 +78,7 @@ const App = () => {
       .get('/api/v1/users/profile')
       .then(({ data }) => dispatch(setCredentials(data)))
       .catch(() => dispatch(logout()));
-  }, [dispatch, userInfo?._id]);
+  }, [dispatch, userInfo, userInfo._id]);
 
   return (
     <PayPalScriptProvider deferLoading={true}>
@@ -113,6 +114,7 @@ const App = () => {
             <Route path='/register/verify' element={<OTPRegisterScreen />} />
 
             <Route element={<AdminRoutes />}>
+              <Route path='/admin' element={<DashboardScreen />} />
               <Route path='/admin/order-list' element={<OrderListScreen />} />
               <Route
                 path='/admin/product-list'
