@@ -1,3 +1,6 @@
+import { Spinner } from '@/components/ui/spinner';
+import { useGetOrders } from '../../hook/useAdmin';
+import { Message } from '@/components/AlertMessage';
 import {
   Table,
   TableBody,
@@ -6,13 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useGetOrders } from './hook/useAdmin';
-import { Spinner } from '@/components/ui/spinner';
-import { Message } from '@/components/AlertMessage';
+import { formatCurrency } from '@/lib/utils';
+import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
 
 const OrderListPage = () => {
   const { isPending, error, allOrders } = useGetOrders();

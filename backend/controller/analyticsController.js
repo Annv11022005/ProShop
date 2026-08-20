@@ -1,9 +1,5 @@
-import asyncHandler from '../middleware/asyncHandler';
-import Product from '../model/productsModel.js';
-import Order from '../model/orderModel.js';
-import { presentProduct } from '../utils/productPresenter.js';
-
 import asyncHandler from '../middleware/asyncHandler.js';
+import Product from '../model/productsModel.js';
 import Order from '../model/orderModel.js';
 import User from '../model/userModel.js';
 
@@ -259,14 +255,11 @@ export const getOrderStatusBreakdown = asyncHandler(async (req, res) => {
   res.status(200).json(breakdown);
 });
 
-// @desc get low stock
-// GET /api/v1/dashboard/low-stock
-// private/admin
 // @desc get products with low stock variants
-// GET /api/v1/analytics/low-stock?threshold=5
+// GET /api/v1/analytics/low-stock
 // @access private/admin
 export const getLowStockProducts = asyncHandler(async (req, res) => {
-  const threshold = 5;
+  const threshold = 10;
 
   const products = await Product.find({
     variants: {
@@ -291,4 +284,43 @@ export const getLowStockProducts = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json(lowStockItems);
+});
+
+// @desc get top 5 selling products with total orders and revenue
+// GET /api/v1/analytics/top-products
+// @access private/admin
+export const getTopProducts = asyncHandler(async (req, res) => {
+  const topProducts = await Order.aggregate([
+    {
+      $match: {
+        isPaid: true,
+        isCancelled: { $ne: true },
+      },
+    },
+    { $unwind: '$orderItems' },
+    {
+      $group: {
+        _id: '$orderItems.product',
+        name: { $first: '$orderItems.name' },
+        qtySold: { $sum: '$orderItems.qty' },
+        revenue: {
+          $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] },
+        },
+        ordersSet: { $addToSet: '$_id' },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        qtySold: 1,
+        orders: { $size: '$ordersSet' },
+        revenue: { $round: ['$revenue', 0] },
+      },
+    },
+    { $sort: { qtySold: -1 } },
+    { $limit: 5 },
+  ]);
+
+  res.status(200).json(topProducts);
 });

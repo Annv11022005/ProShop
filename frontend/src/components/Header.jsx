@@ -104,7 +104,7 @@ const Header = () => {
           ) : userInfo && userInfo.isAdmin ? (
             <Button
               variant='outline'
-              onClick={() => navigate('/admin/product-list')}
+              onClick={() => navigate('/admin')}
               size='lg'
             >
               {userInfo?.name}

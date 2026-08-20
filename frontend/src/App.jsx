@@ -78,7 +78,7 @@ const App = () => {
       .get('/api/v1/users/profile')
       .then(({ data }) => dispatch(setCredentials(data)))
       .catch(() => dispatch(logout()));
-  }, [dispatch, userInfo, userInfo._id]);
+  }, [dispatch, userInfo]);
 
   return (
     <PayPalScriptProvider deferLoading={true}>

@@ -1,4 +1,4 @@
-import OrderListPage from '@/features/admin/OrderListPage';
+import OrderListPage from '@/features/admin/page/order/OrderListPage';
 
 const OrderListScreen = () => {
   return <OrderListPage />;

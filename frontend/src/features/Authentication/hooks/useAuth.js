@@ -1,5 +1,5 @@
 import { login, logout, register, verifyOTP } from '../api/apiUsers';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useLogin() {
   const {
@@ -14,12 +14,16 @@ export function useLogin() {
 }
 
 export function useLogout() {
+  const queryClient = useQueryClient();
   const {
     mutate: logoutUser,
     isPending,
     error,
   } = useMutation({
     mutationFn: logout,
+    onSuccess: () => {
+      queryClient.clear();
+    },
   });
 
   return { logoutUser, isPending, error };

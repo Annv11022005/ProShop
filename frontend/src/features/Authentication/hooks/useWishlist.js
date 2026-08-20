@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import {
   addToWishlist as addToWishlistApi,
   GetAllWishlist,
@@ -6,6 +7,8 @@ import {
 } from '../api/apiUsers';
 
 export function useGetWishlist() {
+  const userInfo = useSelector((state) => state?.auth?.userInfo);
+
   const {
     isPending,
     error,
@@ -13,9 +16,14 @@ export function useGetWishlist() {
   } = useQuery({
     queryKey: ['wishlist'],
     queryFn: () => GetAllWishlist(),
+    enabled: !!userInfo,
   });
 
-  return { isPending, error, wishlist };
+  return {
+    isPending: !!userInfo && isPending,
+    error,
+    wishlist: wishlist || [],
+  };
 }
 
 export function useAddToWishlist() {

@@ -1,17 +1,17 @@
+import { Spinner } from '@/components/ui/spinner';
+import { messageSentLocally, setMessages } from '@/features/chat/chatSlice';
+import {
+  useGetMessages,
+  useGetUserChatForAdmin,
+  useSendMessage,
+} from '@/features/chat/hooks/useChat';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { messageSentLocally, setMessages } from '../chat/chatSlice';
 
-import {
-  useGetUserChatForAdmin,
-  useGetMessages,
-  useSendMessage,
-} from '../chat/hooks/useChat';
-import { Spinner } from '@/components/ui/spinner';
-import { Message as AlertMessage } from '@/components/AlertMessage';
 import { toast } from 'sonner';
-import ChatSidebar from './component/ChatSidebar';
-import ChatWindow from './component/ChatWindow';
+import { Message as AlertMessage } from '@/components/AlertMessage';
+import ChatSidebar from '../../component/ChatSidebar';
+import ChatWindow from '../../component/ChatWindow';
 
 const MessageManagementPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);

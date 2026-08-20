@@ -19,6 +19,7 @@ const mountRoutes = (app) => {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/v1/coupons', couponRoutes);
   app.use('/api/v1/messages', messageRoutes);
+  app.use('/api/v1/analytics', analyticsRoutes);
   app.use('/api/v1/dashboard', analyticsRoutes);
 
   app.get('/api/config/paypal', (req, res) => {
