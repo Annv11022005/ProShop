@@ -495,7 +495,9 @@ const ProfilePage = () => {
                   </Button>
                 </div>
               ) : (
-                <p>You don't have any orders yet.</p>
+                <p className='text-center text-md font-normal text-muted-foreground'>
+                  You don't have any orders yet!
+                </p>
               )}
             </div>
           </div>

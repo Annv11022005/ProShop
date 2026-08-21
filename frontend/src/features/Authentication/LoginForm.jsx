@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { setCredentials } from './authSlice';
 import { useLogin } from './hooks/useAuth';
 import useToggle from '@/lib/handleToggle';
@@ -8,7 +11,13 @@ import useToggle from '@/lib/handleToggle';
 import { toast } from 'sonner';
 import LoginWithThird from './components/LoginWithThird';
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import {
@@ -21,12 +30,30 @@ import AuthHeroImage from './components/AuthHeroImage';
 import BrandMark from './components/BrandMark';
 import DividerWithLabel from './components/DividerWithLabel';
 
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email is required' })
+    .email({ message: 'Please enter a valid email address' }),
+  password: z
+    .string()
+    .min(1, { message: 'Password is required' })
+    .min(6, { message: 'Password must be at least 6 characters' }),
+});
+
 function LoginForm() {
   const { loginUser, isPending } = useLogin();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
   const [isPassword, handleToggle] = useToggle(false);
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: 'onTouched',
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,18 +70,22 @@ function LoginForm() {
     }
   }, [userInfo, redirect, navigate]);
 
-  function submitHandler(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     loginUser(
-      { email, password },
+      { email: data.email, password: data.password },
       {
-        onSuccess: (data) => {
-          dispatch(setCredentials(data));
+        onSuccess: (resData) => {
+          dispatch(setCredentials(resData));
           navigate(redirect);
         },
         onError: (err) => {
-          toast(err.response?.data?.message, { position: 'top-center' });
+          const serverMessage =
+            err.response?.data?.message || 'Invalid email or password';
+          toast.error(serverMessage, { position: 'top-center' });
+          setError('password', {
+            type: 'server',
+            message: serverMessage,
+          });
         },
       },
     );
@@ -67,33 +98,37 @@ function LoginForm() {
         <div className='mx-auto grid w-full max-w-304 items-center justify-center gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,450px)] lg:gap-24 xl:grid-cols-[minmax(0,420px)_minmax(0,490px)] xl:gap-28'>
           <div className='mx-auto flex w-full max-w-90 flex-col gap-6'>
             <BrandMark title='Sign in to ProShop' subtitle='Welcome back !' />
-            <form onSubmit={submitHandler}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <FieldSet>
                 <FieldGroup>
-                  <Field>
+                  <Field data-invalid={!!errors.email}>
                     <FieldLabel htmlFor='email' className='text-md'>
                       Email address
                     </FieldLabel>
                     <Input
                       id='email'
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       type='email'
                       className='rounded-lg'
-                      placeholder='Enter Email'
+                      placeholder='Enter your email'
+                      aria-invalid={!!errors.email}
+                      {...register('email')}
                     />
+                    {errors.email && (
+                      <FieldError>{errors.email.message}</FieldError>
+                    )}
                   </Field>
-                  <Field>
+
+                  <Field data-invalid={!!errors.password}>
                     <FieldLabel htmlFor='password' className='text-md'>
                       Password
                     </FieldLabel>
                     <InputGroup className='rounded-lg'>
                       <InputGroupInput
                         id='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
                         type={isPassword ? 'text' : 'password'}
-                        placeholder='Enter password'
+                        placeholder='Enter your password'
+                        aria-invalid={!!errors.password}
+                        {...register('password')}
                       />
                       <InputGroupAddon
                         className='cursor-pointer'
@@ -103,6 +138,9 @@ function LoginForm() {
                         {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
                       </InputGroupAddon>
                     </InputGroup>
+                    {errors.password && (
+                      <FieldError>{errors.password.message}</FieldError>
+                    )}
                   </Field>
 
                   <Field className='mx-auto max-w-20'>

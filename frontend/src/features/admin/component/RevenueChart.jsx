@@ -40,9 +40,9 @@ export default function RevenueChart() {
   const { isPending, error, revenueData } = useRevenueAnalytics({ period });
 
   const periods = [
-    { key: '7d', label: '7 ngày' },
-    { key: '30d', label: '30 ngày' },
-    { key: '12m', label: '12 tháng' },
+    { key: '7d', label: '7 days' },
+    { key: '30d', label: '30 days' },
+    { key: '12m', label: '12 months' },
   ];
 
   const labels = revenueData?.labels || [];
@@ -67,7 +67,7 @@ export default function RevenueChart() {
   const yMax = Math.ceil(rawMax / (magnitude / 2)) * (magnitude / 2);
   const yTicksCount = 5;
   const yTicks = Array.from({ length: yTicksCount }, (_, i) =>
-    Math.round(yMax - (i * yMax) / (yTicksCount - 1))
+    Math.round(yMax - (i * yMax) / (yTicksCount - 1)),
   );
 
   // Map data to SVG coordinates
@@ -77,7 +77,9 @@ export default function RevenueChart() {
         ? paddingLeft + (idx / (labels.length - 1)) * chartWidth
         : paddingLeft + chartWidth / 2;
     const y =
-      paddingTop + chartHeight - ((val - rawMin) / (yMax - rawMin || 1)) * chartHeight;
+      paddingTop +
+      chartHeight -
+      ((val - rawMin) / (yMax - rawMin || 1)) * chartHeight;
     return { x, y, val, label: labels[idx] };
   });
 
@@ -95,7 +97,7 @@ export default function RevenueChart() {
       {/* Card Header */}
       <div className='flex items-center justify-between mb-4'>
         <h2 className='text-lg font-semibold tracking-tight text-foreground'>
-          Doanh thu theo ngày
+          Daily Revenue
         </h2>
         <div className='flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border/50'>
           {periods.map((p) => (
@@ -115,12 +117,12 @@ export default function RevenueChart() {
       </div>
 
       {/* Chart Body */}
-      <div className='relative flex-1 min-h-[240px] flex items-center justify-center'>
+      <div className='relative flex-1 min-h-60 flex items-center justify-center'>
         {isPending ? (
           <Spinner />
         ) : error ? (
           <p className='text-sm text-destructive font-medium'>
-            {error.message || 'Khôi phục dữ liệu thất bại'}
+            {error.message || 'Data recovery failed.'}
           </p>
         ) : (
           <div className='w-full h-full relative select-none'>
@@ -130,7 +132,8 @@ export default function RevenueChart() {
               onMouseLeave={() => setHoverIndex(null)}
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
-                const mouseX = ((e.clientX - rect.left) / rect.width) * svgWidth;
+                const mouseX =
+                  ((e.clientX - rect.left) / rect.width) * svgWidth;
                 if (points.length > 0) {
                   let closestIdx = 0;
                   let minDiff = Infinity;
@@ -146,7 +149,13 @@ export default function RevenueChart() {
               }}
             >
               <defs>
-                <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
+                <linearGradient
+                  id='revenueGradient'
+                  x1='0'
+                  y1='0'
+                  x2='0'
+                  y2='1'
+                >
                   <stop offset='0%' stopColor='#2563eb' stopOpacity='0.25' />
                   <stop offset='100%' stopColor='#2563eb' stopOpacity='0.01' />
                 </linearGradient>
@@ -200,9 +209,7 @@ export default function RevenueChart() {
               {/* X Labels */}
               {points.map((pt, i) => {
                 const shouldShow =
-                  i === 0 ||
-                  i === points.length - 1 ||
-                  i % step === 0;
+                  i === 0 || i === points.length - 1 || i % step === 0;
 
                 if (!shouldShow) return null;
 

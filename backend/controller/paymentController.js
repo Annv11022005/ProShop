@@ -91,36 +91,29 @@ export const VNPayCallback = asyncHandler(async (req, res) => {
   const orderId = vnp_TxnRef?.split('_')[0];
   const order = await Order.findById(orderId);
 
+  //1. Kiểm tra chữ ký
   if (!verify.isVerified) {
-    return res
-      .status(200)
-      .json({ RspCode: '97', Message: 'Invalid signature' });
+    return res.redirect(`http://localhost:5173/vnpay-return?status=failed&message=invalid_signature`);
   }
 
   if (!verify.isVerified || vnp_ResponseCode !== '00') {
     if (orderId) {
       await cancelOrderPayment(orderId);
     }
-    return res
-      .status(400)
-      .json({ Message: 'Payment failed and returned to warehouse.' });
+    return res.redirect(`http://localhost:5173/vnpay-return?status=failed&orderId=${orderId}`);
   }
 
   if (!order) {
-    return res.status(200).json({ RspCode: '01', Message: 'Order not found' });
+     return res.redirect(`http://localhost:5173/vnpay-return?status=failed&message=order_not_found`);
   }
 
-  if (order.isPaid) {
-    return res
-      .status(200)
-      .json({ RspCode: '02', Message: 'Order already confirmed' });
-  }
+  if (!order.isPaid) {
+    await processOrderPayment(orderId, {
+      id: vnp_TransactionNo,
+      status: vnp_ResponseCode,
+      update_time: vnp_PayDate,
+    });
+  } 
 
-  await processOrderPayment(orderId, {
-    id: vnp_TransactionNo,
-    status: vnp_ResponseCode,
-    update_time: vnp_PayDate,
-  });
-
-  return res.status(200).json({ RspCode: '00', Message: 'Confirm Success' });
+  return res.redirect(`http://localhost:5173/vnpay-return?status=success&orderId=${orderId}`);
 });

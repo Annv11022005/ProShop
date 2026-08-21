@@ -58,26 +58,15 @@ const App = () => {
     };
   }, [userInfo, dispatch]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const authUser = params.get('authUser');
-
-    if (authUser) {
-      const userData = JSON.parse(decodeURIComponent(authUser));
-      dispatch(setCredentials(userData));
-      window.history.replaceState({}, '', '/');
-    }
-  }, [dispatch]);
-
   // Redux is persisted locally while the JWT is an HTTP-only cookie. Validate
   // the cookie on refresh so a deleted/expired account does not look logged in.
   useEffect(() => {
-    if (!userInfo) return;
-
-    axios
-      .get('/api/v1/users/profile')
-      .then(({ data }) => dispatch(setCredentials(data)))
-      .catch(() => dispatch(logout()));
+    if (userInfo) {
+      axios
+        .get('/api/v1/users/profile')
+        .then(({ data }) => dispatch(setCredentials(data)))
+        .catch(() => dispatch(logout()));
+    }
   }, [dispatch, userInfo]);
 
   return (

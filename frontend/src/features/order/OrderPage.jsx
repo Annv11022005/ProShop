@@ -291,6 +291,12 @@ const OrderPage = () => {
                 </div>
               )}
             </CardFooter>
+          ) : order.isPaid && !userInfo.isAdmin ? (
+            <CardFooter>
+              <p className='text-md font-medium text-primary text-center'>
+                The order has been successfully paid for.
+              </p>
+            </CardFooter>
           ) : (
             <CardFooter>
               <p className='text-md font-medium text-primary text-center'>

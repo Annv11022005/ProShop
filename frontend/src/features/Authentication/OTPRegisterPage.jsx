@@ -54,12 +54,12 @@ const OTPRegisterPage = () => {
   }
 
   return (
-    <div className='flex'>
+    <div className='flex p-10'>
       <Button size='lg' onClick={() => navigate('/register')}>
         <ChevronLeft />
         Go Back
       </Button>
-      <form onSubmit={VerifyHandler} className='max-w-md mx-auto'>
+      <form onSubmit={VerifyHandler} className='max-w-md mx-auto mt-20'>
         <Card>
           <CardHeader>
             <CardTitle>Verify your register</CardTitle>

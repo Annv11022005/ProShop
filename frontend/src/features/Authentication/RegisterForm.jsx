@@ -1,12 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useRegister } from './hooks/useAuth';
-
 import useToggle from '@/lib/handleToggle';
 
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   InputGroup,
@@ -19,18 +27,45 @@ import GridBackground from './components/GridBackground';
 import AuthHeroImage from './components/AuthHeroImage';
 import BrandMark from './components/BrandMark';
 
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, { message: 'Name is required' })
+      .min(2, { message: 'Name must be at least 2 characters' }),
+    email: z
+      .string()
+      .min(1, { message: 'Email is required' })
+      .email({ message: 'Please enter a valid email address' }),
+    password: z
+      .string()
+      .min(1, { message: 'Password is required' })
+      .min(6, { message: 'Password must be at least 6 characters' }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: 'Please confirm your password' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
 function RegisterForm() {
   const { registerUser, isPending } = useRegister();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
   const [isPassword, handleToggle] = useToggle(false);
   const [isConfirmPassword, handleToggleConfirm] = useToggle(false);
 
-  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    mode: 'onTouched',
+  });
 
+  const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
 
   const { search } = useLocation();
@@ -43,17 +78,26 @@ function RegisterForm() {
     }
   }, [userInfo, redirect, navigate]);
 
-  function submitHandler(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     registerUser(
-      { name, email, password },
+      { name: data.name, email: data.email, password: data.password },
       {
         onSuccess: () => {
-          navigate(`/register/verify?email=${encodeURIComponent(email)}`);
+          navigate(`/register/verify?email=${encodeURIComponent(data.email)}`);
         },
         onError: (err) => {
-          toast(err.response?.data?.message, { position: 'top-center' });
+          const serverMessage =
+            err.response?.data?.message || 'Failed to register account';
+          toast.error(serverMessage, { position: 'top-center' });
+          if (
+            serverMessage.toLowerCase().includes('already exists') ||
+            serverMessage.toLowerCase().includes('email')
+          ) {
+            setError('email', {
+              type: 'server',
+              message: serverMessage,
+            });
+          }
         },
       },
     );
@@ -66,48 +110,59 @@ function RegisterForm() {
       <div className='relative z-10 flex w-full items-center justify-center'>
         <div className='mx-auto grid w-full max-w-304 items-center justify-center gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,450px)] lg:gap-24 xl:grid-cols-[minmax(0,420px)_minmax(0,490px)] xl:gap-28'>
           <div className='mx-auto flex w-full max-w-90 flex-col gap-6'>
-            <BrandMark title='Sign up to ProShop' subtitle='Welcome back !' />
+            <BrandMark
+              title='Sign up to ProShop'
+              subtitle='Create your account!'
+            />
 
-            <form onSubmit={submitHandler}>
-              <FieldSet className='w-full m-3'>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <FieldSet className='w-full'>
                 <FieldGroup>
-                  <Field>
+                  <Field data-invalid={!!errors.name}>
                     <FieldLabel htmlFor='name' className='text-md'>
                       Name
                     </FieldLabel>
                     <Input
                       id='name'
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
                       type='text'
                       className='rounded-lg'
-                      placeholder='Enter name'
+                      placeholder='Enter your full name'
+                      aria-invalid={!!errors.name}
+                      {...register('name')}
                     />
+                    {errors.name && (
+                      <FieldError>{errors.name.message}</FieldError>
+                    )}
                   </Field>
-                  <Field>
+
+                  <Field data-invalid={!!errors.email}>
                     <FieldLabel htmlFor='email' className='text-md'>
                       Email address
                     </FieldLabel>
                     <Input
                       id='email'
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       type='email'
                       className='rounded-lg'
-                      placeholder='Enter Email'
+                      placeholder='Enter your email'
+                      aria-invalid={!!errors.email}
+                      {...register('email')}
                     />
+                    {errors.email && (
+                      <FieldError>{errors.email.message}</FieldError>
+                    )}
                   </Field>
-                  <Field>
+
+                  <Field data-invalid={!!errors.password}>
                     <FieldLabel htmlFor='password' className='text-md'>
                       Password
                     </FieldLabel>
                     <InputGroup className='rounded-lg'>
                       <InputGroupInput
                         id='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
                         type={isPassword ? 'text' : 'password'}
-                        placeholder='Enter password'
+                        placeholder='Enter password (min 6 characters)'
+                        aria-invalid={!!errors.password}
+                        {...register('password')}
                       />
                       <InputGroupAddon
                         className='cursor-pointer'
@@ -117,19 +172,22 @@ function RegisterForm() {
                         {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
                       </InputGroupAddon>
                     </InputGroup>
+                    {errors.password && (
+                      <FieldError>{errors.password.message}</FieldError>
+                    )}
                   </Field>
 
-                  <Field>
+                  <Field data-invalid={!!errors.confirmPassword}>
                     <FieldLabel htmlFor='confirmPassword' className='text-md'>
                       Confirm Password
                     </FieldLabel>
                     <InputGroup className='rounded-lg'>
                       <InputGroupInput
                         id='confirmPassword'
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
                         type={isConfirmPassword ? 'text' : 'password'}
-                        placeholder='Enter confirm password'
+                        placeholder='Confirm your password'
+                        aria-invalid={!!errors.confirmPassword}
+                        {...register('confirmPassword')}
                       />
                       <InputGroupAddon
                         className='cursor-pointer'
@@ -139,6 +197,9 @@ function RegisterForm() {
                         {!isConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
                       </InputGroupAddon>
                     </InputGroup>
+                    {errors.confirmPassword && (
+                      <FieldError>{errors.confirmPassword.message}</FieldError>
+                    )}
                   </Field>
 
                   <Field className='mx-auto max-w-20'>
@@ -149,7 +210,7 @@ function RegisterForm() {
 
                   <Field className='text-center'>
                     <p className='text-sm text-muted-foreground italic'>
-                      I already have an account?{' '}
+                      Already have an account?{' '}
                       <Link
                         to={redirect ? `/login?redirect=${redirect}` : '/login'}
                         className='underline hover:text-primary hover:font-medium'

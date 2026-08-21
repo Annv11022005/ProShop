@@ -4,7 +4,16 @@ import { logout } from '@/features/authentication/authSlice';
 import { useLogout } from '@/features/authentication/hooks/useAuth';
 
 import { Button } from './ui/button';
-import { LogIn, LogOutIcon, ShoppingCart, UserIcon } from 'lucide-react';
+import {
+  LogIn,
+  LogOutIcon,
+  ShoppingCart,
+  Store,
+  TicketPercent,
+  UserIcon,
+} from 'lucide-react';
+import Search from './Search';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,15 +21,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { toast } from 'sonner';
-import Search from './Search';
 
 const Header = () => {
   const { logoutUser, isPending } = useLogout();
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
-  const avatar = userInfo?.name.charAt(0);
+  const avatar = userInfo?.name.charAt(0).toUpperCase();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -85,7 +92,7 @@ const Header = () => {
 
                 <Link to='/coupon'>
                   <DropdownMenuItem>
-                    <UserIcon />
+                    <TicketPercent />
                     Coupon
                   </DropdownMenuItem>
                 </Link>
@@ -102,13 +109,37 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : userInfo && userInfo.isAdmin ? (
-            <Button
-              variant='outline'
-              onClick={() => navigate('/admin')}
-              size='lg'
-            >
-              {userInfo?.name}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant='outline'
+                    size='lg'
+                    className='rounded-full w-9 h-9'
+                  >
+                    {avatar}
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <Link to='/admin'>
+                  <DropdownMenuItem>
+                    <Store />
+                    Manager
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  variant='destructive'
+                  disabled={isPending}
+                  onClick={logoutHandler}
+                >
+                  <LogOutIcon />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link to='/login'>
               <Button size='lg'>

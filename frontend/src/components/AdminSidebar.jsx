@@ -48,7 +48,7 @@ export function AdminSidebar() {
         navigate('/login');
       },
       onError: (err) => {
-        toast.error(err.response?.data?.message || 'Đăng xuất thất bại', {
+        toast.error(err.response?.data?.message || 'Logout failed', {
           position: 'top-center',
         });
       },
@@ -78,9 +78,9 @@ export function AdminSidebar() {
             size='icon'
             onClick={() => navigate('/')}
             title='Return to the store page'
-            className='h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer'
+            className='w-12 h-12 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer'
           >
-            <Store className='w-4.5 h-4.5' />
+            <Store className='w-5.5! h-5.5!' />
           </Button>
         </div>
 

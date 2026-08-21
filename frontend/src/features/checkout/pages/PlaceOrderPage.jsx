@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCreateOrder } from '@/features/order/hooks/useOrders';
 import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
-import { clearCartItems, applyCoupon } from '../../cart/cartSlice';
+import { clearCartItems, applyCoupon, removeCoupon } from '../../cart/cartSlice';
 
 import StepCheckout from '../components/StepCheckout';
 import PlaceOrderSummary from '../components/PlaceOrderSummary';
@@ -20,8 +21,20 @@ const PlaceOrderPage = () => {
     useGetDefaultAddress();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const cart = useSelector((state) => state.cart);
+
+  const handleApplyCoupon = useCallback(
+    (coupon) => {
+      dispatch(applyCoupon(coupon));
+    },
+    [dispatch],
+  );
+
+  const handleRemoveCoupon = useCallback(() => {
+    dispatch(removeCoupon());
+  }, [dispatch]);
 
   useEffect(() => {
     if (isAddressPending) return;
@@ -45,6 +58,7 @@ const PlaceOrderPage = () => {
       },
       {
         onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ['coupon'] });
           dispatch(clearCartItems());
           navigate(`/order/${data._id}`);
         },
@@ -101,7 +115,8 @@ const PlaceOrderPage = () => {
             isLoading={isPending}
             discount={cart.discount || 0}
             totalAfterDiscount={cart.totalPrice}
-            onApplyCoupon={(coupon) => dispatch(applyCoupon(coupon))}
+            onApplyCoupon={handleApplyCoupon}
+            onRemoveCoupon={handleRemoveCoupon}
           />
         </Col>
       </Row>

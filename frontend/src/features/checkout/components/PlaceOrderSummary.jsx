@@ -7,6 +7,7 @@ const PlaceOrderSummary = ({
   discount,
   totalAfterDiscount,
   onApplyCoupon,
+  onRemoveCoupon,
 }) => {
   return (
     <aside
@@ -41,6 +42,7 @@ const PlaceOrderSummary = ({
         itemsPrice={cart.itemsPrice}
         price={discount}
         onApply={onApplyCoupon}
+        onRemove={onRemoveCoupon}
         initialCouponCode={cart?.coupon?.code}
       />
 

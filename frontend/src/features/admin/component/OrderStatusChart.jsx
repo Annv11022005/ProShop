@@ -3,23 +3,23 @@ import { useOrderStatusBreakdown } from '../hook/useAnalytics';
 
 const STATUS_CONFIG = {
   PaidAndDelivered: {
-    label: 'Đã giao',
-    color: '#008700', // Green matching screenshot
+    label: 'Delivered',
+    color: '#008700',
     order: 1,
   },
   PaidNotDelivered: {
-    label: 'Chờ giao',
-    color: '#2563eb', // Blue
+    label: 'Out for delivery',
+    color: '#2563eb',
     order: 2,
   },
   Unpaid: {
-    label: 'Chưa thanh toán',
-    color: '#eab308', // Yellow/Amber
+    label: 'Unpaid',
+    color: '#eab308',
     order: 3,
   },
   Cancelled: {
-    label: 'Đã hủy',
-    color: '#ef4444', // Red
+    label: 'Cancelled',
+    color: '#ef4444',
     order: 4,
   },
 };
@@ -38,7 +38,8 @@ export default function OrderStatusChart() {
         color: '#6b7280',
         order: 99,
       };
-      const pct = totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0;
+      const pct =
+        totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0;
       return {
         key: item.status,
         label: config.label,
@@ -55,11 +56,12 @@ export default function OrderStatusChart() {
   const strokeWidth = 28;
   const circumference = 2 * Math.PI * radius;
 
-  let cumulativePct = 0;
-  const segments = items.map((item) => {
+  const segments = items.map((item, index) => {
+    const prevPctSum = items
+      .slice(0, index)
+      .reduce((sum, curr) => sum + curr.pct, 0);
     const dashLen = (item.pct / 100) * circumference;
-    const offset = (cumulativePct / 100) * circumference;
-    cumulativePct += item.pct;
+    const offset = (prevPctSum / 100) * circumference;
 
     return {
       ...item,
@@ -72,16 +74,16 @@ export default function OrderStatusChart() {
     <div className='p-5 border border-border rounded-xl bg-card text-card-foreground shadow-2xs flex flex-col justify-between h-full'>
       {/* Card Title */}
       <h2 className='text-lg font-semibold tracking-tight text-foreground mb-4'>
-        Trạng thái đơn hàng
+        Order status
       </h2>
 
       {/* Donut Chart Area */}
-      <div className='flex-1 flex flex-col items-center justify-center min-h-[220px]'>
+      <div className='flex-1 flex flex-col items-center justify-center min-h-55'>
         {isPending ? (
           <Spinner />
         ) : error ? (
           <p className='text-sm text-destructive font-medium'>
-            {error.message || 'Lỗi tải trạng thái đơn'}
+            {error.message || 'Error loading order status'}
           </p>
         ) : (
           <div className='flex flex-col items-center gap-6 w-full'>
@@ -120,7 +122,7 @@ export default function OrderStatusChart() {
                         strokeDashoffset={-seg.offset}
                         className='transition-all duration-500 ease-out hover:opacity-90'
                       />
-                    )
+                    ),
                 )}
               </svg>
             </div>
