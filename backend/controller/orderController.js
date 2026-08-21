@@ -4,6 +4,8 @@ import Order from '../model/orderModel.js';
 import Product from '../model/productsModel.js';
 import Coupon from '../model/couponModel.js';
 import Address from '../model/addressModel.js';
+import Notification from '../model/notificationModel.js';
+import { getReceiverSocketId, io } from '../socket/index.js';
 
 export const addDecimals = (num) => {
   return (Math.round(num * 100) / 100).toFixed(2);
@@ -277,6 +279,27 @@ export const updateOrderToDelivered = asyncHandler(async (req, res) => {
     throw err;
   } finally {
     session.endSession();
+  }
+
+  try {
+    const newNotification = new Notification({
+      recipient: order.user,
+      sender: null,
+      type: 'DELIVERED',
+      title: 'Order notification',
+      message: 'Your order has been successfully delivered!',
+      relatedId: order._id,
+      relatedModel: 'Order',
+    });
+
+    await newNotification.save();
+    const receiverSocketId = getReceiverSocketId(order.user.toString());
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('newNotification', newNotification);
+    }
+  } catch (err) {
+    console.error('Failed to send delivery notification:', err);
   }
 });
 

@@ -49,6 +49,7 @@ import FormInformation from './components/FormInformation';
 import { formatCurrency } from '@/lib/utils';
 import { useGetWishlist } from './hooks/useWishlist';
 import Product from '@/components/ui/Product';
+import Notification from './Notification';
 
 const navTabs = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -517,6 +518,8 @@ const ProfilePage = () => {
             )}
           </div>
         )}
+
+        {activeTab === 'notifications' && <Notification />}
       </Col>
     </Row>
   );

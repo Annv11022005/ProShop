@@ -15,7 +15,7 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
     <div className='flex h-full w-80 shrink-0 flex-col border-r border-border/60'>
       {/* Header */}
       <div className='flex items-center gap-2 border-b border-border/60 px-4 py-3'>
-        <h2 className='text-base font-semibold'>Tin nhắn</h2>
+        <h2 className='text-base font-semibold'>Message</h2>
         <span className='rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'>
           {users.length}
         </span>
@@ -27,7 +27,7 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder='Tìm kiếm...'
+          placeholder='Search ...'
           className='h-9 rounded-full pl-9 text-sm'
         />
       </div>
@@ -36,7 +36,7 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
       <div className='flex-1 overflow-y-auto'>
         {filteredUsers.length === 0 && (
           <p className='px-4 py-8 text-center text-sm text-muted-foreground'>
-            Không tìm thấy user
+            User Not Found
           </p>
         )}
 

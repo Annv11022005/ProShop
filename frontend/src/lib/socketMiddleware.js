@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { messageReceived } from '../features/chat/chatSlice';
+import { toast } from 'sonner';
 
 let socket;
 
@@ -15,6 +16,12 @@ const socketMiddleware = (store) => (next) => (action) => {
 
     socket.on('newMessage', (message) => {
       store.dispatch(messageReceived(message));
+    });
+    socket.on('newNotification', (notification) => {
+      toast.info(notification.title || 'New Notification', {
+        description: notification.message,
+        position: 'top-center',
+      });
     });
   }
 

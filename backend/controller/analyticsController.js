@@ -259,7 +259,7 @@ export const getOrderStatusBreakdown = asyncHandler(async (req, res) => {
 // GET /api/v1/analytics/low-stock
 // @access private/admin
 export const getLowStockProducts = asyncHandler(async (req, res) => {
-  const threshold = 10;
+  const threshold = 5;
 
   const products = await Product.find({
     variants: {

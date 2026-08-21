@@ -4,7 +4,7 @@ const products = [
     subtitle: '75% Wireless Mechanical Keyboard',
     description:
       'A premium 75% mechanical keyboard designed for gaming and productivity with hot-swappable switches and RGB backlighting.',
-    brand: 'AeroFlex',
+    brand: 'AULA',
     category: 'Mechanical Keyboard',
 
     image: [
@@ -85,7 +85,7 @@ const products = [
     subtitle: 'AULA F75 Comic  Mechanical Keyboard',
     description:
       'A compact TKL mechanical keyboard with RGB lighting, hot-swappable switches and a durable aluminum frame.',
-    brand: 'KeyNova',
+    brand: 'AULA',
     category: 'Mechanical Keyboard',
 
     image: [
@@ -118,7 +118,7 @@ const products = [
     subtitle: 'Compact 65% Mechanical Keyboard',
     description:
       'A compact 65% mechanical keyboard designed for users who want a minimal desk setup without sacrificing functionality.',
-    brand: 'NovaType',
+    brand: 'AULA',
     category: 'Mechanical Keyboard',
 
     image: [

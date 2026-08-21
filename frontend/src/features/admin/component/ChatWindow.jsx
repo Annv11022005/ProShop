@@ -31,7 +31,7 @@ const ChatWindow = ({
 }) => {
   const bottomRef = useRef(null);
 
-  // Auto-scroll xuống cuối khi có tin nhắn mới
+  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -47,9 +47,9 @@ const ChatWindow = ({
                 <MessageCircle className='h-8 w-8 text-primary' />
               </div>
             </EmptyMedia>
-            <EmptyTitle className='text-lg'>Chọn cuộc hội thoại</EmptyTitle>
+            <EmptyTitle className='text-lg'>Select a conversation</EmptyTitle>
             <EmptyDescription>
-              Chọn một user từ danh sách bên trái để bắt đầu trò chuyện
+              Select a user from the list on the left to start a conversation.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -75,7 +75,7 @@ const ChatWindow = ({
 
   return (
     <div className='flex flex-1 flex-col'>
-      {/* Header — thông tin user đang chat */}
+      {/* Header */}
       <div className='flex items-center gap-3 border-b border-border/60 bg-background px-5 py-3'>
         <Avatar className='h-9 w-9'>
           <AvatarImage src={selectedUser.avatar} alt={selectedUser.name} />
@@ -89,12 +89,12 @@ const ChatWindow = ({
         </div>
       </div>
 
-      {/* Body — danh sách tin nhắn */}
+      {/* Body  */}
       <div className='flex flex-1 flex-col gap-3 overflow-y-auto p-5'>
         <MessageGroup className='flex flex-col gap-4'>
           {messages.length === 0 && (
             <p className='py-12 text-center text-sm text-muted-foreground'>
-              Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!
+              No messages yet. Start a conversation!
             </p>
           )}
 
@@ -156,13 +156,13 @@ const ChatWindow = ({
         <div ref={bottomRef} />
       </div>
 
-      {/* Footer — input gửi tin nhắn */}
+      {/* Footer */}
       <div className='flex items-center gap-2 border-t border-border/60 bg-background px-4 py-3'>
         <Input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder='Nhập tin nhắn...'
+          placeholder='Aa'
           className='h-10 flex-1 rounded-full border-border/60 text-sm focus-visible:ring-1'
         />
         <Button

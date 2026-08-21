@@ -17,3 +17,5 @@ router.route('/:id').put(makeReadNotification);
 router.route('/read-all').get(makeAllReadNotification);
 
 router.route('/unread-count').get(getUnreadNotification);
+
+export default router;
