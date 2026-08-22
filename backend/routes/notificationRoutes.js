@@ -11,11 +11,8 @@ const router = express.Router();
 router.use(protect);
 
 router.route('/').get(getNotifications);
-
-router.route('/:id').put(makeReadNotification);
-
-router.route('/read-all').get(makeAllReadNotification);
-
 router.route('/unread-count').get(getUnreadNotification);
+router.route('/read-all').put(makeAllReadNotification);
+router.route('/:id').put(makeReadNotification);
 
 export default router;

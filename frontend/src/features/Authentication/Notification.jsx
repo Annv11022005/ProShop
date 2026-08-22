@@ -1,24 +1,30 @@
-import { useNotifications } from './hooks/useNotifications';
+import {
+  useMakeRead,
+  useMakeReadAll,
+  useNotifications,
+} from './hooks/useNotifications';
 
 import { Spinner } from '@/components/ui/spinner';
 import { Message as AlertMessage } from '@/components/AlertMessage';
 import { ArrowRight, Bell, Clock, PackageCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Notification = () => {
   const {
     data,
+    isPending,
+    error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isLoading,
-    isError,
   } = useNotifications();
 
-  if (isLoading) return <Spinner />;
+  const { makeRead } = useMakeRead();
+  const { makeReadAll, isPending: pendMakeAll } = useMakeReadAll();
 
-  if (isError) return <AlertMessage>{isError.message}</AlertMessage>;
-  const notifications = data.pages.flatMap((page) => page.notifications);
+  if (isPending) return <Spinner />;
+  if (error) return <AlertMessage>{error.message}</AlertMessage>;
 
   return (
     <div className='p-5 border border-border rounded-lg shadow-xs'>
@@ -30,18 +36,19 @@ const Notification = () => {
 
         <button
           className='text-sm hover:underline hover:italic font-semibold text-muted-foreground bg-none'
-          onClick={() => {}}
+          onClick={() => makeReadAll()}
+          disabled={pendMakeAll}
         >
           Mark all as read
         </button>
       </div>
       <div className='flex flex-col gap-3'>
-        {notifications.length === 0 ? (
+        {data?.notifications.length === 0 ? (
           <div className='text-center py-8 text-muted-foreground text-sm'>
             No notifications yet
           </div>
         ) : (
-          notifications.map((n) => (
+          data?.notifications.map((n) => (
             <div
               key={n._id}
               className={`relative flex items-start gap-4 p-4 rounded-xl border transition-all duration-200 hover:shadow-xs hover:border-primary/30 ${
@@ -49,6 +56,7 @@ const Notification = () => {
                   ? 'bg-primary/3 border-primary/10'
                   : 'bg-card border-border/80'
               }`}
+              onClick={() => !n.isRead && makeRead(n._id)}
             >
               {/* Icon Status */}
               <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-blue text-blue-avt'>
@@ -102,9 +110,16 @@ const Notification = () => {
       </div>
 
       {hasNextPage && (
-        <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-          {isFetchingNextPage ? 'Loading ...' : 'Load more'}
-        </button>
+        <div className='mt-4 text-center'>
+          <Button
+            variant='outline'
+            className='w-full'
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? 'Loading ...' : 'Load more'}
+          </Button>
+        </div>
       )}
     </div>
   );

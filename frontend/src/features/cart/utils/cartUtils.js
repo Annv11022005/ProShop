@@ -33,7 +33,8 @@ export const updateCart = (state) => {
     Number(state.discount)
   ).toFixed(2);
 
-  localStorage.setItem('cart', JSON.stringify(state));
+  const { coupon, discount: _discount, ...cartToPersist } = state;
+  localStorage.setItem('cart', JSON.stringify(cartToPersist));
 
   return state;
 };

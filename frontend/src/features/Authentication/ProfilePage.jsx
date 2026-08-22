@@ -50,6 +50,7 @@ import { formatCurrency } from '@/lib/utils';
 import { useGetWishlist } from './hooks/useWishlist';
 import Product from '@/components/ui/Product';
 import Notification from './Notification';
+import { useCountUnreadNotification } from './hooks/useNotifications';
 
 const navTabs = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -103,15 +104,21 @@ const ProfilePage = () => {
       new Date(order.createdAt) > new Date(latest.createdAt) ? order : latest,
     myOrders[0],
   );
+  const {
+    count,
+    isPending: pendCount,
+    error: errCount,
+  } = useCountUnreadNotification();
 
-  if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
+  if (!userInfo || pendingDefault || pendingGet || pendCount)
+    return <Spinner />;
 
   if (errDefault) {
     return <Message>Failed to load address, try again later</Message>;
   }
 
-  if (errUp) {
-    return <Message>{errUp?.message}</Message>;
+  if (errUp || errCount) {
+    return <Message>{errUp?.message || errCount?.message}</Message>;
   }
 
   async function submitHandler(e) {
@@ -193,16 +200,24 @@ const ProfilePage = () => {
                   key={tab.id}
                   type='button'
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                  className={` relative gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer w-full text-left ${
                     isActive
                       ? 'bg-bg-blue text-blue-avt font-semibold'
                       : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   }`}
                 >
-                  <Icon
-                    className={`w-4 h-4 ${isActive ? 'text-blue-avt' : 'text-muted-foreground'}`}
-                  />
-                  <span>{tab.label}</span>
+                  <div className='flex items-center gap-3'>
+                    <Icon
+                      className={`w-4 h-4 ${isActive ? 'text-blue-avt' : 'text-muted-foreground'}`}
+                    />
+                    <span>{tab.label}</span>
+                  </div>
+
+                  {tab.id === 'notifications' && count > 0 && (
+                    <span className=' absolute -top-1.5 right-0 w-5 h-5 text-center text-sm rounded-full font-bold  bg-primary/80 text-muted'>
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  )}
                 </button>
               );
             })}
