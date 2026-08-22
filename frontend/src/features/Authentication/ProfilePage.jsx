@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOrderHistory } from '../order/hooks/useOrders';
 import { setCredentials } from './authSlice';
 import { useProfileMutation } from './hooks/useProfile';
 import MyOrders from './components/MyOrders';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   useDeleteAddress,
   useGetAllAddress,
@@ -60,9 +60,19 @@ const navTabs = [
 ];
 
 const ProfilePage = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'profile');
   const [open, setOpen] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
+  const { count: unreadNotificationCount } = useCountUnreadNotification();
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state?.tab]);
+
   const avatar = userInfo?.name.charAt(0);
   const memberSince = new Date(userInfo.createdAt).getFullYear();
 
@@ -104,21 +114,15 @@ const ProfilePage = () => {
       new Date(order.createdAt) > new Date(latest.createdAt) ? order : latest,
     myOrders[0],
   );
-  const {
-    count,
-    isPending: pendCount,
-    error: errCount,
-  } = useCountUnreadNotification();
 
-  if (!userInfo || pendingDefault || pendingGet || pendCount)
-    return <Spinner />;
+  if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
 
   if (errDefault) {
     return <Message>Failed to load address, try again later</Message>;
   }
 
-  if (errUp || errCount) {
-    return <Message>{errUp?.message || errCount?.message}</Message>;
+  if (errUp) {
+    return <Message>{errUp?.message}</Message>;
   }
 
   async function submitHandler(e) {
@@ -200,7 +204,7 @@ const ProfilePage = () => {
                   key={tab.id}
                   type='button'
                   onClick={() => setActiveTab(tab.id)}
-                  className={` relative gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer w-full text-left ${
+                  className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer w-full ${
                     isActive
                       ? 'bg-bg-blue text-blue-avt font-semibold'
                       : 'text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -213,11 +217,14 @@ const ProfilePage = () => {
                     <span>{tab.label}</span>
                   </div>
 
-                  {tab.id === 'notifications' && count > 0 && (
-                    <span className=' absolute -top-1.5 right-0 w-5 h-5 text-center text-sm rounded-full font-bold  bg-primary/80 text-muted'>
-                      {count > 99 ? '99+' : count}
-                    </span>
-                  )}
+                  {tab.id === 'notifications' &&
+                    unreadNotificationCount > 0 && (
+                      <span className='px-2 py-0.5 text-xs font-bold rounded-full bg-primary text-primary-foreground'>
+                        {unreadNotificationCount > 99
+                          ? '99+'
+                          : unreadNotificationCount}
+                      </span>
+                    )}
                 </button>
               );
             })}

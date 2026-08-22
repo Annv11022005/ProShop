@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { messageReceived } from '../features/chat/chatSlice';
 import { toast } from 'sonner';
+import { queryClient } from './queryClient';
 
 let socket;
 
@@ -22,6 +23,7 @@ const socketMiddleware = (store) => (next) => (action) => {
         description: notification.message,
         position: 'top-center',
       });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     });
   }
 

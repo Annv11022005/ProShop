@@ -22,6 +22,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+import NotificationDropdown from '@/features/authentication/components/NotificationDropdown';
+
 const Header = () => {
   const { logoutUser, isPending } = useLogout();
   const { cartItems } = useSelector((state) => state.cart);
@@ -58,7 +60,7 @@ const Header = () => {
           <Search />
         </div>
 
-        <div className='flex gap-3 action'>
+        <div className='flex items-center gap-3 action'>
           <Link to='/cart'>
             <Button size='lg' className=' relative'>
               <ShoppingCart /> Cart
@@ -67,6 +69,8 @@ const Header = () => {
               )}
             </Button>
           </Link>
+
+          {userInfo && <NotificationDropdown />}
 
           {userInfo && !userInfo.isAdmin ? (
             <DropdownMenu>

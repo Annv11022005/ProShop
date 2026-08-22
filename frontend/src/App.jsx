@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useDispatch, useSelector } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
-import { setCredentials } from './features/authentication/authSlice';
-import { logout } from './features/authentication/authSlice';
+import { setCredentials, logout } from './features/authentication/authSlice';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { queryClient } from '@/lib/queryClient';
 
 import AdminRoutes from '@/components/AdminRoutes';
 import PrivateRoutes from '@/components/PrivateRoutes';
@@ -35,14 +35,6 @@ import CouponListScreen from '@/screens/admin/CouponListScreen';
 import CouponEditScreen from '@/screens/admin/CouponEditScreen';
 import CreateCouponScreen from '@/screens/admin/CreateCouponScreen';
 import DashboardScreen from '@/screens/admin/DashboardScreen';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 0,
-    },
-  },
-});
 
 const App = () => {
   const dispatch = useDispatch();
