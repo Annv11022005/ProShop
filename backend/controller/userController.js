@@ -178,6 +178,19 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     user.email = req.body.email || user.email;
 
     if (req.body.password) {
+      if (user.password) {
+        if (!req.body.currentPassword) {
+          res.status(400);
+          throw new Error('Please provide your current password');
+        }
+
+        const isMatch = await user.matchPassword(req.body.currentPassword);
+        if (!isMatch) {
+          res.status(400);
+          throw new Error('Current password is incorrect');
+        }
+      }
+
       user.password = req.body.password;
     }
 

@@ -78,6 +78,7 @@ const ProfilePage = () => {
 
   const [name, setName] = useState(userInfo?.name || '');
   const [email, setEmail] = useState(userInfo?.email || '');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -127,24 +128,43 @@ const ProfilePage = () => {
 
   async function submitHandler(e) {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error('Password do not match');
-    } else {
-      try {
-        const res = await profileUser({
-          _id: userInfo._id,
-          name,
-          email,
-          password,
-        });
 
-        dispatch(setCredentials(res));
-        toast.success('Profile update successfully');
-        setPassword('');
-        setConfirmPassword('');
-      } catch (err) {
-        toast.error(err?.data?.message || err.error || 'update fail');
+    if (password) {
+      if (!currentPassword) {
+        toast.error('Please enter your current password to change password');
+        return;
       }
+      if (password.length < 8) {
+        toast.error('New password must be at least 8 characters');
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast.error('New passwords do not match');
+        return;
+      }
+    }
+
+    try {
+      const res = await profileUser({
+        _id: userInfo._id,
+        name,
+        email,
+        currentPassword: currentPassword || undefined,
+        password: password || undefined,
+      });
+
+      dispatch(setCredentials(res));
+      toast.success('Profile updated successfully');
+      setCurrentPassword('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          err?.data?.message ||
+          err?.message ||
+          'Update failed',
+      );
     }
   }
 
@@ -452,6 +472,8 @@ const ProfilePage = () => {
               setName={setName}
               email={email}
               setEmail={setEmail}
+              currentPassword={currentPassword}
+              setCurrentPassword={setCurrentPassword}
               password={password}
               setPassword={setPassword}
               confirmPassword={confirmPassword}

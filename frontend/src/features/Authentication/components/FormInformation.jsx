@@ -16,6 +16,8 @@ const FormInformation = ({
   setName,
   email,
   setEmail,
+  currentPassword,
+  setCurrentPassword,
   password,
   setPassword,
   confirmPassword,
@@ -23,6 +25,7 @@ const FormInformation = ({
   submitHandler,
   isPending,
 }) => {
+  const [isCurrentPassword, handleToggleCurrent] = useToggle(false);
   const [isPassword, handleToggle] = useToggle(false);
   const [isConfirmPassword, handleToggleConfirm] = useToggle(false);
 
@@ -63,9 +66,33 @@ const FormInformation = ({
         </FieldGroup>
 
         <FieldGroup className='flex flex-row'>
+          <Field className='w-full'>
+            <FieldLabel htmlFor='currentPassword' className='text-md'>
+              Current Password
+            </FieldLabel>
+            <InputGroup className='rounded-lg'>
+              <InputGroupInput
+                id='currentPassword'
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                type={isCurrentPassword ? 'text' : 'password'}
+                placeholder='Enter current password (required to change password)'
+              />
+              <InputGroupAddon
+                className='cursor-pointer'
+                align='inline-end'
+                onClick={handleToggleCurrent}
+              >
+                {!isCurrentPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+        </FieldGroup>
+
+        <FieldGroup className='flex flex-row'>
           <Field>
             <FieldLabel htmlFor='password' className='text-md'>
-              Password
+              New Password
             </FieldLabel>
             <InputGroup className='rounded-lg'>
               <InputGroupInput
@@ -73,7 +100,7 @@ const FormInformation = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type={isPassword ? 'text' : 'password'}
-                placeholder='Enter password'
+                placeholder='Enter new password'
               />
               <InputGroupAddon
                 className='cursor-pointer'
@@ -87,7 +114,7 @@ const FormInformation = ({
 
           <Field>
             <FieldLabel htmlFor='confirmPassword' className='text-md'>
-              Confirm Password
+              Confirm New Password
             </FieldLabel>
             <InputGroup className='rounded-lg'>
               <InputGroupInput
@@ -95,7 +122,7 @@ const FormInformation = ({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 type={isConfirmPassword ? 'text' : 'password'}
-                placeholder='Enter confirm password'
+                placeholder='Confirm new password'
               />
               <InputGroupAddon
                 className='cursor-pointer'
@@ -113,8 +140,9 @@ const FormInformation = ({
             size='lg'
             variant='outline'
             onClick={() => {
-              setName(userInfo?.name);
-              setEmail(userInfo?.email);
+              setName(userInfo?.name || '');
+              setEmail(userInfo?.email || '');
+              setCurrentPassword('');
               setPassword('');
               setConfirmPassword('');
             }}
