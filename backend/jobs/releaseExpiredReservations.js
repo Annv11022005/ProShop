@@ -4,21 +4,23 @@ import { cancelOrderPayment } from '../controller/orderController.js';
 
 export function startReservationCleanupJob() {
   cron.schedule('*/5 * * * *', async () => {
-    const expiredOrders = await Order.find({
-      isPaid: false,
-      isCancelled: { $ne: true },
-      reservationExpiresAt: { $lt: new Date() },
-    });
+    try {
+      const expiredOrders = await Order.find({
+        isPaid: false,
+        isCancelled: { $ne: true },
+        reservationExpiresAt: { $lt: new Date() },
+      });
 
-    for (const order of expiredOrders) {
-      try {
-        await cancelOrderPayment(order._id);
-        order.isCancelled = true;
-        order.cancelledAt = new Date();
-        await order.save();
-      } catch (err) {
-        console.error(`Failed to release order ${order._id}:`, err);
+      for (const order of expiredOrders) {
+        try {
+          await cancelOrderPayment(order._id);
+        } catch (err) {
+          console.error(`Failed to release order ${order._id}:`, err);
+        }
       }
+    } catch (err) {
+      console.error('Failed to run reservation cleanup job:', err);
     }
   });
 }
+

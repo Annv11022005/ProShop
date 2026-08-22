@@ -13,6 +13,15 @@ const limiter = rateLimit({
   message: 'Too many request from this IP, please try again in an hour!',
 });
 
+// Limiter riêng, chặt hơn cho login
+export const authLimiter = rateLimit({
+  max: 10,                      
+  windowMs: 15 * 60 * 1000,     
+  message: 'Too many login attempts, please try again after 15 minutes.',
+  standardHeaders: true,
+  skipSuccessfulRequests: true, 
+});
+
 const applySecurityMiddleware = (app) => {
   // Set security HTTP Header
   app.use(helmet());

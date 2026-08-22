@@ -15,13 +15,20 @@ import {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  forgotPassword,
+  resetPassword,
 } from '../controller/userController.js';
 import { admin, protect } from '../middleware/authMiddleware.js';
-import { loginSchema, registerSchema } from '../validator/userValidator.js';
+import {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from '../validator/userValidator.js';
 import { validate, validateParams } from '../middleware/validateMiddleware.js';
 import { mongoIdParamSchema } from '../validator/commonValidator.js';
 import passport from '../config/passport.js';
-import { generateToken } from '../utils/generateToken.js';
+import { authLimiter } from '../config/security.js';
 
 const router = express.Router();
 
@@ -30,10 +37,16 @@ router
   .get(protect, admin, getUsers)
   .post(validate(registerSchema), registerUser);
 
-router.route('/register/verify').post(verifyUser);
+router.route('/register/verify').post(authLimiter, verifyUser);
 
-router.route('/logout').post(LogoutUser);
-router.route('/login').post(validate(loginSchema), loginUser);
+router.route('/logout').post(authLimiter, LogoutUser);
+router.route('/login').post(authLimiter, validate(loginSchema), loginUser);
+router
+  .route('/forgot-password')
+  .post(authLimiter, validate(forgotPasswordSchema), forgotPassword);
+router
+  .route('/reset-password')
+  .post(authLimiter, validate(resetPasswordSchema), resetPassword);
 
 router
   .route('/profile')

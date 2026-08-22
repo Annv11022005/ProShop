@@ -37,6 +37,8 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
+    resetPasswordOTP: { type: String },
+    resetPasswordExpires: { type: Date },
     facebookId: { type: String, default: null },
     googleId: { type: String, default: null },
   },

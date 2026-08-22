@@ -70,3 +70,15 @@ export async function removeFromWishlist(id) {
 
   return res.data;
 }
+
+export async function forgotPassword(data) {
+  const res = await axios.post('/api/v1/users/forgot-password', data);
+
+  return res.data;
+}
+
+export async function resetPassword(data) {
+  const res = await axios.post('/api/v1/users/reset-password', data);
+
+  return res.data;
+}

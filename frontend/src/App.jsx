@@ -35,6 +35,8 @@ import CouponListScreen from '@/screens/admin/CouponListScreen';
 import CouponEditScreen from '@/screens/admin/CouponEditScreen';
 import CreateCouponScreen from '@/screens/admin/CreateCouponScreen';
 import DashboardScreen from '@/screens/admin/DashboardScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import ResetPasswordScreen from './screens/ResetPasswordScreen';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -93,6 +95,8 @@ const App = () => {
             <Route path='/login' element={<LoginScreen />} />
             <Route path='/register' element={<RegisterScreen />} />
             <Route path='/register/verify' element={<OTPRegisterScreen />} />
+            <Route path='/forgot-password' element={<ForgotPasswordScreen />} />
+            <Route path='/reset-password' element={<ResetPasswordScreen />} />
 
             <Route element={<AdminRoutes />}>
               <Route path='/admin' element={<DashboardScreen />} />

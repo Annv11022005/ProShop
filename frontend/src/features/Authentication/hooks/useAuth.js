@@ -1,4 +1,11 @@
-import { login, logout, register, verifyOTP } from '../api/apiUsers';
+import {
+  forgotPassword,
+  login,
+  logout,
+  register,
+  resetPassword,
+  verifyOTP,
+} from '../api/apiUsers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useLogin() {
@@ -43,4 +50,28 @@ export function useVerify() {
   });
 
   return { verifyUser, isPending };
+}
+
+export function useForgotPassword() {
+  const {
+    mutate: forgotPasswordUser,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: forgotPassword,
+  });
+
+  return { forgotPasswordUser, isPending, error };
+}
+
+export function useResetPassword() {
+  const {
+    mutate: resetPasswordUser,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: resetPassword,
+  });
+
+  return { resetPasswordUser, isPending, error };
 }

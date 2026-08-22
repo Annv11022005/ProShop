@@ -1,29 +1,32 @@
 import Joi from 'joi';
 
-// Schema con: từng item trong đơn hàng
+// Sub-schema: each item in the order
 const orderItemSchema = Joi.object({
   name: Joi.string().trim().required().messages({
-    'string.empty': 'Tên sản phẩm không được để trống',
-    'any.required': 'Tên sản phẩm là bắt buộc',
+    'string.empty': 'Product name is required',
+    'any.required': 'Product name is required',
   }),
   qty: Joi.number().integer().min(1).required().messages({
-    'number.base': 'Số lượng phải là số',
-    'number.min': 'Số lượng phải lớn hơn hoặc bằng 1',
-    'any.required': 'Số lượng là bắt buộc',
+    'number.base': 'Quantity must be a number',
+    'number.integer': 'Quantity must be an integer',
+    'number.min': 'Quantity must be at least 1',
+    'any.required': 'Quantity is required',
   }),
   image: Joi.string().required().messages({
-    'any.required': 'Ảnh sản phẩm là bắt buộc',
+    'string.empty': 'Product image is required',
+    'any.required': 'Product image is required',
   }),
   price: Joi.number().min(0).required().messages({
-    'number.min': 'Giá phải lớn hơn hoặc bằng 0',
-    'any.required': 'Giá là bắt buộc',
+    'number.base': 'Price must be a number',
+    'number.min': 'Price must be greater than or equal to 0',
+    'any.required': 'Price is required',
   }),
   _id: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .required()
     .messages({
-      'string.pattern.base': 'ID sản phẩm không hợp lệ',
-      'any.required': 'ID sản phẩm là bắt buộc',
+      'string.pattern.base': 'Invalid product ID format',
+      'any.required': 'Product ID is required',
     }),
   variantId: Joi.string().allow(null, '').optional(),
   sku: Joi.string().allow(null, '').optional(),
@@ -31,32 +34,51 @@ const orderItemSchema = Joi.object({
   size: Joi.string().allow(null, '').optional(),
 }).unknown(true);
 
-// Schema con: kết quả thanh toán (PayPal/Stripe trả về)
+// Sub-schema: payment result (returned by PayPal/Stripe/VNPay)
 const paymentResultSchema = Joi.object({
-  id: Joi.string().required(),
-  status: Joi.string().required(),
-  update_time: Joi.string().required(),
+  id: Joi.string().required().messages({
+    'string.empty': 'Payment ID is required',
+    'any.required': 'Payment ID is required',
+  }),
+  status: Joi.string().required().messages({
+    'string.empty': 'Payment status is required',
+    'any.required': 'Payment status is required',
+  }),
+  update_time: Joi.string().required().messages({
+    'string.empty': 'Payment update time is required',
+    'any.required': 'Payment update time is required',
+  }),
   email_address: Joi.string()
     .email({ tlds: { allow: false } })
-    .required(),
+    .required()
+    .messages({
+      'string.empty': 'Payer email address is required',
+      'string.email': 'Invalid payer email address',
+      'any.required': 'Payer email address is required',
+    }),
 });
 
-// Validate body khi tạo đơn hàng mới: POST /api/orders
+// Validate body when creating a new order: POST /api/orders
 export const createOrderSchema = Joi.object({
   orderItems: Joi.array().items(orderItemSchema).min(1).required().messages({
-    'array.min': 'Đơn hàng phải có ít nhất 1 sản phẩm',
-    'any.required': 'Danh sách sản phẩm là bắt buộc',
+    'array.min': 'Order must contain at least 1 item',
+    'any.required': 'Order items are required',
   }),
   addressId: Joi.string().required().messages({
-    'any.required': 'ID địa chỉ giao hàng là bắt buộc',
+    'string.empty': 'Shipping address ID is required',
+    'any.required': 'Shipping address ID is required',
   }),
   paymentMethod: Joi.string().trim().required().messages({
-    'any.required': 'Phương thức thanh toán là bắt buộc',
+    'string.empty': 'Payment method is required',
+    'any.required': 'Payment method is required',
   }),
   couponCode: Joi.string().allow(null, '').optional(),
 });
 
-// Validate body khi cập nhật đã thanh toán
+// Validate body when updating order to paid
 export const payOrderSchema = Joi.object({
-  paymentResult: paymentResultSchema.required(),
+  paymentResult: paymentResultSchema.required().messages({
+    'any.required': 'Payment result is required',
+  }),
 });
+

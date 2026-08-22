@@ -141,6 +141,12 @@ function LoginForm() {
                     {errors.password && (
                       <FieldError>{errors.password.message}</FieldError>
                     )}
+                    <button
+                      className='text-xs font-medium text-muted-foreground text-end hover:underline hover:italic'
+                      onClick={() => navigate('/forgot-password')}
+                    >
+                      Forgot Password?
+                    </button>
                   </Field>
 
                   <Field className='mx-auto max-w-20'>

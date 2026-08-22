@@ -364,11 +364,11 @@ export const processOrderPayment = async (orderId, paymentResultData) => {
   }
 };
 
-// Hàm giải phóng số lượng giữ chỗ (reserved) khi thanh toán thất bại/hủy đơn
+// Hàm giải phóng số lượng giữ chỗ (reserved), hoàn lại useCount của coupon và đánh dấu hủy đơn
 export const cancelOrderPayment = async (orderId) => {
   const order = await Order.findById(orderId);
 
-  if (!order || order.isPaid) {
+  if (!order || order.isPaid || order.isCancelled) {
     return;
   }
 
@@ -376,7 +376,7 @@ export const cancelOrderPayment = async (orderId) => {
   session.startTransaction();
   try {
     for (const item of order.orderItems) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(item.product).session(session);
       const targetVariantId = item.variantId || product?.variants[0]?._id;
 
       if (targetVariantId) {
@@ -388,7 +388,20 @@ export const cancelOrderPayment = async (orderId) => {
       }
     }
 
+    if (order.couponId) {
+      await Coupon.updateOne(
+        { _id: order.couponId, useCount: { $gt: 0 } },
+        { $inc: { useCount: -1 } },
+        { session },
+      );
+    }
+
+    order.isCancelled = true;
+    order.cancelledAt = new Date();
+    const updatedOrder = await order.save({ session });
+
     await session.commitTransaction();
+    return updatedOrder;
   } catch (err) {
     await session.abortTransaction();
     throw err;

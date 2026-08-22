@@ -125,14 +125,14 @@ export const verifyUser = asyncHandler(async (req, res) => {
 export const loginWithFacebook = asyncHandler(async (req, res) => {
   generateToken(res, req.user._id);
 
-  res.redirect('http://localhost:5173');
+  res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
 });
 
 // @desc login with google
 export const loginWithGoogle = asyncHandler(async (req, res) => {
   generateToken(res, req.user._id);
 
-  res.redirect('http://localhost:5173');
+  res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
 });
 
 // @desc Logout user & clear token
@@ -200,7 +200,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
 // GET /api/users
 // @access Private/Admin
 export const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({});
+  const users = await User.find({}).select('-password');
 
   res.status(200).json(users);
 });
@@ -321,4 +321,78 @@ export const getWishlist = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json(presentedWishlist);
+});
+
+// @desc forgot password
+// POST /api/v1/users/forgot-password
+// @access public
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const userExists = await User.findOne({ email });
+  const otp = generateOTP();
+  const otpExpires = Date.now() + 5 * 60 * 1000;
+
+  if (!userExists) {
+    return res.status(200).json({
+      message: 'If that email exists in our system, an OTP has been sent.',
+    });
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_USER,
+    to: userExists.email,
+    subject: 'Verification code to reset your password',
+    text: `Hello ${userExists.name},\n\nYour One-Time Password (OTP) is: ${otp}\n\nThis code will expire in 5 minutes. Please do not share this code with anyone.\n\nBest regards.`,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+  } catch (err) {
+    console.error('Error sending email:', err);
+    res.status(500);
+    throw new Error('Failed to send OTP email. Please try again later.');
+  }
+
+  userExists.resetPasswordOTP = otp;
+  userExists.resetPasswordExpires = otpExpires;
+  await userExists.save();
+
+  res.status(200).json({
+    message: 'If that email exists in our system, an OTP has been sent.',
+  });
+});
+
+// @desc reset password
+// POST /api/v1/users/reset-password
+// @access public
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { otp, email, newPassword } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user || !user.resetPasswordOTP || user.resetPasswordOTP !== otp) {
+    res.status(400);
+    throw new Error('Invalid or expired OTP');
+  }
+
+  if (Date.now() > user.resetPasswordExpires) {
+    res.status(400);
+    throw new Error('OTP has expired');
+  }
+
+  user.resetPasswordOTP = undefined;
+  user.resetPasswordExpires = undefined;
+  user.password = newPassword;
+  await user.save();
+
+  res.cookie('jwt', '', {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+
+  res
+    .status(200)
+    .json({ message: 'The password has been successfully updated.' });
 });
