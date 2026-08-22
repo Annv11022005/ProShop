@@ -91,15 +91,15 @@ export default function PromoCodeField({
     <div className='flex w-full flex-col gap-2'>
       <label
         htmlFor='promo-code'
-        className='text-sm font-medium text-neutral-900'
+        className='text-sm font-medium text-foreground'
       >
         Coupon
       </label>
 
       {appliedCode && price > 0 && !displayError ? (
-        <div className='flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800'>
+        <div className='flex items-center justify-between rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success'>
           <div className='flex items-center gap-2'>
-            <Tag className='size-4 text-emerald-600' />
+            <Tag className='size-4 text-success' />
             <span>
               <strong className='font-semibold'>{appliedCode}</strong> (-{formatCurrency(price)})
             </span>
@@ -109,7 +109,7 @@ export default function PromoCodeField({
             variant='ghost'
             type='button'
             onClick={handleRemove}
-            className='h-7 px-2 text-xs font-medium text-red-600 hover:bg-red-50 hover:text-red-700'
+            className='h-7 px-2 text-xs font-medium text-destructive hover:bg-destructive/10 hover:text-destructive'
           >
             <X className='mr-1 size-3.5' />
             Remove
@@ -123,7 +123,7 @@ export default function PromoCodeField({
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder='Enter code...'
-            className='w-full min-w-0 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-400'
+            className='w-full min-w-0 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring'
           />
           <Button
             size='lg'
@@ -137,7 +137,7 @@ export default function PromoCodeField({
         </div>
       )}
 
-      {displayError && <p className='text-sm text-red-500'>{displayError}</p>}
+      {displayError && <p className='text-sm text-destructive'>{displayError}</p>}
     </div>
   );
 }

@@ -244,7 +244,7 @@ export default function RevenueChart() {
                     cy={points[hoverIndex].y}
                     r='5.5'
                     fill='#2563eb'
-                    stroke='#ffffff'
+                    stroke='var(--card)'
                     strokeWidth='2.5'
                   />
                 </g>

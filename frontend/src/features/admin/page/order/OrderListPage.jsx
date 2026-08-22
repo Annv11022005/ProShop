@@ -55,14 +55,14 @@ const OrderListPage = () => {
                   {order.isPaid ? (
                     order.paidAt.substring(0, 10)
                   ) : (
-                    <X className='text-red-400 mx-auto' />
+                    <X className='text-destructive mx-auto' />
                   )}
                 </TableCell>
                 <TableCell className='text-center'>
                   {order.isDelivered ? (
                     order.deliveredAt.substring(0, 10)
                   ) : (
-                    <X className='text-red-400 mx-auto' />
+                    <X className='text-destructive mx-auto' />
                   )}
                 </TableCell>
 

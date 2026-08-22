@@ -105,7 +105,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
 
-                  <span className='shrink-0 text-center text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200/80 w-15'>
+                  <span className='shrink-0 text-center text-xs font-semibold rounded-full bg-warning/15 text-warning border border-warning/30 w-15'>
                     Still {product.countInStock}
                   </span>
                 </div>

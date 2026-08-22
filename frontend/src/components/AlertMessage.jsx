@@ -13,10 +13,10 @@ export function Message({ children, variant = 'danger' }) {
   } else if (variant === 'success') {
     return (
       <Alert
-        variant='destructive'
-        className='max-w-md text-[#7aca4c] border-[#a4ce8b]'
+        variant='default'
+        className='max-w-md text-success border-success/40 bg-success/5'
       >
-        <BadgeCheckIcon />
+        <BadgeCheckIcon className='text-success' />
         {children}
       </Alert>
     );

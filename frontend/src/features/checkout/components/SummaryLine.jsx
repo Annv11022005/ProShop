@@ -4,15 +4,15 @@ export default function SummaryLine({ label, value, emphasis = false }) {
       <div
         className={`flex-1 truncate text-sm ${
           emphasis
-            ? 'font-semibold text-emerald-600'
-            : 'font-normal text-neutral-900'
+            ? 'font-semibold text-success'
+            : 'font-normal text-foreground'
         }`}
       >
         {label}
       </div>
       <span
         className={`shrink-0 text-sm font-medium tabular-nums ${
-          emphasis ? 'font-semibold text-emerald-600' : 'text-neutral-900'
+          emphasis ? 'font-semibold text-success' : 'text-foreground'
         }`}
       >
         {value}

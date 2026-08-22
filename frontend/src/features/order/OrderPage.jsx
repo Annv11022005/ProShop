@@ -256,7 +256,7 @@ const OrderPage = () => {
               <p>{formatCurrency(order.taxPrice)}</p>
             </div>
             {order.discount > 0 && (
-              <div className='flex flex-row justify-between text-emerald-600 font-medium'>
+              <div className='flex flex-row justify-between text-success font-medium'>
                 <p>Discount:</p>
                 <p>-{formatCurrency(order.discount)}</p>
               </div>

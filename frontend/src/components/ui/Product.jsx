@@ -82,7 +82,7 @@ const Product = ({ product }) => {
 
         <div className='py-1 bg-muted-foreground/10 mt-2 rounded-xl text-center text-sm flex gap-1 w-25 items-center justify-center text-green-rating font-medium ml-auto'>
           <p className='flex items-center justify-center gap-0.5'>
-            {product.rating} <Star size={14} fill='#0abeaf' />
+            {product.rating} <Star size={14} className='fill-green-rating text-green-rating' />
           </p>
 
           <span className='px-[0.3px] py-2 bg-green-rating' />

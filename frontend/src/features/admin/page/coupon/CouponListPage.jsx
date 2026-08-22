@@ -84,8 +84,7 @@ const CouponListPage = () => {
                     <SquarePenIcon />
                   </Button>
                   <Button
-                    variant=''
-                    className='bg-red-500'
+                    variant='destructive'
                     disabled={pendDelete}
                     onClick={() => {
                       deletedCoupon(coupon._id);

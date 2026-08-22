@@ -11,7 +11,7 @@ const PlaceOrderSummary = ({
 }) => {
   return (
     <aside
-      className='flex w-full max-w-md flex-col gap-6 rounded-2xl border border-neutral-200 p-5'
+      className='flex w-full max-w-md flex-col gap-6 rounded-2xl border border-border p-5'
       aria-label='Order summary'
     >
       <div className='flex items-start justify-between gap-4'>
@@ -19,7 +19,7 @@ const PlaceOrderSummary = ({
           <h2 className='text-base font-semibold text-primary'>
             Order Summary
           </h2>
-          <p className='mt-0.5 text-sm text-neutral-500'>
+          <p className='mt-0.5 text-sm text-muted-foreground'>
             {cart.cartItems.length}{' '}
             {cart.cartItems.length === 1 ? 'item' : 'items'} shipping to Home
           </p>
@@ -32,11 +32,11 @@ const PlaceOrderSummary = ({
             <CartItemRow key={item._id} item={item} />
           ))
         ) : (
-          <p className='text-sm text-neutral-500'>Cart is empty.</p>
+          <p className='text-sm text-muted-foreground'>Cart is empty.</p>
         )}
       </div>
 
-      <div className='h-px w-full bg-neutral-200' />
+      <div className='h-px w-full bg-border' />
 
       <PromoCodeField
         itemsPrice={cart.itemsPrice}
@@ -46,7 +46,7 @@ const PlaceOrderSummary = ({
         initialCouponCode={cart?.coupon?.code}
       />
 
-      <div className='h-px w-full bg-neutral-200' />
+      <div className='h-px w-full bg-border' />
 
       <div className='flex w-full flex-col'>
         <SummaryLine label='Subtotal' value={formatCurrency(cart.itemsPrice)} />
@@ -64,25 +64,25 @@ const PlaceOrderSummary = ({
         )}
       </div>
 
-      <div className='flex flex-col gap-3 rounded-xl border border-dashed border-neutral-300 bg-white p-4'>
+      <div className='flex flex-col gap-3 rounded-xl border border-dashed border-border bg-card p-4'>
         <div className='flex min-w-0 items-start justify-between gap-4'>
           <div className='min-w-0'>
-            <div className='text-base font-semibold text-neutral-900'>
+            <div className='text-base font-semibold text-foreground'>
               Total
             </div>
-            <p className='text-sm text-neutral-500'>
+            <p className='text-sm text-muted-foreground'>
               Delivery, promo, and tax included.
             </p>
           </div>
-          <span className='shrink-0 text-2xl leading-none font-semibold tabular-nums text-neutral-900'>
+          <span className='shrink-0 text-2xl leading-none font-semibold tabular-nums text-foreground'>
             {formatCurrency(totalAfterDiscount)}
           </span>
         </div>
-        <div className='flex min-w-0 items-center justify-between gap-3 border-t border-dashed border-neutral-200 pt-3'>
-          <span className='truncate text-xs text-neutral-500'>
+        <div className='flex min-w-0 items-center justify-between gap-3 border-t border-dashed border-border pt-3'>
+          <span className='truncate text-xs text-muted-foreground'>
             Charged after review
           </span>
-          <span className='inline-flex h-5 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 text-xs font-medium text-emerald-700'>
+          <span className='inline-flex h-5 items-center gap-1 rounded-full border border-success/30 bg-success/10 px-2 text-xs font-medium text-success'>
             Ready to place
           </span>
         </div>

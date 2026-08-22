@@ -64,9 +64,9 @@ const UserListPage = () => {
               </TableCell>
               <TableCell>
                 {user.isAdmin ? (
-                  <CheckIcon className='mx-auto text-green-500' />
+                  <CheckIcon className='mx-auto text-success' />
                 ) : (
-                  <X className='mx-auto text-red-500' />
+                  <X className='mx-auto text-destructive' />
                 )}
               </TableCell>
 
@@ -74,7 +74,7 @@ const UserListPage = () => {
                 <UserEditDialog userId={user._id} onSuccess={refetch} />
 
                 <Button
-                  className='bg-red-500'
+                  variant='destructive'
                   onClick={() => deleteHandler(user._id)}
                 >
                   <Trash2 />

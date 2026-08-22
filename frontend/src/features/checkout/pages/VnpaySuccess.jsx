@@ -24,9 +24,9 @@ const VnpaySuccess = () => {
           <EmptyMedia>
             <IconStack aria-hidden='true' className='text-primary h-24 w-22'>
               {isSuccess ? (
-                <SparklesIcon className='text-green-500 size-6' />
+                <SparklesIcon className='text-success size-6' />
               ) : (
-                <XCircleIcon className='text-red-500 size-6' />
+                <XCircleIcon className='text-destructive size-6' />
               )}
             </IconStack>
           </EmptyMedia>

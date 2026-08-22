@@ -39,18 +39,18 @@ export default function AllCouponPage() {
       <section className='mx-auto w-full max-w-6xl'>
         <header className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
           <div className='flex min-w-0 flex-col gap-2'>
-            <h1 className='text-xs font-semibold tracking-widest text-neutral-500 uppercase'>
+            <h1 className='text-xs font-semibold tracking-widest text-muted-foreground uppercase'>
               Offers
             </h1>
-            <h2 className='mt-2 text-2xl font-bold text-neutral-900'>
+            <h2 className='mt-2 text-2xl font-bold text-foreground'>
               Current Offers
             </h2>
-            <p className='mt-2 text-sm text-neutral-600'>
+            <p className='mt-2 text-sm text-muted-foreground'>
               View current offers and copy codes directly to clipboard.
             </p>
           </div>
           <div className='inline-flex shrink-0 items-baseline gap-1.5 self-start text-sm tabular-nums text-muted-foreground sm:self-auto'>
-            <p className='text-sm text-neutral-500'>
+            <p className='text-sm text-muted-foreground'>
               Showing {coupons.length} of{' '}
               {couponResponse?.count ?? coupons.length} <span>offers</span>
             </p>

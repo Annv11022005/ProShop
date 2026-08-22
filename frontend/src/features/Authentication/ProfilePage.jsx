@@ -490,17 +490,17 @@ const ProfilePage = () => {
                   </div>
 
                   {latestOrder.isDelivered === true ? (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-green-rating/20 px-3 py-1 rounded-3xl text-green-900 font-semibold'>
+                    <div className='my-auto flex gap-2 justify-center items-center bg-success/15 px-3 py-1 rounded-3xl text-success font-semibold'>
                       <Check size={16} />
                       Delivered
                     </div>
                   ) : latestOrder.isCancelled === true ? (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-[#DF301C] font-semibold'>
+                    <div className='my-auto flex gap-2 justify-center items-center bg-destructive/10 px-3 py-1 rounded-3xl text-destructive font-semibold'>
                       <CircleX size={16} />
                       Has Been Cancelled
                     </div>
                   ) : (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-red-50 px-3 py-1 rounded-3xl text-[#DF301C] font-semibold'>
+                    <div className='my-auto flex gap-2 justify-center items-center bg-warning/10 px-3 py-1 rounded-3xl text-warning font-semibold'>
                       <Truck size={16} />
                       On the way
                     </div>

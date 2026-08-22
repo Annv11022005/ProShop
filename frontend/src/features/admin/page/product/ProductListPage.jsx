@@ -101,7 +101,7 @@ const ProductListPage = () => {
                 </TableCell>
                 <TableCell className='text-center'>{product.brand}</TableCell>
                 <TableCell className='text-center'>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.status === 'Active' ? 'bg-green-100 text-green-800' : product.status === 'Schedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.status === 'Active' ? 'bg-success/15 text-success' : product.status === 'Schedule' ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
                     {product.status || 'Draft'}
                   </span>
                 </TableCell>

@@ -23,6 +23,7 @@ import {
 } from './ui/dropdown-menu';
 
 import NotificationDropdown from '@/features/authentication/components/NotificationDropdown';
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const { logoutUser, isPending } = useLogout();
@@ -61,6 +62,8 @@ const Header = () => {
         </div>
 
         <div className='flex items-center gap-3 action'>
+          <ThemeToggle />
+
           <Link to='/cart'>
             <Button size='lg' className=' relative'>
               <ShoppingCart /> Cart
