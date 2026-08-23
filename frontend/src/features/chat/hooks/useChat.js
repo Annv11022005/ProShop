@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getMessages,
   getUserChat,
@@ -36,7 +36,7 @@ export function useGetMessages(id) {
   const {
     isPending,
     error,
-    data: HistoryMessages,
+    data: HistoryMessages = [],
   } = useQuery({
     queryKey: ['message', id],
     queryFn: () => getMessages(id),
@@ -47,13 +47,50 @@ export function useGetMessages(id) {
 }
 
 export function useSendMessage() {
+  const queryClient = useQueryClient();
+
   const {
     isPending,
     error,
     mutate: sendedMessage,
   } = useMutation({
     mutationFn: sendMessage,
+    onMutate: async ({ user: receiverId, tempMessage }) => {
+      await queryClient.cancelQueries({ queryKey: ['message', receiverId] });
+
+      const previousMessages =
+        queryClient.getQueryData(['message', receiverId]) || [];
+
+      if (tempMessage) {
+        queryClient.setQueryData(['message', receiverId], (old = []) => [
+          ...old,
+          tempMessage,
+        ]);
+      }
+
+      return { previousMessages, receiverId, tempId: tempMessage?._id };
+    },
+    onSuccess: (savedMessage, variables, context) => {
+      const receiverId = variables.user;
+      const tempId = context?.tempId;
+
+      queryClient.setQueryData(['message', receiverId], (old = []) => {
+        if (!tempId) return [...old, savedMessage];
+        return old.map((m) => (m._id === tempId ? savedMessage : m));
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+    onError: (err, variables, context) => {
+      if (context?.receiverId && context?.previousMessages) {
+        queryClient.setQueryData(
+          ['message', context.receiverId],
+          context.previousMessages,
+        );
+      }
+    },
   });
 
   return { isPending, error, sendedMessage };
 }
+

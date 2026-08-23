@@ -1,11 +1,10 @@
 import { Spinner } from '@/components/ui/spinner';
-import { messageSentLocally, setMessages } from '@/features/chat/chatSlice';
 import {
   useGetMessages,
   useGetUserChatForAdmin,
   useSendMessage,
 } from '@/features/chat/hooks/useChat';
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'sonner';
@@ -16,10 +15,14 @@ import ChatWindow from '../../component/ChatWindow';
 const MessageManagementPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [text, setText] = useState('');
-
   const dispatch = useDispatch();
+  const typingTimeoutRef = useRef(null);
+
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const messages = useSelector((state) => state.chat.messages);
+  const typingUsers = useSelector((state) => state.chat?.typingUsers || {});
+  const isUserTyping = selectedUser?._id
+    ? !!typingUsers[selectedUser._id]
+    : false;
 
   const {
     isPending: pendingUsers,
@@ -27,22 +30,49 @@ const MessageManagementPage = () => {
     userId: chatUsers,
   } = useGetUserChatForAdmin();
 
-  const { isPending: pendingMessages, HistoryMessages } = useGetMessages(
+  const { isPending: pendingMessages, HistoryMessages = [] } = useGetMessages(
     selectedUser?._id,
   );
 
   const { sendedMessage } = useSendMessage();
 
-  useEffect(() => {
-    if (HistoryMessages) {
-      dispatch(setMessages(HistoryMessages));
-    }
-  }, [HistoryMessages, dispatch]);
-
   function handleSelectUser(user) {
+    if (selectedUser?._id && typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      dispatch({
+        type: 'socket/stopTyping',
+        payload: { receiverId: selectedUser._id },
+      });
+    }
     setSelectedUser(user);
     setText('');
-    dispatch(setMessages([]));
+  }
+
+  function handleInputChange(val) {
+    setText(val);
+
+    if (!selectedUser?._id) return;
+
+    if (val.trim().length > 0) {
+      dispatch({
+        type: 'socket/typing',
+        payload: { receiverId: selectedUser._id },
+      });
+
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        dispatch({
+          type: 'socket/stopTyping',
+          payload: { receiverId: selectedUser._id },
+        });
+      }, 1500);
+    } else {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      dispatch({
+        type: 'socket/stopTyping',
+        payload: { receiverId: selectedUser._id },
+      });
+    }
   }
 
   function handleSend() {
@@ -51,27 +81,36 @@ const MessageManagementPage = () => {
     const receiverId = selectedUser?._id;
     if (!receiverId) return;
 
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    dispatch({
+      type: 'socket/stopTyping',
+      payload: { receiverId },
+    });
+
     const formData = new FormData();
     formData.append('text', text);
 
-    // Optimistic update
-    const optimisticMessage = {
-      _id: `chat-${Date.now()}`,
+    const tempId = `chat-${Date.now()}`;
+    const tempMessage = {
+      _id: tempId,
       senderId: userInfo._id,
       receiverId,
       text,
       createdAt: new Date().toISOString(),
     };
-    dispatch(messageSentLocally(optimisticMessage));
+
     setText('');
 
     sendedMessage(
-      { user: receiverId, data: formData },
+      { user: receiverId, data: formData, tempMessage },
       {
         onError: (err) =>
-          toast.error(err?.response?.data?.message || 'Gửi tin nhắn thất bại', {
-            position: 'top-center',
-          }),
+          toast.error(
+            err?.response?.data?.message ||
+              err?.message ||
+              'Gửi tin nhắn thất bại',
+            { position: 'top-center' },
+          ),
       },
     );
   }
@@ -100,13 +139,14 @@ const MessageManagementPage = () => {
         </div>
       ) : (
         <ChatWindow
-          messages={messages}
+          messages={HistoryMessages}
           selectedUser={selectedUser}
           text={text}
-          setText={setText}
+          setText={handleInputChange}
           onSend={handleSend}
           onKeyDown={handleKeyDown}
           adminId={userInfo._id}
+          isUserTyping={isUserTyping}
         />
       )}
     </div>
@@ -114,3 +154,5 @@ const MessageManagementPage = () => {
 };
 
 export default MessageManagementPage;
+
+

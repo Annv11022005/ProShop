@@ -28,13 +28,14 @@ const ChatWindow = ({
   onSend,
   onKeyDown,
   adminId,
+  isUserTyping,
 }) => {
   const bottomRef = useRef(null);
 
-  // Auto-scroll
+  // Auto-scroll khi có tin nhắn mới hoặc user đang gõ
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isUserTyping]);
 
   // Chưa chọn user → hiển thị empty state
   if (!selectedUser) {
@@ -85,7 +86,15 @@ const ChatWindow = ({
         </Avatar>
         <div className='leading-tight'>
           <p className='text-sm font-semibold'>{selectedUser.name}</p>
-          <p className='text-xs text-muted-foreground'>{selectedUser.email}</p>
+          <p className='text-xs text-muted-foreground'>
+            {isUserTyping ? (
+              <span className='font-medium text-emerald-500 animate-pulse'>
+                Đang soạn tin nhắn...
+              </span>
+            ) : (
+              selectedUser.email
+            )}
+          </p>
         </div>
       </div>
 
@@ -152,6 +161,36 @@ const ChatWindow = ({
               </Message>
             );
           })}
+
+          {/* Typing Indicator */}
+          {isUserTyping && (
+            <Message className='items-start'>
+              <MessageAvatar>
+                <Avatar className='h-7 w-7'>
+                  <AvatarImage
+                    src={selectedUser.avatar}
+                    alt={selectedUser.name}
+                  />
+                  <AvatarFallback className='text-[10px]'>
+                    {getInitials(selectedUser.name)}
+                  </AvatarFallback>
+                </Avatar>
+              </MessageAvatar>
+
+              <MessageContent className='items-start'>
+                <Bubble
+                  variant='muted'
+                  className='rounded-2xl rounded-bl-sm border border-border/60 bg-muted/60'
+                >
+                  <BubbleContent className='flex items-center gap-1.5 px-3 py-2'>
+                    <span className='h-2 w-2 rounded-full bg-muted-foreground/70 animate-bounce [animation-delay:-0.3s]' />
+                    <span className='h-2 w-2 rounded-full bg-muted-foreground/70 animate-bounce [animation-delay:-0.15s]' />
+                    <span className='h-2 w-2 rounded-full bg-muted-foreground/70 animate-bounce' />
+                  </BubbleContent>
+                </Bubble>
+              </MessageContent>
+            </Message>
+          )}
         </MessageGroup>
         <div ref={bottomRef} />
       </div>
@@ -179,3 +218,4 @@ const ChatWindow = ({
 };
 
 export default ChatWindow;
+

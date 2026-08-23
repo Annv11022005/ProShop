@@ -3,9 +3,12 @@ import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
   const [search, setSearch] = useState('');
+  const onlineUsers = useSelector((state) => state.chat?.onlineUsers || []);
+  const typingUsers = useSelector((state) => state.chat?.typingUsers || {});
 
   const filteredUsers = users.filter((u) =>
     u.name?.toLowerCase().includes(search.toLowerCase()),
@@ -40,41 +43,56 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
           </p>
         )}
 
-        {filteredUsers.map((user) => (
-          <button
-            key={user._id}
-            onClick={() => onSelectUser(user)}
-            className={cn(
-              'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/60',
-              selectedUserId === user._id &&
-                'bg-primary/5 border-r-2 border-r-primary',
-            )}
-          >
-            <div className='relative'>
-              <Avatar className='h-10 w-10'>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='text-xs font-medium'>
-                  {user.name
-                    ?.split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+        {filteredUsers.map((user) => {
+          const isOnline = onlineUsers.includes(user._id?.toString());
+          const isTyping = !!typingUsers[user._id?.toString()];
+          return (
+            <button
+              key={user._id}
+              onClick={() => onSelectUser(user)}
+              className={cn(
+                'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/60',
+                selectedUserId === user._id &&
+                  'bg-primary/5 border-r-2 border-r-primary',
+              )}
+            >
+              <div className='relative'>
+                <Avatar className='h-10 w-10'>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className='text-xs font-medium'>
+                    {user.name
+                      ?.split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {isOnline && (
+                  <span className='absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-background' />
+                )}
+              </div>
 
-            <div className='min-w-0 flex-1'>
-              <p className='truncate text-sm font-medium'>{user.name}</p>
-              <p className='truncate text-xs text-muted-foreground'>
-                {user.email}
-              </p>
-            </div>
-          </button>
-        ))}
+              <div className='min-w-0 flex-1'>
+                <p className='truncate text-sm font-medium'>{user.name}</p>
+                {isTyping ? (
+                  <p className='truncate text-xs font-medium text-emerald-500 animate-pulse'>
+                    Đang soạn tin...
+                  </p>
+                ) : (
+                  <p className='truncate text-xs text-muted-foreground'>
+                    {user.email}
+                  </p>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 };
 
+
 export default ChatSidebar;
+

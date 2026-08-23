@@ -6,6 +6,7 @@ const LoginWithThird = () => {
     <div className='flex flex-row gap-3 mx-auto'>
       <Field className='w-25'>
         <Button
+          type='button'
           size='lg'
           onClick={() => {
             window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/v1/users/auth/facebook`;
@@ -24,6 +25,7 @@ const LoginWithThird = () => {
 
       <Field className='w-25'>
         <Button
+          type='button'
           size='lg'
           onClick={() => {
             window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/v1/users/auth/google`;

@@ -1,10 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  messageSendFailed,
-  messageSentLocally,
-  messageSentSuccess,
-  setMessages,
-} from './chatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useGetIdSeller,
@@ -41,28 +35,31 @@ import {
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const messages = useSelector((state) => state.chat.messages);
+  const { userInfo } = useSelector((state) => state.auth);
+  const typingUsers = useSelector((state) => state.chat?.typingUsers || {});
   const [text, setText] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const bottomRef = useRef(null);
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   const { isPending: penSeller, error: errSeller, sellerId } = useGetIdSeller();
+  const activeSellerId = sellerId?.[0]?._id;
+  const isSellerTyping = activeSellerId ? !!typingUsers[activeSellerId] : false;
+
   const {
     isPending: pendMessage,
     error: errMessage,
-    HistoryMessages,
-  } = useGetMessages(sellerId?.[0]?._id);
+    HistoryMessages = [],
+  } = useGetMessages(activeSellerId);
   const { sendedMessage } = useSendMessage();
 
   // Create preview URL when imageFile changes
   useEffect(() => {
     if (imageFile) {
       const url = URL.createObjectURL(imageFile);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
     } else {
@@ -76,26 +73,54 @@ const ChatWidget = () => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 50);
     }
-  }, [messages, isOpen]);
+  }, [HistoryMessages, isSellerTyping, isOpen]);
 
-  useEffect(() => {
-    if (HistoryMessages) {
-      dispatch(setMessages(HistoryMessages));
-    }
-  }, [HistoryMessages, dispatch]);
+  if (!userInfo) return null;
 
-  if (penSeller || pendMessage) return <Spinner />;
+  if (penSeller || (pendMessage && isOpen)) return <Spinner />;
 
   if (errSeller || errMessage)
     return (
       <AlertMessage>{errSeller?.message || errMessage?.message}</AlertMessage>
     );
 
+  function handleInputChange(e) {
+    const val = e.target.value;
+    setText(val);
+
+    if (!activeSellerId) return;
+
+    if (val.trim().length > 0) {
+      dispatch({
+        type: 'socket/typing',
+        payload: { receiverId: activeSellerId },
+      });
+
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        dispatch({
+          type: 'socket/stopTyping',
+          payload: { receiverId: activeSellerId },
+        });
+      }, 1500);
+    } else {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      dispatch({
+        type: 'socket/stopTyping',
+        payload: { receiverId: activeSellerId },
+      });
+    }
+  }
+
   function handleSend() {
     if (!text.trim() && !imageFile) return;
+    if (!activeSellerId || !userInfo?._id) return;
 
-    const receiverId = sellerId?.[0]?._id;
-    if (!receiverId) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    dispatch({
+      type: 'socket/stopTyping',
+      payload: { receiverId: activeSellerId },
+    });
 
     const formData = new FormData();
     formData.append('text', text);
@@ -105,33 +130,32 @@ const ChatWidget = () => {
     const localImageUrl = imageFile
       ? URL.createObjectURL(imageFile)
       : undefined;
-    const optimisticMessage = {
+    const tempMessage = {
       _id: tempId,
       senderId: userInfo._id,
-      receiverId,
+      receiverId: activeSellerId,
       text,
       image: localImageUrl,
       createdAt: new Date().toISOString(),
     };
-    dispatch(messageSentLocally(optimisticMessage));
 
     setText('');
     setImageFile(null);
 
     sendedMessage(
-      { user: receiverId, data: formData },
+      { user: activeSellerId, data: formData, tempMessage },
       {
-        onSuccess: (savedMessage) => {
-          dispatch(messageSentSuccess({ tempId, message: savedMessage }));
+        onSuccess: () => {
           if (localImageUrl) URL.revokeObjectURL(localImageUrl);
         },
         onError: (err) => {
-          // gỡ message tạm khỏi UI vì gửi thất bại
-          dispatch(messageSendFailed(tempId));
           if (localImageUrl) URL.revokeObjectURL(localImageUrl);
-          toast.error(err.message.data, {
-            position: 'top-center',
-          });
+          toast.error(
+            err?.response?.data?.message ||
+              err?.message ||
+              'Gửi tin nhắn thất bại',
+            { position: 'top-center' },
+          );
         },
       },
     );
@@ -200,14 +224,14 @@ const ChatWidget = () => {
           {/* Messages */}
           <CardContent className='flex h-96 flex-col gap-1 overflow-y-auto p-4'>
             <MessageGroup className='flex flex-col gap-3'>
-              {messages.map((m) => (
+              {HistoryMessages.map((m) => (
                 <Message
                   key={m._id}
                   className={
                     m.senderId === userInfo._id ? 'flex-row-reverse' : ''
                   }
                 >
-                  {m.senderId === sellerId[0]?._id && (
+                  {m.senderId === activeSellerId && (
                     <MessageAvatar>
                       <Avatar className='h-7 w-7 border border-border/60'>
                         <AvatarImage src='/avatars/shop.png' alt='Shop' />
@@ -244,6 +268,30 @@ const ChatWidget = () => {
                   </MessageContent>
                 </Message>
               ))}
+
+              {/* Typing Indicator */}
+              {isSellerTyping && (
+                <Message className='items-start'>
+                  <MessageAvatar>
+                    <Avatar className='h-7 w-7 border border-border/60'>
+                      <AvatarImage src='/avatars/shop.png' alt='Shop' />
+                      <AvatarFallback>SP</AvatarFallback>
+                    </Avatar>
+                  </MessageAvatar>
+                  <MessageContent className='items-start'>
+                    <Bubble
+                      variant='muted'
+                      className='rounded-2xl rounded-bl-sm border border-border/60 bg-muted/60'
+                    >
+                      <BubbleContent className='flex items-center gap-1.5 px-3 py-2'>
+                        <span className='h-1 w-1 rounded-full bg-muted-foreground/70 animate-bounce [animation-delay:-0.3s]' />
+                        <span className='h-1 w-1 rounded-full bg-muted-foreground/70 animate-bounce [animation-delay:-0.15s]' />
+                        <span className='h-1 w-1 rounded-full bg-muted-foreground/70 animate-bounce' />
+                      </BubbleContent>
+                    </Bubble>
+                  </MessageContent>
+                </Message>
+              )}
             </MessageGroup>
 
             <div ref={bottomRef} />
@@ -295,7 +343,7 @@ const ChatWidget = () => {
               </InputGroupAddon>
               <InputGroupInput
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder='Enter Messages'
                 className='text-sm'
@@ -318,6 +366,7 @@ const ChatWidget = () => {
       )}
 
       {!isOpen && (
+
         <Button
           className='h-12 w-12 rounded-full border border-border/60 shadow-lg transition-transform hover:scale-105 active:scale-95'
           onClick={() => setIsOpen(true)}

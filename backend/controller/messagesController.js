@@ -2,7 +2,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import Message from '../model/messagesModel.js';
 import User from '../model/userModel.js';
 import { hasImageKitConfig, uploadChatMedia } from '../config/imageKit.js';
-import { getReceiverSocketId, io } from '../socket/index.js';
+import { sendToUser } from '../socket/index.js';
 
 // @desc get user seller
 // GET /api/v1/messages
@@ -122,12 +122,10 @@ export const sendMessage = asyncHandler(async (req, res) => {
 
   await newMessage.save();
 
-  // TODO: realtime with socketio
-  const receiverSocketId = getReceiverSocketId(receiverId);
+  // Gửi realtime tới tất cả thiết bị của người nhận và người gửi (đồng bộ đa tab)
+  sendToUser(receiverId, 'newMessage', newMessage);
+  sendToUser(senderId, 'newMessage', newMessage);
 
-  // only send the message in realtime if user is online
-  if (receiverSocketId) {
-    io.to(receiverSocketId).emit('newMessage', newMessage);
-  }
   res.status(201).json(newMessage);
 });
+
