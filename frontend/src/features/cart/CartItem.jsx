@@ -47,6 +47,7 @@ const CartItem = ({ item, addToCartHandler, removeCart }) => {
 
       <Button
         size='lg'
+        aria-label={`Remove ${item.name} from cart`}
         className='my-auto'
         onClick={() => removeCart(item._id, item.variantId)}
       >

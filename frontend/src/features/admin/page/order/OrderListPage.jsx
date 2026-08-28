@@ -12,7 +12,7 @@ import {
 import { formatCurrency } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 
 const OrderListPage = () => {
   const { isPending, error, allOrders } = useGetOrders();
@@ -27,12 +27,13 @@ const OrderListPage = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='text-center'>ID</TableHead>
-              <TableHead className='text-center'>USER</TableHead>
-              <TableHead className='text-center'>DATE</TableHead>
-              <TableHead className='text-center'>TOTAL</TableHead>
-              <TableHead className='text-center'>PAID</TableHead>
-              <TableHead className='text-center'>DELIVERED</TableHead>
+              <TableHead scope='col' className='text-center'>ID</TableHead>
+              <TableHead scope='col' className='text-center'>USER</TableHead>
+              <TableHead scope='col' className='text-center'>DATE</TableHead>
+              <TableHead scope='col' className='text-center'>TOTAL</TableHead>
+              <TableHead scope='col' className='text-center'>PAID</TableHead>
+              <TableHead scope='col' className='text-center'>DELIVERED</TableHead>
+              <TableHead scope='col' className='text-right'>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -67,8 +68,11 @@ const OrderListPage = () => {
                 </TableCell>
 
                 <TableCell className='text-right'>
-                  <Link to={`/order/${order._id}`}>
-                    <Button size='sm'>Detail</Button>
+                  <Link
+                    to={`/order/${order._id}`}
+                    className={buttonVariants({ size: 'sm' })}
+                  >
+                    Detail
                   </Link>
                 </TableCell>
               </TableRow>

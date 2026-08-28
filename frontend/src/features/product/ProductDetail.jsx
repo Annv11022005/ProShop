@@ -38,7 +38,7 @@ const ProductDetail = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
 
-  const userInfo = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
 
   const selectedVariant = product?.variants?.[selectedVariantIndex] || null;
   const countInStock = selectedVariant?.countInStock ?? product?.countInStock;

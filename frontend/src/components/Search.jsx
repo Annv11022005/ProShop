@@ -18,12 +18,13 @@ const Search = () => {
 
   return (
     <form onSubmit={handlerSubmit}>
-      <Field className='w-100'>
+      <Field className='w-full max-w-md sm:w-80 md:w-96'>
         <Input
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           id='search'
           type='search'
+          aria-label='Search products'
           placeholder='Search Product ...'
           className='rounded-lg h-10 py-0 px-2'
         />

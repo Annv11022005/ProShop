@@ -43,10 +43,11 @@ const UserListPage = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='text-center'>ID</TableHead>
-            <TableHead className='text-center'>NAME</TableHead>
-            <TableHead className='text-center'>EMAIL</TableHead>
-            <TableHead className='text-center'>ADMIN</TableHead>
+            <TableHead scope='col' className='text-center'>ID</TableHead>
+            <TableHead scope='col' className='text-center'>NAME</TableHead>
+            <TableHead scope='col' className='text-center'>EMAIL</TableHead>
+            <TableHead scope='col' className='text-center'>ADMIN</TableHead>
+            <TableHead scope='col' className='text-right'>ACTIONS</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -75,6 +76,7 @@ const UserListPage = () => {
 
                 <Button
                   variant='destructive'
+                  aria-label={`Delete ${user.name}`}
                   onClick={() => deleteHandler(user._id)}
                 >
                   <Trash2 />

@@ -346,6 +346,7 @@ const ChatWidget = () => {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder='Enter Messages'
+                aria-label='Type your message'
                 className='text-sm'
               />
               <InputGroupAddon align='inline-end'>
@@ -353,6 +354,7 @@ const ChatWidget = () => {
                   type='submit'
                   variant='default'
                   size='icon-sm'
+                  aria-label='Send message'
                   disabled={!text.trim() && !imageFile}
                   onClick={handleSend}
                   className='rounded-full bg-primary text-primary-foreground hover:bg-primary/90'
@@ -366,8 +368,8 @@ const ChatWidget = () => {
       )}
 
       {!isOpen && (
-
         <Button
+          aria-label='Open support chat'
           className='h-12 w-12 rounded-full border border-border/60 shadow-lg transition-transform hover:scale-105 active:scale-95'
           onClick={() => setIsOpen(true)}
         >

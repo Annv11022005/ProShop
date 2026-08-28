@@ -3,12 +3,10 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import ProductPrice from '@/features/product/components/ProductPrice';
-import { Star } from 'lucide-react';
+import { Star, ShoppingBag } from 'lucide-react';
 import WishlistIcon from '../WishlistIcon';
 import {
   useAddToWishlist,
@@ -16,10 +14,12 @@ import {
   useRemoveFromWishlist,
 } from '@/features/authentication/hooks/useWishlist';
 import { Spinner } from './spinner';
+import { formatCurrency, cn } from '@/lib/utils';
 
 function formatCompact(num) {
+  if (num === null || num === undefined) return '0';
   if (num >= 1000) {
-    return (num / 10).toFixed(1) + 'k';
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
   }
 
   return num.toString();
@@ -49,56 +49,96 @@ const Product = ({ product }) => {
       : product.image?.[0]?.url || product.images?.[0]?.url || '';
 
   const price = product.price ?? product.variants?.[0]?.price ?? 0;
-  const originalPrice = product.originalPrice ?? product.variants?.[0]?.originalPrice;
+  const originalPrice =
+    product.originalPrice ?? product.variants?.[0]?.originalPrice;
 
   if (isPending) return <Spinner />;
 
-  return (
-    <Card className='flex h-full flex-col overflow-hidden p-0'>
-      <CardHeader className='p-0'>
-        <CardTitle>
-          <div className='aspect-4/3 relative w-full overflow-hidden rounded-md bg-muted'>
-            <Link to={`/product/${product.slug || product._id}`}>
-              <img
-                src={imageUrl}
-                alt={product.name}
-                className='h-full w-full object-cover transition-transform duration-300'
-              />
-            </Link>
+  const targetLink = `/product/${product.slug || product._id}`;
 
-            <WishlistIcon
-              isActive={isInWishlist}
-              onClick={handleToggleWishlist}
+  return (
+    <Card className='group relative flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card text-card-foreground shadow-2xs hover:shadow-md hover:border-primary/30 transition-all duration-200 p-0'>
+      {/* Top Media / Image Container */}
+      <CardHeader className='p-0 relative overflow-hidden'>
+        <div className='aspect-4/3 relative w-full overflow-hidden bg-muted/50'>
+          <Link to={targetLink} className='block w-full h-full'>
+            <img
+              src={imageUrl || '/images/sample.jpg'}
+              alt={product.name}
+              loading='lazy'
+              className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
             />
-          </div>
-        </CardTitle>
+          </Link>
+
+          {/* Wishlist Button */}
+          <WishlistIcon
+            isActive={isInWishlist}
+            onClick={handleToggleWishlist}
+          />
+        </div>
       </CardHeader>
-      <CardContent>
-        <Link to={`/product/${product.slug || product._id}`}>
-          <h1 className='product-title'>{product.name}</h1>
+
+      {/* Main Card Content */}
+      <CardContent className='flex flex-1 flex-col gap-1'>
+        {/* Brand mini subtitle */}
+        {product.brand && (
+          <span className='text-[11px] font-medium uppercase tracking-wider text-muted-foreground line-clamp-1'>
+            {product.brand}
+          </span>
+        )}
+
+        {/* Product Title */}
+        <Link to={targetLink} className='group/title'>
+          <h2 className='text-sm font-semibold leading-snug text-foreground group-hover/title:text-primary transition-colors line-clamp-2 min-h-[2.25rem]'>
+            {product.name}
+          </h2>
         </Link>
 
-        <p className='text-sm text-muted-foreground mt-1'>{product.subtitle}</p>
-
-        <div className='py-1 bg-muted-foreground/10 mt-2 rounded-xl text-center text-sm flex gap-1 w-25 items-center justify-center text-green-rating font-medium ml-auto'>
-          <p className='flex items-center justify-center gap-0.5'>
-            {product.rating} <Star size={14} className='fill-green-rating text-green-rating' />
+        {/* Product Subtitle */}
+        {product.subtitle && (
+          <p className='text-xs text-muted-foreground line-clamp-1 leading-normal'>
+            {product.subtitle}
           </p>
+        )}
 
-          <span className='px-[0.3px] py-2 bg-green-rating' />
+        {/* Rating & Sold Stats Row */}
+        <div className='flex items-center gap-2 text-xs text-muted-foreground mt-auto pt-1.5'>
+          <div className='flex items-center gap-1 text-foreground font-semibold'>
+            <Star size={12} className='fill-amber-400 text-amber-400' />
+            <span className='text-[11px]'>{product.rating || '5.0'}</span>
+          </div>
 
-          <p>{formatCompact(product.qtySold)}</p>
+          <span className='text-border'>•</span>
+
+          <span className='text-[11px] text-muted-foreground'>
+            {formatCompact(product.qtySold || 0)} sold
+          </span>
         </div>
       </CardContent>
 
-      <CardFooter className='mt-auto'>
-        <div className='flex items-center w-full justify-between'>
-          <ProductPrice
-            price={price}
-            originalPrice={originalPrice}
-          />
-          <Link to={`/product/${product.slug || product._id}`}>
-            <Button>Buy Now</Button>
+      {/* Footer Price & Action Button */}
+      <CardFooter className='p-3 mt-auto'>
+        <div className='flex items-center justify-between w-full gap-2'>
+          <div className='flex flex-col min-w-0'>
+            <span className='text-sm font-bold text-foreground truncate'>
+              {formatCurrency(price)}
+            </span>
+            {originalPrice && originalPrice > price && (
+              <span className='text-[11px] text-muted-foreground line-through truncate'>
+                {formatCurrency(originalPrice)}
+              </span>
+            )}
+          </div>
+
+          <Link
+            to={targetLink}
+            className={cn(
+              buttonVariants({ size: 'sm' }),
+              'h-7 px-2.5 text-xs font-medium rounded-lg shrink-0 gap-1 shadow-2xs hover:shadow-xs transition-shadow',
+            )}
+          >
+            <ShoppingBag size={12} />
+            <span>Buy</span>
           </Link>
         </div>
       </CardFooter>

@@ -2,8 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/authentication/authSlice';
 import { useLogout } from '@/features/authentication/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
-import { Button } from './ui/button';
+import { Button, buttonVariants } from './ui/button';
 import {
   LogIn,
   LogOutIcon,
@@ -30,7 +31,7 @@ const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
-  const avatar = userInfo?.name.charAt(0).toUpperCase();
+  const avatar = userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : '';
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -50,12 +51,12 @@ const Header = () => {
   return (
     <header>
       <nav className='navbar'>
-        <div className='brand'>
+        <Link to='/' className='brand'>
           <div className='mark'>
             <div className='glyph'></div>
           </div>
-          <Link to='/'>ProShop</Link>
-        </div>
+          <span>ProShop</span>
+        </Link>
 
         <div>
           <Search />
@@ -64,13 +65,14 @@ const Header = () => {
         <div className='flex items-center gap-3 action'>
           <ThemeToggle />
 
-          <Link to='/cart'>
-            <Button size='lg' className=' relative'>
-              <ShoppingCart /> Cart
-              {userInfo && cartItems.length > 0 && (
-                <span className='buble'>{cartItems.length}</span>
-              )}
-            </Button>
+          <Link
+            to='/cart'
+            className={cn(buttonVariants({ size: 'lg' }), 'relative')}
+          >
+            <ShoppingCart /> Cart
+            {userInfo && cartItems.length > 0 && (
+              <span className='buble'>{cartItems.length}</span>
+            )}
           </Link>
 
           {userInfo && <NotificationDropdown />}
@@ -82,6 +84,7 @@ const Header = () => {
                   <Button
                     variant='outline'
                     size='lg'
+                    aria-label='Open user menu'
                     className='rounded-full w-9 h-9'
                   >
                     {avatar}
@@ -89,20 +92,16 @@ const Header = () => {
                 }
               />
               <DropdownMenuContent>
-                <Link to='/profile'>
-                  <DropdownMenuItem>
-                    <UserIcon />
-                    Profile
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem render={<Link to='/profile' />}>
+                  <UserIcon />
+                  Profile
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
 
-                <Link to='/coupon'>
-                  <DropdownMenuItem>
-                    <TicketPercent />
-                    Coupon
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem render={<Link to='/coupon' />}>
+                  <TicketPercent />
+                  Coupon
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
@@ -122,6 +121,7 @@ const Header = () => {
                   <Button
                     variant='outline'
                     size='lg'
+                    aria-label='Open admin menu'
                     className='rounded-full w-9 h-9'
                   >
                     {avatar}
@@ -129,12 +129,10 @@ const Header = () => {
                 }
               />
               <DropdownMenuContent>
-                <Link to='/admin'>
-                  <DropdownMenuItem>
-                    <Store />
-                    Manager
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem render={<Link to='/admin' />}>
+                  <Store />
+                  Manager
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
@@ -148,10 +146,8 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to='/login'>
-              <Button size='lg'>
-                <LogIn /> Sign in
-              </Button>
+            <Link to='/login' className={buttonVariants({ size: 'lg' })}>
+              <LogIn /> Sign in
             </Link>
           )}
         </div>

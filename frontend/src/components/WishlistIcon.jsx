@@ -4,6 +4,8 @@ const WishlistIcon = ({ isActive, onClick }) => {
   return (
     <button
       type='button'
+      aria-label={isActive ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-pressed={isActive}
       className='w-8 h-8 flex items-center justify-center rounded-full bg-muted-foreground/20 absolute top-3 right-3 z-10 transition-colors'
       onClick={onClick}
     >

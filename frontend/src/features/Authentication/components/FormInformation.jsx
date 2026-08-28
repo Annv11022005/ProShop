@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
@@ -46,6 +47,7 @@ const FormInformation = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               type='text'
+              autoComplete='name'
               placeholder='Enter name'
               className='rounded-lg'
             />
@@ -59,6 +61,7 @@ const FormInformation = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type='email'
+              autoComplete='email'
               placeholder='Enter Email'
               className='rounded-lg'
             />
@@ -76,14 +79,20 @@ const FormInformation = ({
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 type={isCurrentPassword ? 'text' : 'password'}
+                autoComplete='current-password'
                 placeholder='Enter current password (required to change password)'
               />
-              <InputGroupAddon
-                className='cursor-pointer'
-                align='inline-end'
-                onClick={handleToggleCurrent}
-              >
-                {!isCurrentPassword ? <EyeOffIcon /> : <EyeIcon />}
+              <InputGroupAddon align='inline-end'>
+                <InputGroupButton
+                  type='button'
+                  size='icon-xs'
+                  aria-label={
+                    isCurrentPassword ? 'Hide password' : 'Show password'
+                  }
+                  onClick={handleToggleCurrent}
+                >
+                  {!isCurrentPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
           </Field>
@@ -100,14 +109,18 @@ const FormInformation = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type={isPassword ? 'text' : 'password'}
+                autoComplete='new-password'
                 placeholder='Enter new password'
               />
-              <InputGroupAddon
-                className='cursor-pointer'
-                align='inline-end'
-                onClick={handleToggle}
-              >
-                {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
+              <InputGroupAddon align='inline-end'>
+                <InputGroupButton
+                  type='button'
+                  size='icon-xs'
+                  aria-label={isPassword ? 'Hide password' : 'Show password'}
+                  onClick={handleToggle}
+                >
+                  {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
           </Field>
@@ -122,14 +135,22 @@ const FormInformation = ({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 type={isConfirmPassword ? 'text' : 'password'}
+                autoComplete='new-password'
                 placeholder='Confirm new password'
               />
-              <InputGroupAddon
-                className='cursor-pointer'
-                align='inline-end'
-                onClick={handleToggleConfirm}
-              >
-                {!isConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+              <InputGroupAddon align='inline-end'>
+                <InputGroupButton
+                  type='button'
+                  size='icon-xs'
+                  aria-label={
+                    isConfirmPassword
+                      ? 'Hide confirm password'
+                      : 'Show confirm password'
+                  }
+                  onClick={handleToggleConfirm}
+                >
+                  {!isConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
           </Field>

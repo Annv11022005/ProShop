@@ -73,8 +73,10 @@ const ProfilePage = () => {
     }
   }, [location.state?.tab]);
 
-  const avatar = userInfo?.name.charAt(0);
-  const memberSince = new Date(userInfo.createdAt).getFullYear();
+  const avatar = userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : '';
+  const memberSince = userInfo?.createdAt
+    ? new Date(userInfo.createdAt).getFullYear()
+    : '—';
 
   const [name, setName] = useState(userInfo?.name || '');
   const [email, setEmail] = useState(userInfo?.email || '');
@@ -106,15 +108,18 @@ const ProfilePage = () => {
 
   const { isPending, profileUser } = useProfileMutation();
   const { isPending: pendingMyOrder, error, myOrders } = useOrderHistory();
-  const OrderedAmount = myOrders?.reduce(
-    (sum, order) => sum + order.totalPrice,
-    0,
-  );
-  const latestOrder = myOrders?.reduce(
-    (latest, order) =>
-      new Date(order.createdAt) > new Date(latest.createdAt) ? order : latest,
-    myOrders[0],
-  );
+  const OrderedAmount =
+    myOrders?.reduce((sum, order) => sum + (order.totalPrice || 0), 0) || 0;
+  const latestOrder =
+    myOrders && myOrders.length > 0
+      ? myOrders.reduce(
+          (latest, order) =>
+            new Date(order.createdAt) > new Date(latest.createdAt)
+              ? order
+              : latest,
+          myOrders[0],
+        )
+      : null;
 
   if (!userInfo || pendingDefault || pendingGet) return <Spinner />;
 
@@ -269,7 +274,7 @@ const ProfilePage = () => {
                 </p>
               </div>
             ) : (
-              <div className='grid grid-cols-[380px_380px] gap-4'>
+              <div className='grid grid-cols-[3fr_3fr_3fr] gap-4'>
                 {wishlist.map((item) => (
                   <Product key={item._id} product={item} />
                 ))}

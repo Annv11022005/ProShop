@@ -30,7 +30,7 @@ const CartSummary = ({ cartItems, checkoutHandler }) => {
 
           <Button
             size='lg'
-            disable={cartItems.length === 0}
+            disabled={cartItems.length === 0}
             onClick={checkoutHandler}
           >
             Process To Checkout

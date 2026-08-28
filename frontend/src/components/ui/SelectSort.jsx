@@ -3,6 +3,7 @@ function SelectSort({ options, value, onChange, type = 'white', ...props }) {
     <select
       value={value}
       onChange={onChange}
+      aria-label='Sort products'
       {...props}
       className={`rounded-sm bg-background px-3 py-3 text-sm font-medium shadow-sm border ${
         type === 'white' ? 'border-border' : 'border-input'

@@ -23,6 +23,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
 import GridBackground from './components/GridBackground';
@@ -33,58 +34,56 @@ import DividerWithLabel from './components/DividerWithLabel';
 const loginSchema = z.object({
   email: z
     .string()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Please enter a valid email address' }),
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .trim(),
   password: z
     .string()
-    .min(1, { message: 'Password is required' })
-    .min(6, { message: 'Password must be at least 6 characters' }),
+    .min(1, 'Password is required')
+    .min(6, 'Password must be at least 6 characters'),
 });
 
 function LoginForm() {
   const { loginUser, isPending } = useLogin();
   const [isPassword, handleToggle] = useToggle(false);
 
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const redirect = new URLSearchParams(location.search).get('redirect') || '/';
+
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    mode: 'onTouched',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const { userInfo } = useSelector((state) => state.auth);
-
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get('redirect') || '/';
 
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);
     }
-  }, [userInfo, redirect, navigate]);
+  }, [navigate, redirect, userInfo]);
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
     loginUser(
       { email: data.email, password: data.password },
       {
-        onSuccess: (resData) => {
-          dispatch(setCredentials(resData));
+        onSuccess: (data) => {
+          dispatch(setCredentials({ ...data }));
           navigate(redirect);
         },
         onError: (err) => {
-          const serverMessage =
-            err.response?.data?.message || 'Invalid email or password';
-          toast.error(serverMessage, { position: 'top-center' });
-          setError('password', {
-            type: 'server',
-            message: serverMessage,
+          toast(err?.response?.data?.message || 'Invalid email or password', {
+            position: 'top-center',
           });
         },
       },
@@ -108,6 +107,7 @@ function LoginForm() {
                     <Input
                       id='email'
                       type='email'
+                      autoComplete='email'
                       className='rounded-lg'
                       placeholder='Enter your email'
                       aria-invalid={!!errors.email}
@@ -126,16 +126,22 @@ function LoginForm() {
                       <InputGroupInput
                         id='password'
                         type={isPassword ? 'text' : 'password'}
+                        autoComplete='current-password'
                         placeholder='Enter your password'
                         aria-invalid={!!errors.password}
                         {...register('password')}
                       />
-                      <InputGroupAddon
-                        className='cursor-pointer'
-                        align='inline-end'
-                        onClick={handleToggle}
-                      >
-                        {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
+                      <InputGroupAddon align='inline-end'>
+                        <InputGroupButton
+                          type='button'
+                          size='icon-xs'
+                          aria-label={
+                            isPassword ? 'Hide password' : 'Show password'
+                          }
+                          onClick={handleToggle}
+                        >
+                          {!isPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </InputGroupButton>
                       </InputGroupAddon>
                     </InputGroup>
                     {errors.password && (

@@ -9,6 +9,7 @@ const ThemeToggle = () => {
     <Button
       variant='outline'
       size='icon'
+      aria-label='Toggle theme'
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
     >
       <Sun className='size-4 dark:hidden' />

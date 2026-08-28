@@ -76,6 +76,7 @@ export function AdminSidebar() {
           <Button
             variant='ghost'
             size='icon'
+            aria-label='Return to the store page'
             onClick={() => navigate('/')}
             title='Return to the store page'
             className='w-12 h-12 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer'

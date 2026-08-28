@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Star,
   ArrowRight,
@@ -95,16 +96,17 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
             <ProductPrice price={price} originalPrice={originalPrice} />
 
             <div className='flex items-center gap-3 w-full sm:w-auto'>
-              <Button
-                size='lg'
-                className='w-full sm:w-auto rounded-xl font-semibold shadow-xs'
+              <Link
+                to={targetLink}
+                className={cn(
+                  buttonVariants({ size: 'lg' }),
+                  'w-full sm:w-auto rounded-xl font-semibold shadow-xs flex items-center gap-2',
+                )}
               >
-                <Link to={targetLink} className='flex items-center gap-2'>
-                  <ShoppingBag size={18} />
-                  <span>Buy Now</span>
-                  <ArrowRight size={18} />
-                </Link>
-              </Button>
+                <ShoppingBag size={18} />
+                <span>Buy Now</span>
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </div>

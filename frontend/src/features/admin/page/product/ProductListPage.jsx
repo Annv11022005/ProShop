@@ -69,14 +69,14 @@ const ProductListPage = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='text-center'>IMAGE</TableHead>
-              <TableHead className='text-center'>NAME</TableHead>
-              <TableHead className='text-center'>PRICE</TableHead>
-              <TableHead className='text-center'>CATEGORY</TableHead>
-              <TableHead className='text-center'>BRAND</TableHead>
-              <TableHead className='text-center'>STATUS</TableHead>
-              <TableHead className='text-center'>STOCK</TableHead>
-              <TableHead className='text-right'></TableHead>
+              <TableHead scope='col' className='text-center'>IMAGE</TableHead>
+              <TableHead scope='col' className='text-center'>NAME</TableHead>
+              <TableHead scope='col' className='text-center'>PRICE</TableHead>
+              <TableHead scope='col' className='text-center'>CATEGORY</TableHead>
+              <TableHead scope='col' className='text-center'>BRAND</TableHead>
+              <TableHead scope='col' className='text-center'>STATUS</TableHead>
+              <TableHead scope='col' className='text-center'>STOCK</TableHead>
+              <TableHead scope='col' className='text-right'>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -111,6 +111,7 @@ const ProductListPage = () => {
                   <Button
                     variant='outline'
                     size='sm'
+                    aria-label={`Edit ${product.name}`}
                     onClick={() =>
                       navigate(`/admin/product/${product._id}/edit`)
                     }
@@ -120,6 +121,7 @@ const ProductListPage = () => {
                   <Button
                     variant='destructive'
                     size='sm'
+                    aria-label={`Delete ${product.name}`}
                     disabled={pendingDelete}
                     onClick={() => deleteHandler(product._id)}
                   >

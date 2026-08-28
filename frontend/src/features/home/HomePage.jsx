@@ -60,18 +60,19 @@ const HomePage = () => {
             <ProductFilter />
           </div>
 
-          <Row>
+          <Row gap='gap-4 sm:gap-5 lg:gap-6'>
             {data.products.map((product) => (
               <Col key={product._id}>
                 <Product product={product} />
               </Col>
             ))}
-            <Paginate
-              pages={data.pages}
-              page={data.page}
-              basePath={keyword ? `/search/${keyword}/page` : '/page'}
-            />
           </Row>
+
+          <Paginate
+            pages={data.pages}
+            page={data.page}
+            basePath={keyword ? `/search/${keyword}/page` : '/page'}
+          />
         </>
       )}
 
