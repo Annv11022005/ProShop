@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import FormReview from './components/FormReview.jsx';
 import ProductGallery from './components/ProductGallery.jsx';
 import ProductPrice from './components/ProductPrice.jsx';
+import { getErrorMessage } from '@/lib/utils';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -125,7 +126,7 @@ const ProductDetail = () => {
       {isPending ? (
         <Spinner />
       ) : error ? (
-        <Message>{error?.data?.message || error.error}</Message>
+        <Message>{getErrorMessage(error)}</Message>
       ) : (
         <>
           <Link to='/'>
@@ -205,18 +206,18 @@ const ProductDetail = () => {
                 Add To Cart
               </Button>
 
-              <div className='flex justify-around w-full text-primary font-normal text-sm'>
-                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+              <div className='grid grid-cols-3 gap-2 sm:gap-3 w-full text-primary font-normal text-xs sm:text-sm'>
+                <div className='flex items-center justify-center flex-col gap-1 border-muted-foreground/40 border border-dashed rounded-lg py-2.5 px-1 min-h-14 text-center'>
                   <Truck size={16} />
-                  Free shipping
+                  <span>Free shipping</span>
                 </div>
-                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+                <div className='flex items-center justify-center flex-col gap-1 border-muted-foreground/40 border border-dashed rounded-lg py-2.5 px-1 min-h-14 text-center'>
                   <RotateCcw size={16} />
-                  30-days returns
+                  <span>30-days returns</span>
                 </div>
-                <div className='flex items-center justify-center flex-col  border-muted-foreground border border-dashed rounded-lg w-40 h-15'>
+                <div className='flex items-center justify-center flex-col gap-1 border-muted-foreground/40 border border-dashed rounded-lg py-2.5 px-1 min-h-14 text-center'>
                   <ShieldCheck size={16} />
-                  1-year warranty
+                  <span>1-year warranty</span>
                 </div>
               </div>
             </Col>
@@ -224,7 +225,7 @@ const ProductDetail = () => {
 
           <Row template='lg:grid-cols-[1fr_0.5fr]'>
             <Col fluid>
-              <div className='flex flex-col items-start gap-1.5 text-md font-normal text-primary mb-15'>
+              <div className='flex flex-col items-start gap-1.5 text-md font-normal text-primary mb-10'>
                 <span>
                   <strong>Category: </strong>
                   {product.category}

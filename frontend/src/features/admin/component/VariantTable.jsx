@@ -61,7 +61,7 @@ const EditableCell = ({
           onChange={(e) => setVal(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className='h-8 text-center text-sm w-full min-w-15'
+          className='h-8 text-center text-sm w-full min-w-16'
         />
       </TableCell>
     );

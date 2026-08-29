@@ -4,39 +4,48 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useDispatch, useSelector } from 'react-redux';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { setCredentials, logout } from './features/authentication/authSlice';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import axios from 'axios';
 import { queryClient } from '@/lib/queryClient';
+import { Spinner } from '@/components/ui/spinner';
 
 import AdminRoutes from '@/components/AdminRoutes';
 import PrivateRoutes from '@/components/PrivateRoutes';
-
 import AppLayout from '@/components/AppLayout';
-import HomeScreen from '@/screens/HomeScreen';
-import ProductScreen from '@/screens/ProductScreen';
-import CartScreen from '@/screens/CartScreen';
-import LoginScreen from '@/screens/LoginScreen';
-import RegisterScreen from '@/screens/RegisterScreen';
-import ShippingScreen from '@/screens/ShippingScreen';
-import PaymentScreen from '@/screens/PaymentScreen';
-import PlaceOrderScreen from '@/screens/PlaceOrderScreen';
-import OrderScreen from '@/screens/OrderScreen';
-import ProfileScreen from '@/screens/ProfileScreen';
-import OrderListScreen from '@/screens/admin/OrderListScreen';
-import ProductListScreen from '@/screens/admin/ProductListScreen';
-import ProductEditScreen from '@/screens/admin/ProductEditScreen';
-import CreateProductScreen from '@/screens/admin/CreateProductScreen';
-import UserListScreen from '@/screens/admin/UserListScreen';
-import OTPRegisterScreen from '@/screens/OTPRegisterScreen';
-import CouponScreen from '@/screens/CouponScreen';
-import VnpaySuccess from '@/features/checkout/pages/VnpaySuccess';
-import MessageScreen from '@/screens/admin/MessageScreen';
-import CouponListScreen from '@/screens/admin/CouponListScreen';
-import CouponEditScreen from '@/screens/admin/CouponEditScreen';
-import CreateCouponScreen from '@/screens/admin/CreateCouponScreen';
-import DashboardScreen from '@/screens/admin/DashboardScreen';
-import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
-import ResetPasswordScreen from './screens/ResetPasswordScreen';
+
+// Lazy-loaded routes for code-splitting
+const HomeScreen = lazy(() => import('@/screens/HomeScreen'));
+const ProductScreen = lazy(() => import('@/screens/ProductScreen'));
+const CartScreen = lazy(() => import('@/screens/CartScreen'));
+const LoginScreen = lazy(() => import('@/screens/LoginScreen'));
+const RegisterScreen = lazy(() => import('@/screens/RegisterScreen'));
+const ShippingScreen = lazy(() => import('@/screens/ShippingScreen'));
+const PaymentScreen = lazy(() => import('@/screens/PaymentScreen'));
+const PlaceOrderScreen = lazy(() => import('@/screens/PlaceOrderScreen'));
+const OrderScreen = lazy(() => import('@/screens/OrderScreen'));
+const ProfileScreen = lazy(() => import('@/screens/ProfileScreen'));
+const OrderListScreen = lazy(() => import('@/screens/admin/OrderListScreen'));
+const ProductListScreen = lazy(() => import('@/screens/admin/ProductListScreen'));
+const ProductEditScreen = lazy(() => import('@/screens/admin/ProductEditScreen'));
+const CreateProductScreen = lazy(() => import('@/screens/admin/CreateProductScreen'));
+const UserListScreen = lazy(() => import('@/screens/admin/UserListScreen'));
+const OTPRegisterScreen = lazy(() => import('@/screens/OTPRegisterScreen'));
+const CouponScreen = lazy(() => import('@/screens/CouponScreen'));
+const VnpaySuccess = lazy(() => import('@/features/checkout/pages/VnpaySuccess'));
+const MessageScreen = lazy(() => import('@/screens/admin/MessageScreen'));
+const CouponListScreen = lazy(() => import('@/screens/admin/CouponListScreen'));
+const CouponEditScreen = lazy(() => import('@/screens/admin/CouponEditScreen'));
+const CreateCouponScreen = lazy(() => import('@/screens/admin/CreateCouponScreen'));
+const DashboardScreen = lazy(() => import('@/screens/admin/DashboardScreen'));
+const ForgotPasswordScreen = lazy(() => import('./screens/ForgotPasswordScreen'));
+const ResetPasswordScreen = lazy(() => import('./screens/ResetPasswordScreen'));
+const NotFoundScreen = lazy(() => import('@/screens/NotFoundScreen'));
+
+const RouteLoadingFallback = () => (
+  <div className='flex min-h-[50vh] w-full items-center justify-center py-12'>
+    <Spinner className='size-8 text-primary' />
+  </div>
+);
 
 const App = () => {
   const dispatch = useDispatch();
@@ -68,72 +77,77 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
         <BrowserRouter>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route path='/' element={<HomeScreen />} />
-              <Route path='/page/:pageNumber' element={<HomeScreen />} />
-              <Route path='/search/:keyword' element={<HomeScreen />} />
-              <Route
-                path='/search/:keyword/page/:pageNumber'
-                element={<HomeScreen />}
-              />
-              <Route path='/product/:slug' element={<ProductScreen />} />
-              <Route path='/coupon' element={<CouponScreen />} />
-              <Route path='/coupon/:pageNumber' element={<CouponScreen />} />
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Routes>
+              <Route element={<AppLayout />}>
+                <Route path='/' element={<HomeScreen />} />
+                <Route path='/page/:pageNumber' element={<HomeScreen />} />
+                <Route path='/search/:keyword' element={<HomeScreen />} />
+                <Route
+                  path='/search/:keyword/page/:pageNumber'
+                  element={<HomeScreen />}
+                />
+                <Route path='/product/:slug' element={<ProductScreen />} />
+                <Route path='/coupon' element={<CouponScreen />} />
+                <Route path='/coupon/:pageNumber' element={<CouponScreen />} />
 
-              <Route element={<PrivateRoutes />}>
-                <Route path='/profile' element={<ProfileScreen />} />
-                <Route path='/cart' element={<CartScreen />} />
-                <Route path='/shipping' element={<ShippingScreen />} />
-                <Route path='/payment' element={<PaymentScreen />} />
-                <Route path='/place-order' element={<PlaceOrderScreen />} />
-                <Route path='/order/:id' element={<OrderScreen />} />
-                <Route path='/vnpay-return' element={<VnpaySuccess />} />
+                <Route element={<PrivateRoutes />}>
+                  <Route path='/profile' element={<ProfileScreen />} />
+                  <Route path='/cart' element={<CartScreen />} />
+                  <Route path='/shipping' element={<ShippingScreen />} />
+                  <Route path='/payment' element={<PaymentScreen />} />
+                  <Route path='/place-order' element={<PlaceOrderScreen />} />
+                  <Route path='/order/:id' element={<OrderScreen />} />
+                  <Route path='/vnpay-return' element={<VnpaySuccess />} />
+                </Route>
+
+                {/* 404 Catch-All Route inside AppLayout */}
+                <Route path='*' element={<NotFoundScreen />} />
               </Route>
-            </Route>
 
-            <Route path='/login' element={<LoginScreen />} />
-            <Route path='/register' element={<RegisterScreen />} />
-            <Route path='/register/verify' element={<OTPRegisterScreen />} />
-            <Route path='/forgot-password' element={<ForgotPasswordScreen />} />
-            <Route path='/reset-password' element={<ResetPasswordScreen />} />
+              <Route path='/login' element={<LoginScreen />} />
+              <Route path='/register' element={<RegisterScreen />} />
+              <Route path='/register/verify' element={<OTPRegisterScreen />} />
+              <Route path='/forgot-password' element={<ForgotPasswordScreen />} />
+              <Route path='/reset-password' element={<ResetPasswordScreen />} />
 
-            <Route element={<AdminRoutes />}>
-              <Route path='/admin' element={<DashboardScreen />} />
-              <Route path='/admin/order-list' element={<OrderListScreen />} />
-              <Route
-                path='/admin/product-list'
-                element={<ProductListScreen />}
-              />
-              <Route
-                path='/admin/product-list/:pageNumber'
-                element={<ProductListScreen />}
-              />
-              <Route
-                path='/admin/product/:id/edit'
-                element={<ProductEditScreen />}
-              />
-              <Route
-                path='/admin/product/create'
-                element={<CreateProductScreen />}
-              />
-              <Route path='/admin/user-list' element={<UserListScreen />} />
-              <Route path='/admin/coupon-list' element={<CouponListScreen />} />
-              <Route
-                path='/admin/coupon-list/:pageNumber'
-                element={<CouponListScreen />}
-              />
-              <Route
-                path='/admin/coupon/create'
-                element={<CreateCouponScreen />}
-              />
-              <Route
-                path='/admin/coupon/:id/edit'
-                element={<CouponEditScreen />}
-              />
-              <Route path='/admin/chat' element={<MessageScreen />} />
-            </Route>
-          </Routes>
+              <Route element={<AdminRoutes />}>
+                <Route path='/admin' element={<DashboardScreen />} />
+                <Route path='/admin/order-list' element={<OrderListScreen />} />
+                <Route
+                  path='/admin/product-list'
+                  element={<ProductListScreen />}
+                />
+                <Route
+                  path='/admin/product-list/:pageNumber'
+                  element={<ProductListScreen />}
+                />
+                <Route
+                  path='/admin/product/:id/edit'
+                  element={<ProductEditScreen />}
+                />
+                <Route
+                  path='/admin/product/create'
+                  element={<CreateProductScreen />}
+                />
+                <Route path='/admin/user-list' element={<UserListScreen />} />
+                <Route path='/admin/coupon-list' element={<CouponListScreen />} />
+                <Route
+                  path='/admin/coupon-list/:pageNumber'
+                  element={<CouponListScreen />}
+                />
+                <Route
+                  path='/admin/coupon/create'
+                  element={<CreateCouponScreen />}
+                />
+                <Route
+                  path='/admin/coupon/:id/edit'
+                  element={<CouponEditScreen />}
+                />
+                <Route path='/admin/chat' element={<MessageScreen />} />
+              </Route>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </QueryClientProvider>
     </PayPalScriptProvider>

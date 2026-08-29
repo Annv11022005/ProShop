@@ -21,3 +21,6 @@ export function getStoredJSON(key, fallback = null) {
   }
 }
 
+export { getErrorMessage } from './errorUtils';
+
+

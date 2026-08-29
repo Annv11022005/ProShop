@@ -204,7 +204,7 @@ const ProfilePage = () => {
     <Row template='lg:grid-cols-[0.7fr_2fr]' className='gap-3'>
       {/* Sidebar Profile */}
       <Col fluid>
-        <div className='flex flex-col h-79 gap-4 p-4 sm:p-5 rounded-xl border border-border bg-card shadow-xs'>
+        <div className='flex flex-col h-auto min-h-80 gap-4 p-4 sm:p-5 rounded-xl border border-border bg-card shadow-xs'>
           {/* User info  */}
           <div className='flex items-center gap-3 pb-2 border-b border-border/50'>
             <div className='w-12 h-12 rounded-full bg-bg-blue text-blue-avt font-bold text-base flex items-center justify-center shrink-0 '>
@@ -274,7 +274,7 @@ const ProfilePage = () => {
                 </p>
               </div>
             ) : (
-              <div className='grid grid-cols-[3fr_3fr_3fr] gap-4'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {wishlist.map((item) => (
                   <Product key={item._id} product={item} />
                 ))}
@@ -286,8 +286,8 @@ const ProfilePage = () => {
         {activeTab === 'profile' && (
           <div>
             {/* Quick facts */}
-            <div className='flex flex-row mb-5 gap-7 justify-between'>
-              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5'>
+              <div className='flex flex-col items-center gap-1 justify-center w-full min-h-28 p-3 border border-border rounded-lg shadow-xs'>
                 <h2 className='text-lg font-medium text-center'>
                   Total Orders
                 </h2>
@@ -295,7 +295,7 @@ const ProfilePage = () => {
                   {Number(myOrders?.length)}
                 </p>
               </div>
-              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+              <div className='flex flex-col items-center gap-1 justify-center w-full min-h-28 p-3 border border-border rounded-lg shadow-xs'>
                 <h2 className='text-lg font-medium text-center'>
                   Ordered Amount
                 </h2>
@@ -304,7 +304,7 @@ const ProfilePage = () => {
                   {formatCurrency(OrderedAmount)}
                 </p>
               </div>
-              <div className='flex flex-col items-center gap-1 justify-center w-60 h-30 p-3 border border-border rounded-lg shadow-xs'>
+              <div className='flex flex-col items-center gap-1 justify-center w-full min-h-28 p-3 border border-border rounded-lg shadow-xs'>
                 <h2 className='text-lg font-medium text-center'>
                   Member Since
                 </h2>
@@ -360,7 +360,7 @@ const ProfilePage = () => {
 
             {/* Dialog Address */}
             <Dialog open={open} onOpenChange={setOpen}>
-              <DialogContent className='sm:max-w-155 p-6 rounded-sm bg-popover text-popover-foreground shadow-xl border border-border outline-none'>
+              <DialogContent className='sm:max-w-xl p-6 rounded-sm bg-popover text-popover-foreground shadow-xl border border-border outline-none'>
                 <DialogHeader className='flex flex-row items-center justify-between pb-1 space-y-0'>
                   <DialogTitle className='text-lg sm:text-xl font-bold text-foreground'>
                     Delivery address
@@ -498,7 +498,8 @@ const ProfilePage = () => {
                     <img
                       src={latestOrder.orderItems[0].image}
                       alt={latestOrder.orderItems[0].name}
-                      className='w-35 h-20 object-cover'
+                      loading='lazy'
+                      className='w-36 h-20 aspect-video object-cover rounded-md'
                     />
 
                     <div className='flex justify-around flex-col'>

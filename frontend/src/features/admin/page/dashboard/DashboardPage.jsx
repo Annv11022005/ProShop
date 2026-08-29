@@ -29,7 +29,7 @@ const DashboardPage = () => {
   if (error || errStock || errSummary)
     return (
       <Message>
-        {(error || errStock || errSummary)?.message || 'Lỗi tải dữ liệu'}
+        {(error || errStock || errSummary)?.message || 'Failed to load data'}
       </Message>
     );
 
@@ -49,9 +49,9 @@ const DashboardPage = () => {
       </div>
 
       {/* Top & Stock */}
-      <div className='flex items-stretch justify-between gap-10'>
+      <div className='flex flex-col lg:flex-row items-stretch justify-between gap-6'>
         {/* Top */}
-        <div className='w-[50%] p-4 border border-border rounded-lg shadow-xs'>
+        <div className='w-full lg:w-1/2 p-4 border border-border rounded-lg shadow-xs'>
           <h2 className='text-lg flex items-center gap-2 font-semibold mb-5'>
             <ChartNetwork size={18} />
             Top-selling products
@@ -82,7 +82,7 @@ const DashboardPage = () => {
           </div>
         </div>
         {/* Stock */}
-        <div className='w-[50%] max-h-60 overflow-y-scroll p-4 border border-border rounded-lg shadow-xs'>
+        <div className='w-full lg:w-1/2 max-h-60 overflow-y-auto p-4 border border-border rounded-lg shadow-xs'>
           <h2 className='text-lg flex items-center gap-3 font-semibold mb-5'>
             <ShieldAlert size={18} />
             Low stock
@@ -105,7 +105,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
 
-                  <span className='shrink-0 text-center text-xs font-semibold rounded-full bg-warning/15 text-warning border border-warning/30 w-15'>
+                  <span className='shrink-0 text-center text-xs font-semibold rounded-full bg-warning/15 text-warning border border-warning/30 px-2.5 py-0.5'>
                     Still {product.countInStock}
                   </span>
                 </div>

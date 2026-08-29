@@ -430,24 +430,24 @@ A comprehensive frontend audit of the **ProShop** codebase was conducted against
 - [x] **2.7** Add `autoComplete` attributes on all login, registration, and profile password/email fields.
 
 ### Phase 3: Performance & SEO Optimization (Day 3)
-- [ ] **3.1** Implement `React.lazy()` and `<Suspense>` route splitting in `App.jsx`.
-- [ ] **3.2** Set default `staleTime: 60000` in `queryClient.js` to prevent excessive background refetching.
-- [ ] **3.3** Add missing `404 Not Found` catch-all route in `App.jsx`.
-- [ ] **3.4** Populate meta description, Open Graph tags, and valid favicon in `index.html`.
-- [ ] **3.5** Compress large PNG images (`screen.png`, `screenDark.png`) to WebP/AVIF format.
-- [ ] **3.6** Add `loading="lazy"` and aspect-ratio reservation on product gallery and catalog images.
+- [x] **3.1** Implement `React.lazy()` and `<Suspense>` route splitting in `App.jsx`.
+- [x] **3.2** Set default `staleTime: 60000` in `queryClient.js` to prevent excessive background refetching.
+- [x] **3.3** Add missing `404 Not Found` catch-all route in `App.jsx`.
+- [x] **3.4** Populate meta description, Open Graph tags, and valid favicon in `index.html`.
+- [x] **3.5** Compress large PNG images (`screen.png`, `screenDark.png`) to WebP/AVIF format.
+- [x] **3.6** Add `loading="lazy"` and aspect-ratio reservation on product gallery and catalog images.
 
 ### Phase 4: Responsive UI & CSS Cleanup (Day 4)
-- [ ] **4.1** Convert fixed grid columns in `ProfilePage.jsx` (wishlist & quick facts) to fluid responsive grids.
-- [ ] **4.2** Convert `DashboardPage.jsx` bottom columns to `flex-col lg:flex-row`.
-- [ ] **4.3** Enable `<SidebarTrigger />` in `AppLayoutAdmin.jsx` for mobile admin navigation.
-- [ ] **4.4** Replace `h-screen` with `min-h-screen` in `AppLayout.jsx`.
-- [ ] **4.5** Replace non-standard Tailwind classes (`w-100`, `h-95`, `h-15`, `mb-15`, `bg-grey-50`) with standard utilities.
+- [x] **4.1** Convert fixed grid columns in `ProfilePage.jsx` (wishlist & quick facts) to fluid responsive grids.
+- [x] **4.2** Convert `DashboardPage.jsx` bottom columns to `flex-col lg:flex-row`.
+- [x] **4.3** Enable `<SidebarTrigger />` in `AppLayoutAdmin.jsx` for mobile admin navigation.
+- [x] **4.4** Replace `h-screen` with `min-h-screen` in `AppLayout.jsx`.
+- [x] **4.5** Replace non-standard Tailwind classes (`w-100`, `h-95`, `h-15`, `mb-15`, `bg-grey-50`) with standard utilities.
 
 ### Phase 5: Error Handling, Resilience & Testing Setup (Day 5)
-- [ ] **5.1** Create a top-level React `ErrorBoundary` component in `main.jsx`.
-- [ ] **5.2** Create a centralized `getErrorMessage(err)` utility to safely parse Axios error responses.
-- [ ] **5.3** Setup Vitest and React Testing Library; write unit tests for `cartUtils.js` (totals, discounts, taxes) and auth guard routing.
+- [x] **5.1** Create a top-level React `ErrorBoundary` component in `main.jsx`.
+- [x] **5.2** Create a centralized `getErrorMessage(err)` utility to safely parse Axios error responses.
+- [x] **5.3** Setup Vitest and React Testing Library; write unit tests for `cartUtils.js` (totals, discounts, taxes) and auth guard routing.
 
 ---
 *Report generated automatically from code analysis according to Front-End Checklist Global.*

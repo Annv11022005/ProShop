@@ -38,7 +38,7 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
   const targetLink = `/product/${selectedProduct.slug || selectedProduct._id}`;
 
   return (
-    <div className='relative overflow-hidden rounded-2xl bg-card text-card-foreground border border-border shadow-xs my-4 p-6 md:p-8 h-auto md:h-95 flex items-center'>
+    <div className='relative overflow-hidden rounded-2xl bg-card text-card-foreground border border-border shadow-xs my-4 p-6 md:p-8 h-auto md:h-96 flex items-center'>
       <div className='grid items-center gap-6 md:grid-cols-12 w-full h-full'>
         <div className='flex flex-col justify-between h-full md:col-span-7 py-1 gap-3'>
           <div className='flex flex-wrap items-center gap-2'>
@@ -120,6 +120,8 @@ const HomeBanner = ({ product, badge = 'Featured Products' }) => {
             <img
               src={imageUrl}
               alt={selectedProduct.name}
+              loading='eager'
+              fetchPriority='high'
               className='max-h-full max-w-full object-contain transition-transform duration-300'
             />
           </Link>

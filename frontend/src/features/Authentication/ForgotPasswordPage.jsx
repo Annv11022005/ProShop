@@ -119,7 +119,7 @@ const ForgotPasswordPage = () => {
               </FieldSet>
             </form>
           </div>
-          <AuthHeroImage srcLight='/screen.png' srcDark='/screenDark.png' />
+          <AuthHeroImage srcLight='/screenLight.svg' srcDark='/screenDark.svg' />
         </div>
       </div>
     </div>

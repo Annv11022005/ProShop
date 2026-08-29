@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" fill="none">
+  <defs>
+    <linearGradient id="bgGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="glassGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.4" />
+    </linearGradient>
+    <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="50" result="blur" />
+    </filter>
+  </defs>
+  
+  <rect width="800" height="1000" fill="url(#bgGradDark)" rx="24" />
+  
+  <!-- Glow orbs -->
+  <circle cx="280" cy="380" r="190" fill="#0284c7" opacity="0.3" filter="url(#neonGlow)" />
+  <circle cx="530" cy="560" r="170" fill="#7c3aed" opacity="0.3" filter="url(#neonGlow)" />
+  
+  <!-- Flowing waves -->
+  <path d="M100 700 C 250 500, 450 850, 700 450" stroke="url(#neonGrad)" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.6" />
+  <path d="M150 780 C 320 600, 500 900, 750 550" stroke="#818cf8" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.4" />
+
+  <!-- Center Card / Padlock -->
+  <g transform="translate(250, 350)">
+    <rect x="0" y="50" width="300" height="250" rx="36" fill="url(#glassGradDark)" stroke="#334155" stroke-width="1.5" />
+    
+    <!-- Shackle -->
+    <path d="M75 60 V-10 C75 -55, 225 -55, 225 -10 V60" stroke="url(#neonGrad)" stroke-width="20" stroke-linecap="round" fill="none" />
+    
+    <!-- Keyhole -->
+    <circle cx="150" cy="150" r="22" fill="url(#neonGrad)" />
+    <path d="M142 165 L138 215 H162 L158 165 Z" fill="url(#neonGrad)" />
+  </g>
+</svg>

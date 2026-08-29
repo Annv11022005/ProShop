@@ -87,7 +87,8 @@ const ProductListPage = () => {
                   <img
                     src={product.image || '/images/sample.jpg'}
                     alt={product.name}
-                    className='w-12 h-12 object-cover rounded-md mx-auto'
+                    loading='lazy'
+                    className='w-12 h-12 aspect-square object-cover rounded-md mx-auto'
                   />
                 </TableCell>
                 <TableCell className='text-center font-semibold max-w-[200px] truncate'>

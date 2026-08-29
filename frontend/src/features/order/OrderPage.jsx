@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 import { useUpdateOrder } from '../admin/hook/useAdmin';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
@@ -84,7 +85,7 @@ const OrderPage = () => {
         refetch();
         toast.success('Payment successfully', { position: 'top-center' });
       } catch (error) {
-        toast.error(error?.data?.message || error?.message || 'payment error', {
+        toast.error(getErrorMessage(error, 'Payment failed'), {
           position: 'top-center',
         });
       }
@@ -113,7 +114,7 @@ const OrderPage = () => {
   }
 
   function onError(err) {
-    toast.error(err.message);
+    toast.error(getErrorMessage(err, 'Payment error'));
   }
 
   async function deliverHandler() {
@@ -122,7 +123,7 @@ const OrderPage = () => {
       refetch();
       toast.success('Order delivered', { position: 'top-center' });
     } catch (error) {
-      toast.error(error?.data?.message || error?.message || 'payment error', {
+      toast.error(getErrorMessage(error, 'Failed to update delivery status'), {
         position: 'top-center',
       });
     }
@@ -133,7 +134,7 @@ const OrderPage = () => {
       const payment = await createPayment(orderId);
       window.location.href = payment.paymentUrl;
     } catch (error) {
-      toast.error(error?.data?.message || error?.message || 'payment error', {
+      toast.error(getErrorMessage(error, 'Failed to initiate payment'), {
         position: 'top-center',
       });
     }

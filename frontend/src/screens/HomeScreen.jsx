@@ -1,11 +1,7 @@
 import HomePage from '@/features/home/HomePage';
 
 const HomeScreen = () => {
-  return (
-    <>
-      <HomePage />
-    </>
-  );
+  return <HomePage />;
 };
 
 export default HomeScreen;

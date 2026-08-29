@@ -13,7 +13,12 @@ const CartItem = ({ item, addToCartHandler, removeCart }) => {
   const { image, name, price, originalPrice, qty, countInStock, color } = item;
   return (
     <div className='flex gap-5'>
-      <img src={image} alt={name} className=' rounded-lg size-14 sm:size-16' />
+      <img
+        src={image}
+        alt={name}
+        loading='lazy'
+        className='rounded-lg size-14 sm:size-16 aspect-square object-cover shrink-0'
+      />
 
       <div className='flex flex-col justify-around w-[50%]'>
         <h3 className='text-primary text-lg font-semibold'>

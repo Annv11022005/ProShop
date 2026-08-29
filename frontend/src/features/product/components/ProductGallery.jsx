@@ -17,7 +17,7 @@ export default function ProductGallery({
               type='button'
               onClick={() => onSelectImage(index)}
               className={cn(
-                'relative size-14 overflow-hidden rounded-md border sm:size-16',
+                'relative size-14 aspect-square overflow-hidden rounded-md border sm:size-16',
                 'focus-visible:outline-none focus-visible:ring-2',
                 'focus-visible:ring-ring',
                 selectedIndex === index
@@ -27,7 +27,8 @@ export default function ProductGallery({
             >
               <img
                 src={image}
-                alt={`${productName} ${index + 1}`}
+                alt={`${productName} thumbnail ${index + 1}`}
+                loading='lazy'
                 className='absolute inset-0 h-full w-full object-cover'
               />
             </button>
@@ -39,6 +40,8 @@ export default function ProductGallery({
           <img
             src={images[selectedIndex]}
             alt={productName}
+            loading='eager'
+            fetchPriority='high'
             className='absolute inset-0 h-full w-full object-cover'
           />
         </div>

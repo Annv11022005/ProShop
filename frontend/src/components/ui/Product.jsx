@@ -13,7 +13,6 @@ import {
   useGetWishlist,
   useRemoveFromWishlist,
 } from '@/features/authentication/hooks/useWishlist';
-import { Spinner } from './spinner';
 import { formatCurrency, cn } from '@/lib/utils';
 
 function formatCompact(num) {
@@ -51,8 +50,6 @@ const Product = ({ product }) => {
   const price = product.price ?? product.variants?.[0]?.price ?? 0;
   const originalPrice =
     product.originalPrice ?? product.variants?.[0]?.originalPrice;
-
-  if (isPending) return <Spinner />;
 
   const targetLink = `/product/${product.slug || product._id}`;
 
