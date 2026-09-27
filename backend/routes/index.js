@@ -7,6 +7,7 @@ import couponRoutes from './couponRoute.js';
 import messageRoutes from './messageRoute.js';
 import analyticsRoutes from './analyticsRoute.js';
 import notificationRoutes from './notificationRoutes.js';
+import returnRoutes from './returnRoutes.js';
 
 const mountRoutes = (app) => {
   app.get('/', (req, res) => {
@@ -23,6 +24,7 @@ const mountRoutes = (app) => {
   app.use('/api/v1/analytics', analyticsRoutes);
   app.use('/api/v1/dashboard', analyticsRoutes);
   app.use('/api/v1/notifications', notificationRoutes);
+  app.use('/api/v1/returns', returnRoutes);
 
   app.get('/api/config/paypal', (req, res) => {
     res.send({ clientId: process.env.PAYPAL_CLIENT_ID });

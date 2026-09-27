@@ -76,8 +76,24 @@ const orderSchema = new mongoose.Schema(
     cancelledAt: { type: Date },
     orderStatus: {
       type: String,
-      enum: ['PENDING_PAYMENT', 'CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED'],
+      enum: [
+        'PENDING_PAYMENT',
+        'CONFIRMED',
+        'SHIPPING',
+        'DELIVERED',
+        'CANCELLED',
+        'RETURNED',
+      ],
       default: 'PENDING_PAYMENT',
+    },
+    returnStatus: {
+      type: String,
+      enum: ['NONE', 'REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED'],
+      default: 'NONE',
+    },
+    returnRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ReturnRequest',
     },
     confirmedAt: { type: Date },
     shippedAt: { type: Date },

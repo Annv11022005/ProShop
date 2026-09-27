@@ -54,4 +54,33 @@ router
     }
   });
 
+router
+  .route('/return-proof')
+  .post(protect, upload.array('images', 5), async (req, res, next) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        res.status(400);
+        throw new Error('Please upload at least one image');
+      }
+
+      const uploadPromises = req.files.map((file) =>
+        imagekitConfig.imagekit.upload({
+          file: file.buffer.toString('base64'),
+          fileName: `return-${Date.now()}-${file.originalname}`,
+          folder: '/proshop/returns',
+        }),
+      );
+
+      const results = await Promise.all(uploadPromises);
+      const imageUrls = results.map((r) => r.url);
+
+      res.status(200).json({
+        message: 'Images uploaded successfully',
+        images: imageUrls,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
 export default router;

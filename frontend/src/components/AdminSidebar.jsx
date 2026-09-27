@@ -21,6 +21,7 @@ import {
   Store,
   Ticket,
   Users,
+  RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -29,6 +30,7 @@ const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Product', url: '/admin/product-list', icon: Package },
   { title: 'Order', url: '/admin/order-list', icon: ShoppingCart },
+  { title: 'Returns', url: '/admin/return-list', icon: RotateCcw },
   { title: 'User', url: '/admin/user-list', icon: Users },
   { title: 'Coupon', url: '/admin/coupon-list', icon: Ticket },
   { title: 'Chat', url: '/admin/chat', icon: MessageCircle },

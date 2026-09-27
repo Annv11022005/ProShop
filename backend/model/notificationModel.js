@@ -17,7 +17,15 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ['DELIVERED'],
+      enum: [
+        'DELIVERED',
+        'ORDER_CONFIRMED',
+        'ORDER_SHIPPING',
+        'RETURN_REQUESTED',
+        'RETURN_APPROVED',
+        'RETURN_REJECTED',
+        'RETURN_COMPLETED',
+      ],
     },
     title: {
       type: String,
@@ -40,7 +48,7 @@ const notificationSchema = new mongoose.Schema(
     },
     relatedModel: {
       type: String,
-      enum: ['Order'],
+      enum: ['Order', 'ReturnRequest'],
     },
   },
   {

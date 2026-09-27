@@ -5,6 +5,7 @@ import {
   Truck,
   PackageCheck,
   XCircle,
+  RotateCcw,
 } from 'lucide-react';
 
 const STATUS_CONFIG = {
@@ -33,10 +34,22 @@ const STATUS_CONFIG = {
     color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
     icon: XCircle,
   },
+  RETURN_REQUESTED: {
+    label: 'Return Requested',
+    color: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800',
+    icon: RotateCcw,
+  },
+  RETURNED: {
+    label: 'Returned & Refunded',
+    color: 'bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800',
+    icon: RotateCcw,
+  },
 };
 
 export const getEffectiveStatus = (order) => {
   if (!order) return 'PENDING_PAYMENT';
+  if (order.orderStatus === 'RETURNED' || order.returnStatus === 'COMPLETED') return 'RETURNED';
+  if (order.returnStatus === 'REQUESTED' || order.returnStatus === 'APPROVED') return 'RETURN_REQUESTED';
   if (order.orderStatus) return order.orderStatus;
   if (order.isCancelled) return 'CANCELLED';
   if (order.isDelivered) return 'DELIVERED';

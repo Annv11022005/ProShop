@@ -29,6 +29,8 @@ import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import OrderStatusBadge, { getEffectiveStatus } from '@/components/OrderStatusBadge';
 import OrderTimelineStepper from '@/components/OrderTimelineStepper';
+import ReturnStatusCard from '../returns/components/ReturnStatusCard';
+import { useGetReturnByOrder } from '../returns/hooks/useReturns';
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
@@ -39,6 +41,8 @@ const OrderPage = () => {
     order,
     refetch,
   } = useGetOrderDetail(orderId);
+
+  const { returnRequest, refetch: refetchReturn } = useGetReturnByOrder(orderId);
 
   const { payOrderItem } = usePayOrder();
 
@@ -162,6 +166,14 @@ const OrderPage = () => {
 
         {/* Order Progress Stepper */}
         <OrderTimelineStepper order={order} />
+
+        {/* Return & Refund Status / Action Card */}
+        <ReturnStatusCard
+          order={order}
+          returnRequest={returnRequest}
+          refetchReturn={refetchReturn}
+          refetchOrder={refetch}
+        />
 
         <FieldSet className='w-full pb-4 mb-2'>
           <FieldGroup>

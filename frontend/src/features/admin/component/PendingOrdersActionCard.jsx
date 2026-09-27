@@ -7,10 +7,15 @@ import {
   ArrowRight,
   CheckCircle2,
   Boxes,
+  RotateCcw,
 } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
+import { useGetAllReturns } from '@/features/returns/hooks/useReturns';
 
 export default function PendingOrdersActionCard({ actionRequired }) {
+  const { data: returnsData } = useGetAllReturns({ status: 'PENDING_APPROVAL', limit: 1 });
+  const pendingReturns = returnsData?.pendingCount || 0;
+
   const {
     total = 0,
     confirmed = 0,
@@ -98,6 +103,15 @@ export default function PendingOrdersActionCard({ actionRequired }) {
               >
                 <Clock className='w-3.5 h-3.5 text-amber-600 dark:text-amber-400' />
                 <span>{pendingPayment} Pending payment</span>
+              </Link>
+            )}
+            {pendingReturns > 0 && (
+              <Link
+                to='/admin/return-list?status=PENDING_APPROVAL'
+                className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800 hover:border-rose-400 transition-colors shadow-2xs font-semibold'
+              >
+                <RotateCcw className='w-3.5 h-3.5 text-rose-600 dark:text-rose-400' />
+                <span>{pendingReturns} Returns awaiting approval</span>
               </Link>
             )}
           </div>
