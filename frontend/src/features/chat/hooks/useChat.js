@@ -75,6 +75,10 @@ export function useSendMessage() {
       const tempId = context?.tempId;
 
       queryClient.setQueryData(['message', receiverId], (old = []) => {
+        const alreadyHasSaved = old.some((m) => m._id === savedMessage._id);
+        if (alreadyHasSaved) {
+          return old.filter((m) => m._id !== tempId);
+        }
         if (!tempId) return [...old, savedMessage];
         return old.map((m) => (m._id === tempId ? savedMessage : m));
       });

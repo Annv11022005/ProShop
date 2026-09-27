@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Coupon from '../model/couponModel.js';
+import Order from '../model/orderModel.js';
 import APIFeatures from '../utils/apiFeatures.js';
 
 // @desc Get all coupon
@@ -48,17 +49,40 @@ export const getCouponById = asyncHandler(async (req, res) => {
 
 // @desc Get coupon by code
 // GET /api/coupons/code
-// @access public
+// @access public (with optionalAuth)
 export const getCouponByCode = asyncHandler(async (req, res) => {
   const { code } = req.query;
-  const coupon = await Coupon.findOne({ code });
+  const normalizedCode = code?.trim().toUpperCase();
+  const coupon = await Coupon.findOne({ code: normalizedCode });
 
-  if (coupon) {
-    res.status(200).json(coupon);
-  } else {
+  if (!coupon) {
     res.status(404);
     throw new Error('Coupon not found');
   }
+
+  if (coupon.useCount >= coupon.usageLimit) {
+    res.status(400);
+    throw new Error('The discount code has reached its usage limit.');
+  }
+
+  if (coupon.expiry && new Date(coupon.expiry) < new Date()) {
+    res.status(400);
+    throw new Error('This coupon code has expired.');
+  }
+
+  if (req.user) {
+    const alreadyUsed = await Order.findOne({
+      user: req.user._id,
+      couponId: coupon._id,
+      isCancelled: { $ne: true },
+    });
+    if (alreadyUsed) {
+      res.status(400);
+      throw new Error('You have already used this coupon code.');
+    }
+  }
+
+  res.status(200).json(coupon);
 });
 
 // @desc update hidden coupon

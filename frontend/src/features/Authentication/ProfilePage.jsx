@@ -17,6 +17,7 @@ import Col from '@/components/ui/Col';
 import Row from '@/components/ui/Row';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'sonner';
+import OrderStatusBadge from '@/components/OrderStatusBadge';
 import {
   MapPin,
   Pencil,
@@ -517,22 +518,9 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  {latestOrder.isDelivered === true ? (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-success/15 px-3 py-1 rounded-3xl text-success font-semibold'>
-                      <Check size={16} />
-                      Delivered
-                    </div>
-                  ) : latestOrder.isCancelled === true ? (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-destructive/10 px-3 py-1 rounded-3xl text-destructive font-semibold'>
-                      <CircleX size={16} />
-                      Has Been Cancelled
-                    </div>
-                  ) : (
-                    <div className='my-auto flex gap-2 justify-center items-center bg-warning/10 px-3 py-1 rounded-3xl text-warning font-semibold'>
-                      <Truck size={16} />
-                      On the way
-                    </div>
-                  )}
+                  <div className='my-auto'>
+                    <OrderStatusBadge order={latestOrder} className='text-sm py-1 px-3' />
+                  </div>
 
                   <Button
                     size='lg'

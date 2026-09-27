@@ -23,7 +23,7 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
   const currentStart = new Date(now.getTime() - periodDays * dayMs);
   const previousStart = new Date(currentStart.getTime() - periodDays * dayMs);
 
-  const [orderAgg, newCustomersCurrent, newCustomersPrevious] =
+  const [orderAgg, newCustomersCurrent, newCustomersPrevious, pendingOrdersBreakdown] =
     await Promise.all([
       Order.aggregate([
         {
@@ -67,6 +67,21 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         isVerified: true,
         createdAt: { $gte: previousStart, $lt: currentStart },
       }),
+      Order.aggregate([
+        {
+          $match: {
+            isCancelled: { $ne: true },
+            isDelivered: { $ne: true },
+            orderStatus: { $in: ['PENDING_PAYMENT', 'CONFIRMED', 'SHIPPING'] },
+          },
+        },
+        {
+          $group: {
+            _id: '$orderStatus',
+            count: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
 
   const current = orderAgg[0]?.current[0] ?? { revenue: 0, orders: 0 };
@@ -75,6 +90,12 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
   const currentAOV = current.orders > 0 ? current.revenue / current.orders : 0;
   const previousAOV =
     previous.orders > 0 ? previous.revenue / previous.orders : 0;
+
+  const statusMap = new Map(pendingOrdersBreakdown.map((s) => [s._id, s.count]));
+  const pendingPayment = statusMap.get('PENDING_PAYMENT') || 0;
+  const confirmed = statusMap.get('CONFIRMED') || 0;
+  const shipping = statusMap.get('SHIPPING') || 0;
+  const totalActionRequired = pendingPayment + confirmed + shipping;
 
   res.status(200).json({
     period: `${periodDays}d`,
@@ -100,6 +121,12 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
         newCustomersCurrent,
         newCustomersPrevious,
       ),
+    },
+    actionRequired: {
+      total: totalActionRequired,
+      pendingPayment,
+      confirmed,
+      shipping,
     },
   });
 });

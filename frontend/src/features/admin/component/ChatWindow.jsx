@@ -40,7 +40,7 @@ const ChatWindow = ({
   // Chưa chọn user → hiển thị empty state
   if (!selectedUser) {
     return (
-      <div className='flex flex-1 items-center justify-center bg-muted/20'>
+      <div className='flex flex-1 h-full items-center justify-center bg-muted/10'>
         <Empty className='border-none'>
           <EmptyHeader>
             <EmptyMedia>
@@ -75,9 +75,9 @@ const ChatWindow = ({
   }
 
   return (
-    <div className='flex flex-1 flex-col'>
+    <div className='flex flex-1 flex-col h-full min-h-0 overflow-hidden'>
       {/* Header */}
-      <div className='flex items-center gap-3 border-b border-border/60 bg-background px-5 py-3'>
+      <div className='flex items-center gap-3 border-b border-border/60 bg-background px-5 py-3 shrink-0'>
         <Avatar className='h-9 w-9'>
           <AvatarImage src={selectedUser.avatar} alt={selectedUser.name} />
           <AvatarFallback className='text-xs'>
@@ -99,7 +99,7 @@ const ChatWindow = ({
       </div>
 
       {/* Body  */}
-      <div className='flex flex-1 flex-col gap-3 overflow-y-auto p-5'>
+      <div className='flex flex-1 flex-col gap-3 overflow-y-auto p-5 min-h-0'>
         <MessageGroup className='flex flex-col gap-4'>
           {messages.length === 0 && (
             <p className='py-12 text-center text-sm text-muted-foreground'>
@@ -196,7 +196,7 @@ const ChatWindow = ({
       </div>
 
       {/* Footer */}
-      <div className='flex items-center gap-2 border-t border-border/60 bg-background px-4 py-3'>
+      <div className='flex items-center gap-2 border-t border-border/60 bg-background px-4 py-3 shrink-0'>
         <Input
           value={text}
           onChange={(e) => setText(e.target.value)}

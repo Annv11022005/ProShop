@@ -7,8 +7,10 @@ export function startReservationCleanupJob() {
     try {
       const expiredOrders = await Order.find({
         isPaid: false,
+        paymentMethod: { $ne: 'COD' },
+        orderStatus: 'PENDING_PAYMENT',
         isCancelled: { $ne: true },
-        reservationExpiresAt: { $lt: new Date() },
+        reservationExpiresAt: { $ne: null, $lt: new Date() },
       });
 
       for (const order of expiredOrders) {

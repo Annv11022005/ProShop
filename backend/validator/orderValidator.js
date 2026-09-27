@@ -68,10 +68,14 @@ export const createOrderSchema = Joi.object({
     'string.empty': 'Shipping address ID is required',
     'any.required': 'Shipping address ID is required',
   }),
-  paymentMethod: Joi.string().trim().required().messages({
-    'string.empty': 'Payment method is required',
-    'any.required': 'Payment method is required',
-  }),
+  paymentMethod: Joi.string()
+    .valid('Paypal', 'PayPal', 'VNPay', 'COD')
+    .required()
+    .messages({
+      'string.empty': 'Payment method is required',
+      'any.only': 'Payment method must be Paypal, VNPay, or COD',
+      'any.required': 'Payment method is required',
+    }),
   couponCode: Joi.string().allow(null, '').optional(),
 });
 
@@ -80,5 +84,18 @@ export const payOrderSchema = Joi.object({
   paymentResult: paymentResultSchema.required().messages({
     'any.required': 'Payment result is required',
   }),
+});
+
+// Validate body when updating order status
+export const updateOrderStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid('PENDING_PAYMENT', 'CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED')
+    .required()
+    .messages({
+      'string.empty': 'Order status is required',
+      'any.only': 'Invalid order status',
+      'any.required': 'Order status is required',
+    }),
+  note: Joi.string().allow('', null).optional(),
 });
 

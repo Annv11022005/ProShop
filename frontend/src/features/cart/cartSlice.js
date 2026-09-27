@@ -29,12 +29,15 @@ const cartSlice = createSlice({
       } else {
         state.cartItems = [...state.cartItems, item];
       }
+      state.coupon = null;
+      state.discount = 0;
       return updateCart(state);
     },
     removeFromCart: (state, action) => {
       const { id, variantId } = action.payload;
       state.cartItems = state.cartItems.filter((x) => !(x._id === id && x.variantId === variantId));
-
+      state.coupon = null;
+      state.discount = 0;
       return updateCart(state);
     },
 

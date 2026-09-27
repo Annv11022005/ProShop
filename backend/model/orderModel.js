@@ -74,9 +74,31 @@ const orderSchema = new mongoose.Schema(
     deliveredAt: { type: Date },
     isCancelled: { type: Boolean, required: true, default: false },
     cancelledAt: { type: Date },
+    orderStatus: {
+      type: String,
+      enum: ['PENDING_PAYMENT', 'CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED'],
+      default: 'PENDING_PAYMENT',
+    },
+    confirmedAt: { type: Date },
+    shippedAt: { type: Date },
+    statusHistory: [
+      {
+        status: { type: String, required: true },
+        updatedAt: { type: Date, default: Date.now },
+        note: { type: String },
+        updatedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      },
+    ],
     reservationExpiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 30 * 60 * 1000),
+      default: function () {
+        return this.paymentMethod === 'COD'
+          ? null
+          : new Date(Date.now() + 30 * 60 * 1000);
+      },
     },
     couponId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -90,6 +112,7 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.index({ isPaid: 1, reservationExpiresAt: 1 });
+orderSchema.index({ orderStatus: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
 

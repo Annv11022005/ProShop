@@ -15,7 +15,7 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
   );
 
   return (
-    <div className='flex h-full w-80 shrink-0 flex-col border-r border-border/60'>
+    <div className='flex h-full w-80 shrink-0 flex-col border-r border-border/60 min-h-0'>
       {/* Header */}
       <div className='flex items-center gap-2 border-b border-border/60 px-4 py-3'>
         <h2 className='text-base font-semibold'>Message</h2>
@@ -36,7 +36,7 @@ const ChatSidebar = ({ users = [], selectedUserId, onSelectUser }) => {
       </div>
 
       {/* User list */}
-      <div className='flex-1 overflow-y-auto'>
+      <div className='flex-1 overflow-y-auto min-h-0'>
         {filteredUsers.length === 0 && (
           <p className='px-4 py-8 text-center text-sm text-muted-foreground'>
             User Not Found

@@ -35,6 +35,22 @@ const socketMiddleware = (store) => (next) => (action) => {
       queryClient.setQueryData(['message', partnerId], (oldMessages = []) => {
         const exists = oldMessages.some((m) => m._id === message._id);
         if (exists) return oldMessages;
+
+        // Nếu đây là tin nhắn do chính user gửi, thay thế tin nhắn tạm (temp message)
+        if (message.senderId === currentUserId) {
+          const tempIndex = oldMessages.findIndex(
+            (m) =>
+              typeof m._id === 'string' &&
+              m._id.startsWith('chat-') &&
+              m.text === message.text,
+          );
+          if (tempIndex !== -1) {
+            const updated = [...oldMessages];
+            updated[tempIndex] = message;
+            return updated;
+          }
+        }
+
         return [...oldMessages, message];
       });
 

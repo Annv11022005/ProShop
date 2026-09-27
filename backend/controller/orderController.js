@@ -50,6 +50,18 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     throw new Error('Coupon has reached its usage limit');
   }
 
+  if (couponOrder) {
+    const alreadyUsed = await Order.findOne({
+      user: req.user._id,
+      couponId: couponOrder._id,
+      isCancelled: { $ne: true },
+    });
+    if (alreadyUsed) {
+      res.status(400);
+      throw new Error('You have already used this coupon code.');
+    }
+  }
+
   let discount = 0;
 
   if (!selectedAddress) {
@@ -102,14 +114,26 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         );
       }
 
-      const stockResult = await Product.findOneAndUpdate(
-        {
-          _id: matchedProduct._id,
-          'variants._id': selectedVariant._id,
-        },
-        { $inc: { 'variants.$.reserved': qty } },
-        { session, new: true },
-      );
+      let stockResult;
+      if (paymentMethod === 'COD') {
+        stockResult = await Product.findOneAndUpdate(
+          {
+            _id: matchedProduct._id,
+            'variants._id': selectedVariant._id,
+          },
+          { $inc: { 'variants.$.countInStock': -qty } },
+          { session, new: true },
+        );
+      } else {
+        stockResult = await Product.findOneAndUpdate(
+          {
+            _id: matchedProduct._id,
+            'variants._id': selectedVariant._id,
+          },
+          { $inc: { 'variants.$.reserved': qty } },
+          { session, new: true },
+        );
+      }
 
       if (!stockResult) {
         throw new Error(
@@ -173,6 +197,8 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         roundedDiscount,
     ).toFixed(2);
 
+    const isCOD = paymentMethod === 'COD';
+
     const order = new Order({
       orderItems: orderItemsData,
       user: req.user._id,
@@ -192,6 +218,19 @@ export const addOrderItems = asyncHandler(async (req, res) => {
       discount: roundedDiscount,
       totalPrice,
       couponId: couponOrder ? couponOrder._id : null,
+      orderStatus: isCOD ? 'CONFIRMED' : 'PENDING_PAYMENT',
+      confirmedAt: isCOD ? new Date() : undefined,
+      reservationExpiresAt: isCOD ? null : new Date(Date.now() + 30 * 60 * 1000),
+      statusHistory: [
+        {
+          status: isCOD ? 'CONFIRMED' : 'PENDING_PAYMENT',
+          note: isCOD
+            ? 'Order placed with Cash on Delivery (COD)'
+            : 'Order created, awaiting payment',
+          updatedAt: new Date(),
+          updatedBy: req.user._id,
+        },
+      ],
     });
 
     const createOrder = await order.save({ session });
@@ -232,10 +271,19 @@ export const getOrderByID = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Update order to delivered
-// PUT /api/orders/:id/deliver
+const VALID_TRANSITIONS = {
+  PENDING_PAYMENT: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['SHIPPING', 'CANCELLED'],
+  SHIPPING: ['DELIVERED', 'CANCELLED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+// @desc Update order status
+// PUT /api/orders/:id/status
 // @access private/Admin
-export const updateOrderToDelivered = asyncHandler(async (req, res) => {
+export const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { status, note } = req.body;
   const order = await Order.findById(req.params.id);
 
   if (!order) {
@@ -243,62 +291,142 @@ export const updateOrderToDelivered = asyncHandler(async (req, res) => {
     throw new Error('Order not found');
   }
 
-  if (order.isDelivered) {
+  const currentStatus =
+    order.orderStatus ||
+    (order.isDelivered
+      ? 'DELIVERED'
+      : order.isCancelled
+        ? 'CANCELLED'
+        : order.isPaid
+          ? 'CONFIRMED'
+          : 'PENDING_PAYMENT');
+
+  if (currentStatus === status) {
+    return res.status(200).json(order);
+  }
+
+  const allowedTransitions = VALID_TRANSITIONS[currentStatus] || [];
+  if (!allowedTransitions.includes(status)) {
     res.status(400);
-    throw new Error('Order is delivered');
+    throw new Error(`Cannot change status from ${currentStatus} to ${status}`);
+  }
+
+  if (status === 'CANCELLED') {
+    const cancelledOrder = await cancelOrderPayment(
+      order._id,
+      note || 'Cancelled by Admin',
+      req.user?._id,
+    );
+    return res.status(200).json(cancelledOrder);
   }
 
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    for (const item of order.orderItems) {
-      const stockResult = await Product.updateOne(
-        { _id: item.product, 'variants._id': item.variantId },
-        {
-          $inc: {
-            qtySold: item.qty,
-          },
-        },
-        { session },
-      );
+    if (status === 'CONFIRMED') {
+      order.confirmedAt = Date.now();
+    } else if (status === 'SHIPPING') {
+      order.shippedAt = Date.now();
+    } else if (status === 'DELIVERED') {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
 
-      if (stockResult.matchedCount === 0) {
-        throw new Error(
-          `No product found to deduct from inventory: ${item.name}`,
+      // If Cash on Delivery and not paid yet, mark paid upon successful delivery
+      if (order.paymentMethod === 'COD' && !order.isPaid) {
+        order.isPaid = true;
+        order.paidAt = Date.now();
+        order.paymentResult = {
+          id: `COD-${Date.now()}`,
+          status: 'COMPLETED',
+          update_time: new Date().toISOString(),
+        };
+      }
+
+      // Update qtySold
+      for (const item of order.orderItems) {
+        const stockResult = await Product.updateOne(
+          { _id: item.product, 'variants._id': item.variantId },
+          {
+            $inc: {
+              qtySold: item.qty,
+            },
+          },
+          { session },
         );
+
+        if (stockResult.matchedCount === 0) {
+          throw new Error(
+            `No product found to update sales quantity: ${item.name}`,
+          );
+        }
       }
     }
 
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
+    order.orderStatus = status;
+    order.statusHistory.push({
+      status,
+      note: note || `Order status updated to ${status}`,
+      updatedAt: new Date(),
+      updatedBy: req.user?._id,
+    });
 
-    const updateOrder = await order.save({ session });
+    const updatedOrder = await order.save({ session });
     await session.commitTransaction();
-    res.status(200).json(updateOrder);
+
+    // Send notification to user
+    try {
+      const statusNotificationMap = {
+        CONFIRMED: {
+          type: 'ORDER_CONFIRMED',
+          title: 'Order Confirmed',
+          message: 'Your order has been confirmed and is being prepared.',
+        },
+        SHIPPING: {
+          type: 'ORDER_SHIPPING',
+          title: 'Order Shipped',
+          message: 'Your order is currently on its way to you!',
+        },
+        DELIVERED: {
+          type: 'DELIVERED',
+          title: 'Order Delivered',
+          message: 'Your order has been successfully delivered!',
+        },
+      };
+
+      const notif = statusNotificationMap[status];
+      if (notif) {
+        const newNotification = new Notification({
+          recipient: order.user,
+          sender: req.user?._id || null,
+          type: notif.type,
+          title: notif.title,
+          message: notif.message,
+          relatedId: order._id,
+          relatedModel: 'Order',
+        });
+
+        await newNotification.save();
+        sendToUser(order.user.toString(), 'newNotification', newNotification);
+      }
+    } catch (err) {
+      console.error('Failed to send status notification:', err);
+    }
+
+    res.status(200).json(updatedOrder);
   } catch (err) {
     await session.abortTransaction();
     throw err;
   } finally {
     session.endSession();
   }
+});
 
-  try {
-    const newNotification = new Notification({
-      recipient: order.user,
-      sender: null,
-      type: 'DELIVERED',
-      title: 'Order notification',
-      message: 'Your order has been successfully delivered!',
-      relatedId: order._id,
-      relatedModel: 'Order',
-    });
-
-    await newNotification.save();
-    sendToUser(order.user.toString(), 'newNotification', newNotification);
-  } catch (err) {
-
-    console.error('Failed to send delivery notification:', err);
-  }
+// @desc Update order to delivered (Legacy backwards-compatible endpoint)
+// PUT /api/orders/:id/deliver
+// @access private/Admin
+export const updateOrderToDelivered = asyncHandler(async (req, res) => {
+  req.body = { status: 'DELIVERED', note: 'Marked as delivered' };
+  return updateOrderStatus(req, res);
 });
 
 // @desc get all orders
@@ -316,10 +444,6 @@ export const processOrderPayment = async (orderId, paymentResultData) => {
   if (!order) {
     throw new Error('Order not found');
   }
-
-  // if (order.isPaid) {
-  //   throw new Error('The order has already been paid for.');
-  // }
 
   if (order.isPaid) {
     return order;
@@ -350,6 +474,13 @@ export const processOrderPayment = async (orderId, paymentResultData) => {
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = paymentResultData;
+    order.orderStatus = 'CONFIRMED';
+    order.confirmedAt = Date.now();
+    order.statusHistory.push({
+      status: 'CONFIRMED',
+      note: 'Payment completed successfully',
+      updatedAt: new Date(),
+    });
 
     const updatedOrder = await order.save({ session });
     await session.commitTransaction();
@@ -363,11 +494,15 @@ export const processOrderPayment = async (orderId, paymentResultData) => {
 };
 
 // Hàm giải phóng số lượng giữ chỗ (reserved), hoàn lại useCount của coupon và đánh dấu hủy đơn
-export const cancelOrderPayment = async (orderId) => {
+export const cancelOrderPayment = async (
+  orderId,
+  note = 'Order cancelled',
+  cancelledBy = null,
+) => {
   const order = await Order.findById(orderId);
 
-  if (!order || order.isPaid || order.isCancelled) {
-    return;
+  if (!order || order.isCancelled) {
+    return order;
   }
 
   const session = await mongoose.startSession();
@@ -378,11 +513,21 @@ export const cancelOrderPayment = async (orderId) => {
       const targetVariantId = item.variantId || product?.variants[0]?._id;
 
       if (targetVariantId) {
-        await Product.updateOne(
-          { _id: item.product, 'variants._id': targetVariantId },
-          { $inc: { 'variants.$.reserved': -item.qty } },
-          { session },
-        );
+        // If order was already paid or was COD, countInStock was deducted -> restore countInStock
+        if (order.isPaid || order.paymentMethod === 'COD') {
+          await Product.updateOne(
+            { _id: item.product, 'variants._id': targetVariantId },
+            { $inc: { 'variants.$.countInStock': item.qty } },
+            { session },
+          );
+        } else {
+          // Online payment pending: only reserved was incremented -> release reserved
+          await Product.updateOne(
+            { _id: item.product, 'variants._id': targetVariantId },
+            { $inc: { 'variants.$.reserved': -item.qty } },
+            { session },
+          );
+        }
       }
     }
 
@@ -394,8 +539,15 @@ export const cancelOrderPayment = async (orderId) => {
       );
     }
 
+    order.orderStatus = 'CANCELLED';
     order.isCancelled = true;
     order.cancelledAt = new Date();
+    order.statusHistory.push({
+      status: 'CANCELLED',
+      note,
+      updatedAt: new Date(),
+      updatedBy: cancelledBy,
+    });
     const updatedOrder = await order.save({ session });
 
     await session.commitTransaction();

@@ -11,3 +11,9 @@ export async function updateOrderToDelivered(id) {
 
   return res.data;
 }
+
+export async function updateOrderStatus({ id, status, note }) {
+  const res = await axios.put(`/api/v1/orders/${id}/status`, { status, note });
+
+  return res.data;
+}

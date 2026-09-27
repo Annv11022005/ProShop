@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, admin, optionalAuth } from '../middleware/authMiddleware.js';
 import { validateParams } from '../middleware/validateMiddleware.js';
 import { mongoIdParamSchema } from '../validator/commonValidator.js';
 import {
@@ -18,7 +18,7 @@ router.route('/').get(getAllCoupon).post(protect, admin, createCoupon);
 
 router.route('/category').get(getAllCategory);
 
-router.route('/code').get(getCouponByCode);
+router.route('/code').get(optionalAuth, getCouponByCode);
 
 router
   .route('/:id')

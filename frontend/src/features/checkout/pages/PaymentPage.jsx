@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { savePaymentMethod } from '../../cart/cartSlice';
 
@@ -16,7 +16,8 @@ import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
 import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
 
 const PaymentPage = () => {
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const cart = useSelector((state) => state.cart);
+  const [paymentMethod, setPaymentMethod] = useState(cart.paymentMethod || 'Paypal');
   const { currentAddress, isPending } = useGetDefaultAddress();
 
   const dispatch = useDispatch();
@@ -43,30 +44,58 @@ const PaymentPage = () => {
         <FieldSet className='w-full m-3'>
           <FieldGroup>
             <Field>
-              <h2 className='text-lg font-semibold'>Select Method</h2>
+              <h2 className='text-lg font-semibold'>Select Payment Method</h2>
             </Field>
 
             <RadioGroup
               value={paymentMethod}
               onValueChange={(value) => setPaymentMethod(value)}
             >
-              <Field orientation='horizontal'>
+              <Field orientation='horizontal' className='items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer'>
+                <RadioGroupItem
+                  name='paymentMethod'
+                  value='COD'
+                  id='cod'
+                />
+                <FieldContent>
+                  <FieldLabel htmlFor='cod' className='font-semibold cursor-pointer'>
+                    Cash on Delivery (COD)
+                  </FieldLabel>
+                  <p className='text-xs text-muted-foreground'>
+                    Pay with cash directly to the courier when you receive the package.
+                  </p>
+                </FieldContent>
+              </Field>
+
+              <Field orientation='horizontal' className='items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer'>
+                <RadioGroupItem
+                  name='paymentMethod'
+                  value='VNPay'
+                  id='VNPay'
+                />
+                <FieldContent>
+                  <FieldLabel htmlFor='VNPay' className='font-semibold cursor-pointer'>
+                    VNPay (ATM / QR Pay)
+                  </FieldLabel>
+                  <p className='text-xs text-muted-foreground'>
+                    Pay instantly using domestic bank card or VNPay QR code.
+                  </p>
+                </FieldContent>
+              </Field>
+
+              <Field orientation='horizontal' className='items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer'>
                 <RadioGroupItem
                   name='paymentMethod'
                   value='Paypal'
                   id='paypal'
                 />
                 <FieldContent>
-                  <FieldLabel htmlFor='paypal'>
-                    Paypal or Credit Card
+                  <FieldLabel htmlFor='paypal' className='font-semibold cursor-pointer'>
+                    PayPal or Credit Card
                   </FieldLabel>
-                </FieldContent>
-              </Field>
-
-              <Field orientation='horizontal'>
-                <RadioGroupItem name='paymentMethod' value='VNPay' id='VNPay' />
-                <FieldContent>
-                  <FieldLabel htmlFor='VNPay'>VNPay</FieldLabel>
+                  <p className='text-xs text-muted-foreground'>
+                    Safe payment through PayPal, Visa, Mastercard.
+                  </p>
                 </FieldContent>
               </Field>
             </RadioGroup>

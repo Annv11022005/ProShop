@@ -7,6 +7,7 @@ import {
 import { Message } from '@/components/AlertMessage';
 import { formatCurrency } from '@/lib/utils';
 import DashboardSummaryCards from '../../component/DashboardSummaryCards';
+import PendingOrdersActionCard from '../../component/PendingOrdersActionCard';
 import RevenueChart from '../../component/RevenueChart';
 import OrderStatusChart from '../../component/OrderStatusChart';
 import { ChartNetwork, ShieldAlert } from 'lucide-react';
@@ -37,6 +38,9 @@ const DashboardPage = () => {
     <div className='flex flex-col gap-6 p-2'>
       {/* Top KPI Cards */}
       <DashboardSummaryCards summary={summary} />
+
+      {/* Orders Needing Processing Action Box */}
+      <PendingOrdersActionCard actionRequired={summary?.actionRequired} />
 
       {/* Revenue & Order Status Charts */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>

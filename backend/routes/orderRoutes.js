@@ -6,6 +6,7 @@ import {
   getMyOrder,
   getOrderByID,
   getOrders,
+  updateOrderStatus,
   updateOrderToDelivered,
   updateOrderToPaid,
 } from '../controller/orderController.js';
@@ -15,6 +16,7 @@ import { mongoIdParamSchema } from '../validator/commonValidator.js';
 import {
   createOrderSchema,
   payOrderSchema,
+  updateOrderStatusSchema,
 } from '../validator/orderValidator.js';
 import {
   createPayment,
@@ -44,6 +46,15 @@ router
 router
   .route('/:id/deliver')
   .put(validateParams(mongoIdParamSchema), updateOrderToDelivered);
+
+router
+  .route('/:id/status')
+  .put(
+    admin,
+    validateParams(mongoIdParamSchema),
+    validate(updateOrderStatusSchema),
+    updateOrderStatus,
+  );
 
 router
   .route('/:id/vnpay/create')

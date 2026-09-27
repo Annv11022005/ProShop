@@ -93,9 +93,13 @@ const PlaceOrderPage = () => {
 
             <FieldSet className='w-full pb-4 mb-2'>
               <FieldGroup>
-                <Field className='flex flex-row'>
+                <Field className='flex flex-row items-center gap-2'>
                   <FieldTitle className='text-md'>Payment Method:</FieldTitle>
-                  <p>{cart.paymentMethod}</p>
+                  <p className='font-medium'>
+                    {cart.paymentMethod === 'COD'
+                      ? 'Cash on Delivery (COD)'
+                      : cart.paymentMethod}
+                  </p>
                 </Field>
               </FieldGroup>
             </FieldSet>
