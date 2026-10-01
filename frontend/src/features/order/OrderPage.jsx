@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { FileText } from 'lucide-react';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import {
   useGetOrderDetail,
@@ -31,6 +32,8 @@ import OrderStatusBadge, { getEffectiveStatus } from '@/components/OrderStatusBa
 import OrderTimelineStepper from '@/components/OrderTimelineStepper';
 import ReturnStatusCard from '../returns/components/ReturnStatusCard';
 import { useGetReturnByOrder } from '../returns/hooks/useReturns';
+import CancelOrderModal from './components/CancelOrderModal';
+
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
@@ -58,6 +61,7 @@ const OrderPage = () => {
   } = useGetPayPalClientById();
 
   const { userInfo } = useSelector((state) => state.auth);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const { isPending: pendingDeliver, deliverOrder } = useUpdateOrder();
   const { isPending: pendingStatusChange, changeOrderStatus } =
     useUpdateOrderStatus();
@@ -155,13 +159,25 @@ const OrderPage = () => {
   const isCod = order.paymentMethod === 'COD';
 
   return (
-    <Row template='lg:grid-cols-[2fr_1fr]'>
+    <>
+      <Row template='lg:grid-cols-[2fr_1fr]'>
+
       <Col fluid>
         <div className='flex flex-wrap items-center justify-between gap-3 mb-5'>
           <h2 className='text-2xl sm:text-3xl font-semibold text-primary'>
             ORDER <span className='italic font-bold'>#{order._id}</span>
           </h2>
-          <OrderStatusBadge order={order} className='text-sm py-1.5 px-3' />
+          <div className='flex items-center gap-2.5'>
+            <Link
+              to={`/order/${order._id}/invoice`}
+              className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs sm:text-sm font-medium transition-colors shadow-2xs'
+              title='Print / Export PDF Invoice'
+            >
+              <FileText className='w-4 h-4 text-primary' />
+              <span>Xuất hoá đơn / Invoice</span>
+            </Link>
+            <OrderStatusBadge order={order} className='text-sm py-1.5 px-3' />
+          </div>
         </div>
 
         {/* Order Progress Stepper */}
@@ -315,7 +331,7 @@ const OrderPage = () => {
 
           {/* Customer Payment Section */}
           {!order.isPaid && !userInfo?.isAdmin && !order.isCancelled ? (
-            <CardFooter>
+            <CardFooter className='flex flex-col gap-3'>
               {isCod ? (
                 <div className='w-full text-center p-3 rounded-lg bg-muted/70 text-xs text-muted-foreground font-medium'>
                   Cash on Delivery selected. No online payment required.
@@ -342,12 +358,34 @@ const OrderPage = () => {
                   )}
                 </div>
               )}
+
+              {/* Customer Cancel Order Button for Pending Payment */}
+              {(currentStatus === 'PENDING_PAYMENT' || currentStatus === 'CONFIRMED') && (
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='w-full text-destructive border-destructive/30 hover:bg-destructive/10 font-medium'
+                  onClick={() => setCancelModalOpen(true)}
+                >
+                  Cancel Order
+                </Button>
+              )}
             </CardFooter>
           ) : order.isPaid && !userInfo?.isAdmin ? (
-            <CardFooter>
+            <CardFooter className='flex flex-col gap-3'>
               <p className='text-sm font-medium text-emerald-600 dark:text-emerald-400 text-center w-full'>
                 The order has been successfully paid for.
               </p>
+              {!order.isCancelled && (currentStatus === 'PENDING_PAYMENT' || currentStatus === 'CONFIRMED') && (
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='w-full text-destructive border-destructive/30 hover:bg-destructive/10 font-medium'
+                  onClick={() => setCancelModalOpen(true)}
+                >
+                  Cancel Order
+                </Button>
+              )}
             </CardFooter>
           ) : order.isCancelled && !userInfo?.isAdmin ? (
             <CardFooter>
@@ -356,6 +394,7 @@ const OrderPage = () => {
               </p>
             </CardFooter>
           ) : null}
+
 
           {/* Admin Management Actions */}
           {userInfo?.isAdmin && (
@@ -441,7 +480,16 @@ const OrderPage = () => {
         </Card>
       </Col>
     </Row>
+
+    <CancelOrderModal
+      orderId={orderId}
+      open={cancelModalOpen}
+      onOpenChange={setCancelModalOpen}
+      onSuccess={refetch}
+    />
+  </>
   );
 };
 
 export default OrderPage;
+

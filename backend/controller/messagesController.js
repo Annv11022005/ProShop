@@ -129,3 +129,34 @@ export const sendMessage = asyncHandler(async (req, res) => {
   res.status(201).json(newMessage);
 });
 
+// @desc Mark messages as read
+// PUT /api/v1/messages/read/:senderId
+// private
+export const markMessagesAsRead = asyncHandler(async (req, res) => {
+  const { senderId } = req.params;
+  const myId = req.user._id;
+
+  const result = await Message.updateMany(
+    {
+      senderId: senderId,
+      receiverId: myId,
+      isRead: false,
+    },
+    {
+      $set: { isRead: true },
+    },
+  );
+
+  // Notify sender that their messages have been read
+  sendToUser(senderId, 'messagesRead', {
+    readBy: myId,
+    senderId,
+  });
+
+  res.status(200).json({
+    message: 'Messages marked as read',
+    modifiedCount: result.modifiedCount,
+  });
+});
+
+

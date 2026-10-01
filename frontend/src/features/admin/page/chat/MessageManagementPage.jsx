@@ -3,8 +3,10 @@ import {
   useGetMessages,
   useGetUserChatForAdmin,
   useSendMessage,
+  useMarkMessagesAsRead,
 } from '@/features/chat/hooks/useChat';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 
 import { toast } from 'sonner';
@@ -35,6 +37,14 @@ const MessageManagementPage = () => {
   );
 
   const { sendedMessage } = useSendMessage();
+  const { markAsRead } = useMarkMessagesAsRead();
+
+  useEffect(() => {
+    if (selectedUser?._id) {
+      markAsRead(selectedUser._id);
+    }
+  }, [selectedUser?._id, HistoryMessages.length, markAsRead]);
+
 
   function handleSelectUser(user) {
     if (selectedUser?._id && typingTimeoutRef.current) {

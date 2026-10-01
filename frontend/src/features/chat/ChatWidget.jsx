@@ -4,7 +4,9 @@ import {
   useGetIdSeller,
   useGetMessages,
   useSendMessage,
+  useMarkMessagesAsRead,
 } from './hooks/useChat';
+
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bubble, BubbleContent } from '@/components/ui/bubble';
@@ -55,6 +57,14 @@ const ChatWidget = () => {
     HistoryMessages = [],
   } = useGetMessages(activeSellerId);
   const { sendedMessage } = useSendMessage();
+  const { markAsRead } = useMarkMessagesAsRead();
+
+  // Mark incoming messages as read when chat is open
+  useEffect(() => {
+    if (isOpen && activeSellerId) {
+      markAsRead(activeSellerId);
+    }
+  }, [isOpen, activeSellerId, HistoryMessages.length, markAsRead]);
 
   // Create preview URL when imageFile changes
   useEffect(() => {
@@ -66,6 +76,7 @@ const ChatWidget = () => {
       setPreviewUrl(null);
     }
   }, [imageFile]);
+
 
   useEffect(() => {
     if (isOpen) {

@@ -7,7 +7,9 @@ import {
   getPaypalClientId,
   getMyOrders,
   createVnpayPayment,
+  cancelOrder,
 } from '../api/apiOrders';
+
 
 export function useCreateOrder() {
   const {
@@ -98,3 +100,21 @@ export function useCreateVnpayPayment() {
 
   return { isPending, error, createPayment };
 }
+
+export function useCancelOrder() {
+  const queryClient = useQueryClient();
+  const {
+    isPending,
+    error,
+    mutateAsync: cancelOrderItem,
+  } = useMutation({
+    mutationFn: ({ id, reason, note }) => cancelOrder({ id, reason, note }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['orderHistory'] });
+    },
+  });
+
+  return { isPending, error, cancelOrderItem };
+}
+

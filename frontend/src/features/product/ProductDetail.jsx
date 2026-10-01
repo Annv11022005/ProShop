@@ -11,6 +11,10 @@ import {
   ShieldCheck,
   ShoppingBag,
   Truck,
+  Plus,
+  Minus,
+  Zap,
+  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Row from '@/components/ui/Row';
@@ -23,7 +27,14 @@ import { toast } from 'sonner';
 import FormReview from './components/FormReview.jsx';
 import ProductGallery from './components/ProductGallery.jsx';
 import ProductPrice from './components/ProductPrice.jsx';
-import { getErrorMessage } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
+import {
+  useGetWishlist,
+  useAddToWishlist,
+  useRemoveFromWishlist,
+} from '@/features/authentication/hooks/useWishlist';
+import { useGetDefaultAddress } from '@/features/address/hooks/useAddress';
+
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -32,7 +43,7 @@ const ProductDetail = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const qty = 1;
+  const [qty, setQty] = useState(1);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -40,9 +51,33 @@ const ProductDetail = () => {
   const [comment, setComment] = useState('');
 
   const { userInfo } = useSelector((state) => state.auth);
+  const { currentAddress } = useGetDefaultAddress();
+
+  const { wishlist } = useGetWishlist();
+
+  const { addToWishlist } = useAddToWishlist();
+  const { removeFromWishlist } = useRemoveFromWishlist();
+  const isInWishlist = wishlist?.some((item) => item._id === product?._id);
+
+  const handleToggleWishlist = () => {
+    if (!userInfo) {
+      toast.error('Please sign in to add to wishlist', {
+        position: 'top-center',
+      });
+      return;
+    }
+    if (isInWishlist) {
+      removeFromWishlist(product._id);
+      toast.success('Removed from wishlist', { position: 'top-center' });
+    } else {
+      addToWishlist(product._id);
+      toast.success('Added to wishlist', { position: 'top-center' });
+    }
+  };
+
 
   const selectedVariant = product?.variants?.[selectedVariantIndex] || null;
-  const countInStock = selectedVariant?.countInStock ?? product?.countInStock;
+  const countInStock = selectedVariant?.countInStock ?? product?.countInStock ?? 0;
 
   const galleryImages = useMemo(() => {
     const productImages = (product?.images || []).map((img) => ({
@@ -65,7 +100,7 @@ const ProductDetail = () => {
     );
   }, [product]);
 
-  function addToCartHandler() {
+  function addToCartHandler(shouldNavigate = true) {
     dispatch(
       addToCart({
         ...product,
@@ -79,8 +114,30 @@ const ProductDetail = () => {
       }),
     );
 
-    navigate('/cart');
+    if (shouldNavigate) {
+      navigate('/cart');
+    }
   }
+
+  function buyNowHandler() {
+    if (!userInfo) {
+      toast.error('Please sign in to proceed with purchase', {
+        position: 'top-center',
+      });
+      navigate(`/login?redirect=/product/${slug}`);
+      return;
+    }
+
+    addToCartHandler(false);
+
+    if (currentAddress) {
+      navigate('/payment');
+    } else {
+      navigate('/shipping', { state: { action: 'create' } });
+    }
+  }
+
+
 
   async function createReviewHandler(e) {
     e.preventDefault();
@@ -112,6 +169,12 @@ const ProductDetail = () => {
   const handlerSelectVariant = (index) => {
     setSelectedVariantIndex(index);
 
+    const targetVariant = product.variants?.[index];
+    const targetStock = targetVariant?.countInStock ?? 0;
+    if (qty > targetStock && targetStock > 0) {
+      setQty(1);
+    }
+
     // tìm ảnh đầu tiên trong gallery thuộc variant này
     const imageIndex = galleryImages.findIndex(
       (img) => img.variantIndex === index,
@@ -129,12 +192,29 @@ const ProductDetail = () => {
         <Message>{getErrorMessage(error)}</Message>
       ) : (
         <>
-          <Link to='/'>
-            <Button>
-              <ChevronLeft />
-              Go Back
-            </Button>
-          </Link>
+          <div className='flex items-center justify-between gap-4 mb-4 flex-wrap'>
+            <Link to='/'>
+              <Button variant='outline' size='sm' className='gap-1.5'>
+                <ChevronLeft size={16} />
+                Back to Products
+              </Button>
+            </Link>
+
+            {/* Breadcrumb Navigation */}
+            <div className='flex items-center gap-2 text-xs sm:text-sm text-muted-foreground'>
+              <Link to='/' className='hover:text-primary transition-colors'>
+                Home
+              </Link>
+              <span>/</span>
+              <span className='capitalize font-medium text-foreground/80'>
+                {product.category || 'Catalog'}
+              </span>
+              <span>/</span>
+              <span className='text-primary font-semibold truncate max-w-[180px] sm:max-w-none'>
+                {product.name}
+              </span>
+            </div>
+          </div>
 
           <Row template='lg:grid-cols-[0.75fr_1fr]' className='gap-8'>
             <Col fluid className='my-auto'>
@@ -190,21 +270,99 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              <div className='flex justify-between gap-5 '>
-                <p>Status:</p>
-                <p>{countInStock > 0 ? 'In Stock' : 'Out Of Stock'}</p>
-                <p>({countInStock})</p>
+              {/* Quantity Selector */}
+              <div className='flex items-center justify-between w-full py-2.5 border-y border-border/60'>
+                <span className='text-sm font-medium text-foreground'>
+                  Quantity:
+                </span>
+                <div className='flex items-center gap-3'>
+                  <div className='flex items-center border border-border rounded-lg overflow-hidden bg-background'>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8 rounded-none hover:bg-muted'
+                      disabled={qty <= 1 || countInStock === 0}
+                      onClick={() => setQty((prev) => Math.max(1, prev - 1))}
+                    >
+                      <Minus className='h-3.5 w-3.5' />
+                    </Button>
+                    <span className='px-3 min-w-[2.5rem] text-center font-semibold text-sm'>
+                      {qty}
+                    </span>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8 rounded-none hover:bg-muted'
+                      disabled={qty >= countInStock || countInStock === 0}
+                      onClick={() =>
+                        setQty((prev) => Math.min(countInStock, prev + 1))
+                      }
+                    >
+                      <Plus className='h-3.5 w-3.5' />
+                    </Button>
+                  </div>
+                  <span className='text-xs text-muted-foreground'>
+                    {countInStock > 0 ? (
+                      <span className='text-emerald-600 dark:text-emerald-400 font-medium'>
+                        In Stock ({countInStock})
+                      </span>
+                    ) : (
+                      <span className='text-rose-500 font-medium'>Out of Stock</span>
+                    )}
+                  </span>
+                </div>
               </div>
 
-              <Button
-                size='lg'
-                disabled={countInStock == 0}
-                className='w-full rounded-lg mt-auto gap-7'
-                onClick={addToCartHandler}
-              >
-                <ShoppingBag size={16} />
-                Add To Cart
-              </Button>
+              {/* Action Buttons: Add To Cart, Buy Now, Wishlist */}
+              <div className='flex items-center gap-2.5 w-full mt-auto pt-2'>
+                <Button
+                  size='lg'
+                  variant='outline'
+                  disabled={countInStock === 0}
+                  className='flex-1 rounded-lg gap-2 font-semibold border-2 border-primary text-primary hover:bg-primary/5 transition-all'
+                  onClick={() => addToCartHandler(true)}
+                >
+                  <ShoppingBag size={18} />
+                  Add To Cart
+                </Button>
+
+                <Button
+                  size='lg'
+                  disabled={countInStock === 0}
+                  className='flex-1 rounded-lg gap-2 font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all'
+                  onClick={buyNowHandler}
+                >
+                  <Zap size={18} />
+                  Buy Now
+                </Button>
+
+                <Button
+                  size='lg'
+                  variant='outline'
+                  type='button'
+                  className={cn(
+                    'px-3.5 rounded-lg border-border hover:bg-muted transition-colors',
+                    isInWishlist
+                      ? 'bg-muted/80 text-primary border-primary/40'
+                      : 'text-muted-foreground hover:text-primary',
+                  )}
+                  onClick={handleToggleWishlist}
+                  aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                  title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                  <Heart
+                    size={20}
+                    fill={isInWishlist ? 'currentColor' : 'none'}
+                    className={
+                      isInWishlist ? 'text-primary' : 'text-muted-foreground'
+                    }
+                  />
+                </Button>
+              </div>
+
+
 
               <div className='grid grid-cols-3 gap-2 sm:gap-3 w-full text-primary font-normal text-xs sm:text-sm'>
                 <div className='flex items-center justify-center flex-col gap-1 border-muted-foreground/40 border border-dashed rounded-lg py-2.5 px-1 min-h-14 text-center'>

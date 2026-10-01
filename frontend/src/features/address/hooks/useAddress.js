@@ -4,9 +4,11 @@ import {
   deleteAddress,
   getAllAddress,
   getDefaultAddress,
+  getSellerAddress,
   updateAddress,
   updateDefaultAddress,
 } from '../api/apiAddress';
+
 
 export function useGetAllAddress() {
   const {
@@ -136,3 +138,20 @@ export function useDeleteAddress() {
     deletedAddress,
   };
 }
+
+export function useGetSellerAddress() {
+  const {
+    isPending,
+    error,
+    refetch,
+    data: sellerAddress,
+  } = useQuery({
+    queryKey: ['address', 'seller'],
+    queryFn: () => getSellerAddress(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return { isPending, error, sellerAddress, refetch };
+}
+

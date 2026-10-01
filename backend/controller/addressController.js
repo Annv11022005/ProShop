@@ -1,5 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Address from '../model/addressModel.js';
+import User from '../model/userModel.js';
+
 
 // @desc get all Address
 // GET /api/address
@@ -139,3 +141,37 @@ export const deleteAddress = asyncHandler(async (req, res) => {
     throw new Error('Resource not found');
   }
 });
+
+// @desc get seller / store address (from admin)
+// GET /api/v1/address/seller
+export const getSellerAddress = asyncHandler(async (req, res) => {
+  const adminUser = await User.findOne({ isAdmin: true }).select('name email');
+  if (!adminUser) {
+    return res.status(200).json(null);
+  }
+
+  // Find admin's default address or first available address
+  let address = await Address.findOne({
+    user: adminUser._id,
+    isDefault: true,
+  });
+
+  if (!address) {
+    address = await Address.findOne({ user: adminUser._id });
+  }
+
+  if (address) {
+    return res.status(200).json({
+      name: address.name || adminUser.name || 'ProShop Store',
+      phone: address.phone || '',
+      address: address.address,
+      city: address.city,
+      postalCode: address.postalCode,
+      country: address.country,
+      email: adminUser.email,
+    });
+  }
+
+  res.status(200).json(null);
+});
+

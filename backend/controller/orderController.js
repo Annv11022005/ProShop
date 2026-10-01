@@ -572,3 +572,66 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   });
   res.status(200).json(updatedOrder);
 });
+
+// @desc Customer cancels their own order
+// PUT /api/orders/:id/cancel
+// @access private (Customer owner)
+export const cancelMyOrder = asyncHandler(async (req, res) => {
+  const { reason, note } = req.body;
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+
+  // Check ownership
+  if (order.user.toString() !== req.user._id.toString()) {
+    res.status(403);
+    throw new Error('Not authorized to cancel this order');
+  }
+
+  if (order.isCancelled || order.orderStatus === 'CANCELLED') {
+    res.status(400);
+    throw new Error('This order has already been cancelled');
+  }
+
+  // Only allow cancellation when order is in PENDING_PAYMENT or CONFIRMED
+  const cancellableStatuses = ['PENDING_PAYMENT', 'CONFIRMED'];
+  if (!cancellableStatuses.includes(order.orderStatus)) {
+    res.status(400);
+    throw new Error(
+      `Cannot cancel order with status ${order.orderStatus}. Orders can only be cancelled before shipping.`,
+    );
+  }
+
+  const cancelNote = reason
+    ? `Customer cancelled: ${reason}${note ? ` (${note})` : ''}`
+    : note || 'Customer cancelled';
+
+  const updatedOrder = await cancelOrderPayment(
+    order._id,
+    cancelNote,
+    req.user._id,
+  );
+
+  // Send notification to customer
+  try {
+    const newNotification = new Notification({
+      recipient: order.user,
+      sender: req.user._id,
+      type: 'ORDER_CANCELLED',
+      title: 'Order Cancelled',
+      message: `Your order #${order._id.toString().slice(-6)} has been cancelled successfully.`,
+      relatedId: order._id,
+      relatedModel: 'Order',
+    });
+    await newNotification.save();
+    sendToUser(order.user.toString(), 'newNotification', newNotification);
+  } catch (err) {
+    console.error('Failed to send cancel notification:', err);
+  }
+
+  res.status(200).json(updatedOrder);
+});
+

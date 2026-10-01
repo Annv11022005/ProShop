@@ -23,3 +23,10 @@ export async function getMessages(userId) {
 
   return res.data;
 }
+
+export async function markMessagesAsRead(senderId) {
+  const res = await axios.put(`/api/v1/messages/read/${senderId}`);
+
+  return res.data;
+}
+

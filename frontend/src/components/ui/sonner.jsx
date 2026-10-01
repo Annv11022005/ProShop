@@ -3,14 +3,17 @@ import { Toaster as Sonner } from "sonner";
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
 const Toaster = ({
+  position = "top-center",
   ...props
 }) => {
   const { theme = "system" } = useTheme()
 
   return (
     <Sonner
+      position={position}
       theme={theme}
       className="toaster group"
+
       icons={{
         success: (
           <CircleCheckIcon className="size-4" />

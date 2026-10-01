@@ -3,6 +3,7 @@ const router = express.Router();
 
 import {
   addOrderItems,
+  cancelMyOrder,
   getMyOrder,
   getOrderByID,
   getOrders,
@@ -14,10 +15,12 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 import { validate, validateParams } from '../middleware/validateMiddleware.js';
 import { mongoIdParamSchema } from '../validator/commonValidator.js';
 import {
+  cancelOrderSchema,
   createOrderSchema,
   payOrderSchema,
   updateOrderStatusSchema,
 } from '../validator/orderValidator.js';
+
 import {
   createPayment,
   VNPayCallback,
@@ -46,6 +49,14 @@ router
 router
   .route('/:id/deliver')
   .put(validateParams(mongoIdParamSchema), updateOrderToDelivered);
+
+router
+  .route('/:id/cancel')
+  .put(
+    validateParams(mongoIdParamSchema),
+    validate(cancelOrderSchema),
+    cancelMyOrder,
+  );
 
 router
   .route('/:id/status')

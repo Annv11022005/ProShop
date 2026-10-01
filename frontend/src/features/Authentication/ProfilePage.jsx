@@ -30,6 +30,7 @@ import {
   Heart,
   BellRing,
   CircleX,
+  RotateCcw,
 } from 'lucide-react';
 import { Message } from '@/components/AlertMessage';
 import {
@@ -52,13 +53,16 @@ import { useGetWishlist } from './hooks/useWishlist';
 import Product from '@/components/ui/Product';
 import Notification from './Notification';
 import { useCountUnreadNotification } from './hooks/useNotifications';
+import MyReturns from '../returns/components/MyReturns';
 
 const navTabs = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'wishlist', label: 'Wishlist', icon: Heart },
   { id: 'orders', label: 'Orders', icon: Package },
+  { id: 'returns', label: 'Returns & Refunds', icon: RotateCcw },
   { id: 'notifications', label: 'Notifications', icon: BellRing },
 ];
+
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -557,8 +561,11 @@ const ProfilePage = () => {
           </div>
         )}
 
+        {activeTab === 'returns' && <MyReturns />}
+
         {activeTab === 'notifications' && <Notification />}
       </Col>
+
     </Row>
   );
 };

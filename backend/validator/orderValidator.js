@@ -99,3 +99,13 @@ export const updateOrderStatusSchema = Joi.object({
   note: Joi.string().allow('', null).optional(),
 });
 
+// Validate body when customer cancels order
+export const cancelOrderSchema = Joi.object({
+  reason: Joi.string().trim().required().messages({
+    'string.empty': 'Cancellation reason is required',
+    'any.required': 'Cancellation reason is required',
+  }),
+  note: Joi.string().allow('', null).optional(),
+});
+
+

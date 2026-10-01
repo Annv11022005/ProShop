@@ -4,6 +4,7 @@ import {
   getChatUser,
   getMessages,
   getUserSeller,
+  markMessagesAsRead,
   sendMessage,
 } from '../controller/messagesController.js';
 import { upload } from '../middleware/uploadMiddleware.js';
@@ -20,4 +21,7 @@ router.route('/:id').get(getMessages);
 
 router.route('/send/:id').post(upload.single('image'), sendMessage);
 
+router.route('/read/:senderId').put(markMessagesAsRead);
+
 export default router;
+

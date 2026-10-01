@@ -43,3 +43,14 @@ export async function createVnpayPayment(id) {
 
   return res.data;
 }
+
+export async function cancelOrder({ id, reason, note }) {
+  const res = await axios.put(
+    `/api/v1/orders/${id}/cancel`,
+    { reason, note },
+    { withCredentials: true },
+  );
+
+  return res.data;
+}
+

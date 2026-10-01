@@ -8,10 +8,12 @@ import { useEffect, lazy, Suspense } from 'react';
 import axios from 'axios';
 import { queryClient } from '@/lib/queryClient';
 import { Spinner } from '@/components/ui/spinner';
+import { Toaster } from '@/components/ui/sonner';
 
 import AdminRoutes from '@/components/AdminRoutes';
 import PrivateRoutes from '@/components/PrivateRoutes';
 import AppLayout from '@/components/AppLayout';
+
 
 // Lazy-loaded routes for code-splitting
 const HomeScreen = lazy(() => import('@/screens/HomeScreen'));
@@ -41,6 +43,10 @@ const DashboardScreen = lazy(() => import('@/screens/admin/DashboardScreen'));
 const ForgotPasswordScreen = lazy(() => import('./screens/ForgotPasswordScreen'));
 const ResetPasswordScreen = lazy(() => import('./screens/ResetPasswordScreen'));
 const NotFoundScreen = lazy(() => import('@/screens/NotFoundScreen'));
+const OrderInvoiceScreen = lazy(() => import('@/screens/OrderInvoiceScreen'));
+const StoreAddressPage = lazy(() =>
+  import('@/features/admin/page/address/StoreAddressPage')
+);
 
 const RouteLoadingFallback = () => (
   <div className='flex min-h-[50vh] w-full items-center justify-center py-12'>
@@ -78,7 +84,9 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
         <BrowserRouter>
+          <Toaster position='top-center' />
           <Suspense fallback={<RouteLoadingFallback />}>
+
             <Routes>
               <Route element={<AppLayout />}>
                 <Route path='/' element={<HomeScreen />} />
@@ -99,6 +107,7 @@ const App = () => {
                   <Route path='/payment' element={<PaymentScreen />} />
                   <Route path='/place-order' element={<PlaceOrderScreen />} />
                   <Route path='/order/:id' element={<OrderScreen />} />
+                  <Route path='/order/:id/invoice' element={<OrderInvoiceScreen />} />
                   <Route path='/vnpay-return' element={<VnpaySuccess />} />
                 </Route>
 
@@ -114,6 +123,7 @@ const App = () => {
 
               <Route element={<AdminRoutes />}>
                 <Route path='/admin' element={<DashboardScreen />} />
+                <Route path='/admin/store-address' element={<StoreAddressPage />} />
                 <Route path='/admin/order-list' element={<OrderListScreen />} />
                 <Route path='/admin/return-list' element={<ReturnListScreen />} />
                 <Route

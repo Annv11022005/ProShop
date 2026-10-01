@@ -51,3 +51,10 @@ export async function deleteAddress(id) {
 
   return res.data;
 }
+
+export async function getSellerAddress() {
+  const res = await axios.get('/api/v1/address/seller');
+
+  return res.data;
+}
+

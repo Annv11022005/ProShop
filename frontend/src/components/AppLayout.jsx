@@ -13,9 +13,9 @@ function AppLayout() {
         </div>
       </main>
       <Footer />
-      <Toaster />
     </div>
   );
 }
 
 export default AppLayout;
+

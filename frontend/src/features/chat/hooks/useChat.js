@@ -2,9 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getMessages,
   getUserChat,
+  markMessagesAsRead,
   sendMessage,
   userSeller,
 } from '../api/apiChat';
+
 
 export function useGetIdSeller() {
   const {
@@ -97,4 +99,22 @@ export function useSendMessage() {
 
   return { isPending, error, sendedMessage };
 }
+
+export function useMarkMessagesAsRead() {
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: markAsRead,
+    isPending,
+  } = useMutation({
+    mutationFn: markMessagesAsRead,
+    onSuccess: (_data, senderId) => {
+      queryClient.invalidateQueries({ queryKey: ['message', senderId] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+
+  return { markAsRead, isPending };
+}
+
 
